@@ -1,11 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-// import TextField from '@material-ui/core/TextField';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Navbar from 'react-bootstrap/Navbar';
-// import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
-// import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import './App.css';
 //=============================================================
@@ -13,7 +10,7 @@ import AddToRoadnet from './Screens/AddToRoadnet';
 import AddToRI from './Screens/AddToRI'
 import AddToGasboy from './Screens/AddToGasboy';
 import RemoveFromRI from './Screens/RemoveFromRI';
-// import { FormControl } from '@material-ui/core/FormControl';
+import GoToDev from './Screens/GoToDev';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -110,6 +107,7 @@ class App extends React.Component {
     this.RestoreColumns = this.RestoreColumns.bind(this);
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.AddToGasboy = this.AddToGasboy.bind(this);
+    this.GoToDev = this.GoToDev.bind(this);
   }
   changeSelectedRouterNumber(e) {
     this.setState({
@@ -146,6 +144,7 @@ class App extends React.Component {
             <h6>Add User to Gasboy</h6>
           </li>
         </ul>
+        <Link to="/goToDev">Dev Screen</Link>
       </div>
     )
   }
@@ -179,6 +178,15 @@ class App extends React.Component {
   AddToGasboy() {
     return (
       <AddToGasboy
+        userId={this.state.userId}
+        allOpCo={this.state.allOpCo}
+      />
+    )
+  }
+
+  GoToDev() {
+    return (
+      <GoToDev
         userId={this.state.userId}
         allOpCo={this.state.allOpCo}
       />
@@ -229,8 +237,8 @@ class App extends React.Component {
             <Form inline>
               {
                 this.state.userId ?
-                null :
-                <h5 style={{ color: "blue" }}>Who are you assisting?</h5>
+                  null :
+                  <h5 style={{ color: "blue" }}>Who are you assisting?</h5>
               }
               <FormControl
                 type='text'
@@ -261,6 +269,7 @@ class App extends React.Component {
           <Route path="/removeFromRoutingInterface" component={this.RemoveFromRoutingInterface} />
           <Route path="/restoreColumns" component={this.RestoreColumns} />
           <Route path="/addToGasboy" component={this.AddToGasboy} />
+          <Route path="/goToDev" component={this.GoToDev} />
         </div>
       </Router>
     )

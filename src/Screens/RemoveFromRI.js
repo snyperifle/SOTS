@@ -13,7 +13,7 @@ class RemoveFromRI extends React.Component {
   }
   //=============================================================
   componentDidMount() {
-    if (this.props.userId === '') alert('Please go back and enter User ID')
+    if (this.props.userId === '') alert('Please Enter a User ID')
     axios.get('/getFiles')
       .then(res => {
         let data = res.data.split('\n')

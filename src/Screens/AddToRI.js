@@ -21,7 +21,7 @@ class AddToRI extends React.Component {
   }
 
   componentDidMount() {
-    if(this.props.userId === '') alert('Please Enter a User ID')
+    if (this.props.userId === '') alert('Please Enter a User ID')
     axios.get('/getFiles')
       .then(res => {
         let data = res.data.split('\n')
@@ -38,15 +38,15 @@ class AddToRI extends React.Component {
       file: temp,
       selectedOpCoRouters: this.state.file.filter((item) => item.split(' ')[1].includes(String(this.state.selectedOpCo.num)))
     })
-    axios.post('/updateUserConfigs',{
+    axios.post('/updateUserConfigs', {
       data: this.state.file.join('\n')
     })
-    .then( (response) => {
-      console.log(response.data);
-    })
-    .catch( (error) => {
-      console.log(error);
-    })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
 
 
 
@@ -54,7 +54,9 @@ class AddToRI extends React.Component {
   }
   render() {
     return (
-      <div>
+      <div
+        style={{ margin: 20 }}
+      >
         <h2>Add user to Routing Interface</h2>
         {this.props.userId === '' ? <h2>Please go back and enter User ID</h2> : null}
         {/* //============================================================= */}
@@ -129,7 +131,7 @@ class AddToRI extends React.Component {
             Add User
         </Button>
           : null}
-          {/* //============================================================= */}
+        {/* //============================================================= */}
       </div>
     )
   }
