@@ -9,6 +9,9 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import ListIcon from '@material-ui/icons/List';
+import Divider from '@material-ui/core/Divider'
+import { Container, Col, Row } from 'react-bootstrap';
 import './App.css';
 //=============================================================
 import AddToRoadnet from './Screens/AddToRoadnet';
@@ -106,6 +109,8 @@ class App extends React.Component {
         { num: "348", name: "Sygma Fort Worth" },
       ],
       file: [],
+      drawer: false,
+      page: true,
     };
     this.Home = this.Home.bind(this);
     this.AddToRoadnet = this.AddToRoadnet.bind(this);
@@ -137,7 +142,8 @@ class App extends React.Component {
       <div
         style={{ margin: 20 }}
       >
-        <h3>Roadnet</h3>
+        <h1>Welcome</h1>
+        {/* <h3>Roadnet</h3>
         <ul>
           <li>
             <Link to="/addToRoadnet">Add User to Roadnet</Link>
@@ -161,7 +167,7 @@ class App extends React.Component {
             <h6>Add User to Gasboy</h6>
           </li>
         </ul>
-        <Link to="/goToDev">Dev Screen</Link>
+        <Link to="/goToDev">Dev Screen</Link> */}
       </div>
     )
   }
@@ -216,8 +222,7 @@ class App extends React.Component {
         <div className="App">
           {/* //============================================================= */}
           <Navbar
-            // bg="dark"
-            variant="dark"
+            variant="light"
             expand="lg"
             style={{
               color: 'white',
@@ -225,15 +230,29 @@ class App extends React.Component {
               justifyContent: 'space-between',
             }}
           >
-            <Navbar.Brand>
+            <Navbar.Brand
+            >
               <img
                 src="https://www.sysco.com/dam/jcr:2ed25439-a58a-41d2-8306-dcf3761c7d95/Sysco-Logo-Color1.png"
                 height="60"
                 alt="Logo"
               />
+              <ListIcon
+                style={{
+                  marginLeft: 10,
+                  height: 50
+                }}
+                onClick={() => {
+                  this.setState({
+                    drawer: true,
+                    page: false
+                  })
+                }}
+              />
             </Navbar.Brand>
             <Navbar.Brand
-              href="/">
+              href="/"
+            >
               <h3
                 style={{
                   color: "blue",
@@ -242,21 +261,24 @@ class App extends React.Component {
               >Sysco Outbound Transportation Support Dashboard
               </h3>
             </Navbar.Brand>
-
-            {/* <Nav >
-              <Nav.Link
-                href="/"
-                style={{
-                  color: "blue"
-                }}
-              >Home</Nav.Link>
-            </Nav> */}
             <Form inline>
               {
                 this.state.userId ?
                   null :
-                  <h5 style={{ color: "blue" }}>Who are you assisting?</h5>
+                  <h5 style={{ color: "blue", marginRight: 10 }}>Who are you assisting?</h5>
               }
+              {this.state.userId.length > 0 ?
+                <div
+                  style={{ marginRight: 10 }}
+                >
+                  <h5
+                    style={{ color: 'blue' }}
+                  >
+                    {this.state.userOpCo ? `OpCo: ${this.state.userOpCo.split('-')[0]} ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].name}`
+                      : "User not in Routing Interface"}
+                  </h5>
+                </div>
+                : null}
               <FormControl
                 type='text'
                 placeholder="User ID*"
@@ -274,34 +296,81 @@ class App extends React.Component {
                   })
                 }}
               />
+              <CopyToClipboard
+                text={this.state.userId}
+                style={{ marginLeft: 10 }}
+              >
+                <AddIcon
+                  style={{
+                    backgroundColor: 'black',
+                    color: 'red'
+                  }}
+                  onClick={() => alert("User copied to clipboard")}
+                />
+              </CopyToClipboard>
             </Form>
           </Navbar>
-
           {/* //============================================================= */}
-          {this.state.userId.length > 0 ?
-            <div style={{ marginLeft: 20 }}>
-              <h5>You are assisting user: {this.state.userId} {this.state.userOpCo ? ` - OpCo: ${this.state.userOpCo.split('-')[0]} ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].name}` : "- User not in Routing Interface"}</h5>
-              <CopyToClipboard
-                text={this.state.userId}>
-                <Fab
-                variant="extended"
-                >
-                <AddIcon />
-                  Copy ID to clipboard
-                  </Fab>
-              </CopyToClipboard>
+          {this.state.drawer ?
+            <nav className="side-drawer"
+            >
+              <div style={{ margin: 20 }}>
+                <ListIcon
+                  style={{ alignSelf: 'flex-end' }}
+                  onClick={() => {
+                    this.setState({
+                      drawer: false,
+                      page: true
+                    })
+                  }}
+                />
+                <h3>Roadnet</h3>
+                <ul>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
+                    <Link to="/addToRoadnet">Add User to Roadnet</Link>
+                  </li>
+                </ul>
+                <Divider variant="middle" />
+                <h3>Routing Interface</h3>
+                <ul>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
+                    <Link to="/addToRoutingInterface">Add User to Roadnet Interface</Link>
+                  </li>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
+                    <Link to="/removeFromRoutingInterface">Remove User from Routing Interface</Link>
+                  </li>
+                  <li>
+                    <h6 style={{ color: 'grey' }}>Restore Column Settings</h6>
+                  </li>
+                </ul>
+                <Divider variant="middle" />
+                <h3>GasBoy</h3>
+                <ul>
+                  <li>
+                    <h6 style={{ color: 'grey' }}>Add User to Gasboy</h6>
+                  </li>
+                </ul>
+                <Divider variant="middle" />
+                <h3>Telogis</h3>
+                <Divider variant="middle" />
+                <Link to="/goToDev">Dev Screen</Link>
+              </div>
+            </nav>
+            : null}
+          {/* //============================================================= */}
+          {this.state.page ?
+            <div>
+              <Route exact path="/" component={this.Home} />
+              <Route path="/addToRoadnet" component={this.AddToRoadnet} />
+              <Route path="/addToRoutingInterface" component={this.AddToRoutingInterface} />
+              <Route path="/removeFromRoutingInterface" component={this.RemoveFromRoutingInterface} />
+              <Route path="/restoreColumns" component={this.RestoreColumns} />
+              <Route path="/addToGasboy" component={this.AddToGasboy} />
+              <Route path="/goToDev" component={this.GoToDev} />
             </div>
             : null}
-
-          <Route exact path="/" component={this.Home} />
-          <Route path="/addToRoadnet" component={this.AddToRoadnet} />
-          <Route path="/addToRoutingInterface" component={this.AddToRoutingInterface} />
-          <Route path="/removeFromRoutingInterface" component={this.RemoveFromRoutingInterface} />
-          <Route path="/restoreColumns" component={this.RestoreColumns} />
-          <Route path="/addToGasboy" component={this.AddToGasboy} />
-          <Route path="/goToDev" component={this.GoToDev} />
         </div>
-      </Router>
+      </Router >
     )
   }
 }

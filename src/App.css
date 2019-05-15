@@ -3,6 +3,13 @@
   /* margin:40px */
 }
 
-.Future{
-  color:'grey'
+.side-drawer {
+  height:100%;
+  background:white;
+  box-shadow: 2px 0px 5px black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20%;
+  max-width: 400px;
 }

@@ -13,7 +13,6 @@ class RemoveFromRI extends React.Component {
   }
   //=============================================================
   componentDidMount() {
-    if (this.props.userId === '') alert('Please Enter a User ID')
     axios.get('/getFiles')
       .then(res => {
         let data = res.data.split('\n')
@@ -47,9 +46,9 @@ class RemoveFromRI extends React.Component {
       <div
         style={{ margin: 20 }}
       >
-        <h2>Remove user {this.props.userId !== '' ? this.props.userId : 'null'} from Routing Interface?</h2>
+        <h2>Remove {this.props.userId !== '' ? this.props.userId : 'user'} from Routing Interface{this.props.userId !== '' ? '?' : null}</h2>
         {this.props.userId === '' ?
-          <h2>Please go back and enter User ID</h2>
+          <h2 style={{ color: 'red' }}>Please enter a User ID</h2>
           :
           <Button
             variant="contained"

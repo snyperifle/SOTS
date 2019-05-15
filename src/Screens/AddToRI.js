@@ -21,7 +21,6 @@ class AddToRI extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.userId === '') alert('Please Enter a User ID')
     axios.get('/getFiles')
       .then(res => {
         let data = res.data.split('\n')
@@ -57,8 +56,8 @@ class AddToRI extends React.Component {
       <div
         style={{ margin: 20 }}
       >
-        <h2>Add user to Routing Interface</h2>
-        {this.props.userId === '' ? <h2>Please go back and enter User ID</h2> : null}
+        <h2>Add {this.props.userId ? this.props.userId: 'user'} to Routing Interface</h2>
+        {this.props.userId === '' ? <h2 style={{color:'red'}}>Please enter a User ID</h2> : null}
         {/* //============================================================= */}
         <form
           autoComplete="off"
