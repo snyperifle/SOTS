@@ -1,9 +1,14 @@
 import React from 'react';
+import axios from 'axios';
+//=============================================================
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
+import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 import './App.css';
 //=============================================================
 import AddToRoadnet from './Screens/AddToRoadnet';
@@ -18,6 +23,7 @@ class App extends React.Component {
     this.state = {
       open: false,
       userId: '',
+      userOpCo: '',
       copiedUserId: false,
       selectedRouterNumber: 'Selected Router#',
       allOpCo: [
@@ -99,6 +105,7 @@ class App extends React.Component {
         { num: "338", name: "South Wetern Ontario" },
         { num: "348", name: "Sygma Fort Worth" },
       ],
+      file: [],
     };
     this.Home = this.Home.bind(this);
     this.AddToRoadnet = this.AddToRoadnet.bind(this);
@@ -108,6 +115,16 @@ class App extends React.Component {
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.AddToGasboy = this.AddToGasboy.bind(this);
     this.GoToDev = this.GoToDev.bind(this);
+  }
+
+  componentDidMount() {
+    axios.get('/getFiles')
+      .then(res => {
+        let data = res.data.split('\n')
+        this.setState({
+          file: data
+        })
+      })
   }
   changeSelectedRouterNumber(e) {
     this.setState({
@@ -247,6 +264,14 @@ class App extends React.Component {
                   this.setState({
                     userId: text.target.value
                   })
+                  // console.log(this.state.file)
+                  let temp = this.state.file.filter((item) => {
+                    return item.includes(text.target.value);
+                  })
+                  temp.length > 0 ? temp = temp[0].split(' ')[1] : temp = null
+                  this.setState({
+                    userOpCo: temp
+                  })
                 }}
               />
             </Form>
@@ -255,10 +280,15 @@ class App extends React.Component {
           {/* //============================================================= */}
           {this.state.userId.length > 0 ?
             <div style={{ marginLeft: 20 }}>
-              <h5>You are assisting user: {this.state.userId}</h5>
+              <h5>You are assisting user: {this.state.userId} {this.state.userOpCo ? ` - OpCo: ${this.state.userOpCo.split('-')[0]} ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].name}` : "- User not in Routing Interface"}</h5>
               <CopyToClipboard
                 text={this.state.userId}>
-                <button>Copy ID to clipboard</button>
+                <Fab
+                variant="extended"
+                >
+                <AddIcon />
+                  Copy ID to clipboard
+                  </Fab>
               </CopyToClipboard>
             </div>
             : null}

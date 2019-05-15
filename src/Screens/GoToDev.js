@@ -4,7 +4,7 @@ import React from 'react';
 //   Panel,
 //   Breadcrumbs
 // } from 'react-blur-admin';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 //=============================================================
 class GoToDev extends React.Component {
   constructor(props) {
@@ -16,7 +16,18 @@ class GoToDev extends React.Component {
 
   render() {
     return (
-      <div>Dev Screen</div>
+      <div
+        style={{ margin: 20 }}
+      >
+
+      
+        <h2>
+          Dev Screen
+          </h2>
+
+
+
+      </div>
       // <Page
       //   actionBar={this.renderBreadcrumbs()}
       //   title='About'
