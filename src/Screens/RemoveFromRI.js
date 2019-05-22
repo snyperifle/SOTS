@@ -32,6 +32,7 @@ class RemoveFromRI extends React.Component {
       })
         .then((res) => {
           console.log(res.data);
+          this.props.updateOpCo();
         })
         .catch((err) => {
           console.log(err);

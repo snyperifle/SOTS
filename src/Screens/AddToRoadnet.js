@@ -36,7 +36,7 @@ class AddToRoadnet extends React.Component {
   }
 
   componentDidMount(){
-    if(this.props.userId === '') alert('Please Enter a User ID')
+    // if(this.props.userId === '') alert('Please Enter a User ID')
   }
 
   componentWillReceiveProps(prevProps, prevState) {

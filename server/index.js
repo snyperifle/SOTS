@@ -7,10 +7,11 @@ app.use(bodyParser.json())
 const port = 3999
 app.listen(port, () => console.log(`Express server is running on localhost: ${port}`))
 //=============================================================
-let servers = [1, 2, 3];
+let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', 'ms212rdctx12', 'ms212rdctx14', 'ms212rdctx15', 'ms212rdctx16'];
+let filePath = `//${servers[0]}/routing/UserConfigCalvinTest.txt`;
+
 app.get('/getFiles', (req, res) => {
   let fs = require('fs');
-  let filePath = `../Test/Test${1}/UserConfig.txt`;
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) throw err;
     res.setHeader('Content-Type', 'application/json');
@@ -21,6 +22,11 @@ app.get('/getFiles', (req, res) => {
 app.post('/updateUserConfigs', (req, res) => {
   let fs = require('fs');
   servers.forEach((item) => {
-    fs.writeFile(`../Test/Test${item}/UserConfig.txt`, req.body.data);
+    fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, function (err, res) {
+      if (err) throw err;
+      // res.setHeader('Content-Type', 'application/json');
+      // res.send(JSON.stringify(`Writing to server ${item}`))
+    });
   })
+  res.send('test');
 })

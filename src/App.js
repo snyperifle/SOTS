@@ -6,12 +6,9 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
-import Button from '@material-ui/core/Button';
-import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import ListIcon from '@material-ui/icons/List';
 import Divider from '@material-ui/core/Divider'
-import { Container, Col, Row } from 'react-bootstrap';
 import './App.css';
 //=============================================================
 import AddToRoadnet from './Screens/AddToRoadnet';
@@ -117,57 +114,39 @@ class App extends React.Component {
     this.AddToRoutingInterface = this.AddToRoutingInterface.bind(this);
     this.RemoveFromRoutingInterface = this.RemoveFromRoutingInterface.bind(this);
     this.RestoreColumns = this.RestoreColumns.bind(this);
-    this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.AddToGasboy = this.AddToGasboy.bind(this);
     this.GoToDev = this.GoToDev.bind(this);
-  }
+    //=============================================================
+    this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
+    this.updateOpCo = this.updateOpCo.bind(this);
 
+  }
+//=============================================================
   componentDidMount() {
-    axios.get('/getFiles')
-      .then(res => {
-        let data = res.data.split('\n')
-        this.setState({
-          file: data
-        })
-      })
+    this.updateOpCo();
   }
   changeSelectedRouterNumber(e) {
     this.setState({
       selectedRouterNumber: e,
     })
   }
-
+  updateOpCo(){
+    axios.get('/getFiles')
+    .then(res => {
+      let data = res.data.split('\n')
+      this.setState({
+        file: data
+      })
+      console.log('OpCo state updated');
+    })
+  }
+//=============================================================
   Home() {
     return (
       <div
         style={{ margin: 20 }}
       >
         <h1>Welcome</h1>
-        {/* <h3>Roadnet</h3>
-        <ul>
-          <li>
-            <Link to="/addToRoadnet">Add User to Roadnet</Link>
-          </li>
-        </ul>
-        <h3>Routing Interface</h3>
-        <ul>
-          <li>
-            <Link to="/addToRoutingInterface">Add User to Roadnet Interface</Link>
-          </li>
-          <li>
-            <Link to="/removeFromRoutingInterface">Remove User from Routing Interface</Link>
-          </li>
-        </ul>
-        <h3>Future Features</h3>
-        <ul>
-          <li>
-            <h6 >Restore Column Settings</h6>
-          </li>
-          <li>
-            <h6>Add User to Gasboy</h6>
-          </li>
-        </ul>
-        <Link to="/goToDev">Dev Screen</Link> */}
       </div>
     )
   }
@@ -184,6 +163,7 @@ class App extends React.Component {
       <AddToRI
         userId={this.state.userId}
         allOpCo={this.state.allOpCo}
+        updateOpCo={this.updateOpCo}
       />
     )
   }
@@ -192,6 +172,7 @@ class App extends React.Component {
       <RemoveFromRI
         userId={this.state.userId}
         allOpCo={this.state.allOpCo}
+        updateOpCo={this.updateOpCo}
       />
     )
   }

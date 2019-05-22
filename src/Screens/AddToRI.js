@@ -38,15 +38,15 @@ class AddToRI extends React.Component {
       selectedOpCoRouters: this.state.file.filter((item) => item.split(' ')[1].includes(String(this.state.selectedOpCo.num)))
     })
     axios.post('/updateUserConfigs', {
-      data: this.state.file.join('\n')
+      data: temp.join('\n')
     })
       .then((response) => {
         console.log(response.data);
+        this.props.updateOpCo();
       })
       .catch((error) => {
         console.log(error);
       })
-
 
 
     // alert(`${this.props.userId} added to ${this.state.selectedOpCo.name} as ${this.state.selectedRouterNumber}`)
@@ -56,8 +56,8 @@ class AddToRI extends React.Component {
       <div
         style={{ margin: 20 }}
       >
-        <h2>Add {this.props.userId ? this.props.userId: 'user'} to Routing Interface</h2>
-        {this.props.userId === '' ? <h2 style={{color:'red'}}>Please enter a User ID</h2> : null}
+        <h2>Add {this.props.userId ? this.props.userId : 'user'} to Routing Interface</h2>
+        {this.props.userId === '' ? <h2 style={{ color: 'red' }}>Please enter a User ID</h2> : null}
         {/* //============================================================= */}
         <form
           autoComplete="off"
