@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import {Redirect} from "react-router-dom";
 //=============================================================
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -15,43 +16,37 @@ class AddToRI extends React.Component {
       selectedOpCoRouters: [],
       routerNumbers: ['ROADNET01', 'ROADNET02', 'ROADNET03', 'ROADNET04', 'ROADNET05'],
       selectedRouterNumber: null,
-      file: [],
     };
     this.addUser = this.addUser.bind(this);
   }
 
   componentDidMount() {
-    axios.get('/getFiles')
-      .then(res => {
-        let data = res.data.split('\n')
-        this.setState({
-          file: data
-        })
-      })
   }
 
   addUser() {
-    let temp = this.state.file;
+    let temp = this.props.file;
     temp.push(`${this.props.userId} ${this.state.selectedOpCo.num}-${this.state.selectedRouterNumber.substring(8)}`)
+    console.log(temp[temp.length - 1])
     this.setState({
       file: temp,
-      selectedOpCoRouters: this.state.file.filter((item) => item.split(' ')[1].includes(String(this.state.selectedOpCo.num)))
+      selectedOpCoRouters: this.props.file.filter((item) => item.split(' ')[1].includes(String(this.state.selectedOpCo.num)))
     })
+    temp = temp.join("\r\n")
+    console.log(temp);
     axios.post('/updateUserConfigs', {
-      data: temp.join("\n")
+      data: temp
     })
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         this.props.updateOpCo();
       })
       .catch((error) => {
         console.log(error);
       })
 
-
-    // alert(`${this.props.userId} added to ${this.state.selectedOpCo.name} as ${this.state.selectedRouterNumber}`)
   }
   render() {
+    if (this.props.file.length === 0) return <Redirect to='/' />
     return (
       <div
         style={{ margin: 20 }}
@@ -71,7 +66,7 @@ class AddToRI extends React.Component {
               onChange={(event) => {
                 this.setState({
                   selectedOpCo: event.target.value,
-                  selectedOpCoRouters: this.state.file.filter((item) => item.split(' ')[1].includes(String(event.target.value.num)))
+                  selectedOpCoRouters: this.props.file.filter((item) => item.split(' ')[1].includes(String(event.target.value.num)))
                 })
               }}
             >

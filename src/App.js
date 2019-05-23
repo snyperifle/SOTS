@@ -134,7 +134,7 @@ class App extends React.Component {
     console.log('Updating OpCos...');
     axios.get('/getFiles')
       .then(res => {
-        let data = res.data.split('\n')
+        let data = res.data.split('\r\n')
         this.setState({
           file: data
         })
@@ -178,6 +178,7 @@ class App extends React.Component {
       <AddToRI
         userId={this.state.userId}
         allOpCo={this.state.allOpCo}
+        file={this.state.file}
         updateOpCo={this.updateOpCo}
       />
     )

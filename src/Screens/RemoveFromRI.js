@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import {Redirect} from "react-router-dom";
 //=============================================================
 import Button from '@material-ui/core/Button';
 //=============================================================
@@ -13,13 +14,6 @@ class RemoveFromRI extends React.Component {
   }
   //=============================================================
   componentDidMount() {
-    // axios.get('/getFiles')
-    //   .then(res => {
-    //     let data = res.data.split('\n')
-    //     this.setState({
-    //       file: data
-    //     })
-    //   })
   }
 
   removeUser() {
@@ -42,6 +36,7 @@ class RemoveFromRI extends React.Component {
   }
 
   render() {
+    if (this.props.file.length === 0) return <Redirect to='/' />
     return (
       <div
         style={{ margin: 20 }}
