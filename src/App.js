@@ -23,7 +23,7 @@ class App extends React.Component {
     this.state = {
       open: false,
       userId: '',
-      userOpCo: '',
+      userOpCo: null,
       copiedUserId: false,
       selectedRouterNumber: 'Selected Router#',
       allOpCo: [
@@ -121,7 +121,7 @@ class App extends React.Component {
     this.updateOpCo = this.updateOpCo.bind(this);
 
   }
-//=============================================================
+  //=============================================================
   componentDidMount() {
     this.updateOpCo();
   }
@@ -130,17 +130,32 @@ class App extends React.Component {
       selectedRouterNumber: e,
     })
   }
-  updateOpCo(){
+  updateOpCo() {
+    console.log('Updating OpCos...');
     axios.get('/getFiles')
-    .then(res => {
-      let data = res.data.split('\n')
-      this.setState({
-        file: data
+      .then(res => {
+        let data = res.data.split('\n')
+        this.setState({
+          file: data
+        })
+        if (this.state.userId.length === 8) {
+          let temp = data.filter((item) => {
+            return item.includes(this.state.userId);
+          })
+          temp.length > 0 ? temp = temp[0].split(' ')[1] : temp = null
+          this.setState({
+            userOpCo: temp
+          })
+        } else {
+          this.setState({
+            userOpCo: null
+          })
+        }
       })
-      console.log('OpCo state updated');
-    })
+
+
   }
-//=============================================================
+  //=============================================================
   Home() {
     return (
       <div
@@ -172,7 +187,9 @@ class App extends React.Component {
       <RemoveFromRI
         userId={this.state.userId}
         allOpCo={this.state.allOpCo}
+        file={this.state.file}
         updateOpCo={this.updateOpCo}
+        userOpCo={this.state.userOpCo}
       />
     )
   }
@@ -243,11 +260,11 @@ class App extends React.Component {
               </h3>
             </Navbar.Brand>
             <Form inline>
-              {
+              {/* {
                 this.state.userId ?
                   null :
                   <h5 style={{ color: "blue", marginRight: 10 }}>Who are you assisting?</h5>
-              }
+              } */}
               {this.state.userId.length > 0 ?
                 <div
                   style={{ marginRight: 10 }}
@@ -256,25 +273,31 @@ class App extends React.Component {
                     style={{ color: 'blue' }}
                   >
                     {this.state.userOpCo ? `OpCo: ${this.state.userOpCo.split('-')[0]} ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].name}`
-                      : "User not in Routing Interface"}
+                      : null}
                   </h5>
                 </div>
                 : null}
               <FormControl
                 type='text'
-                placeholder="User ID*"
+                placeholder="Caller User ID*"
                 onChange={(text) => {
-                  this.setState({
-                    userId: text.target.value
-                  })
-                  // console.log(this.state.file)
-                  let temp = this.state.file.filter((item) => {
-                    return item.includes(text.target.value);
-                  })
-                  temp.length > 0 ? temp = temp[0].split(' ')[1] : temp = null
-                  this.setState({
-                    userOpCo: temp
-                  })
+                  if (text.target.value.length === 8) {
+                    this.setState({
+                      userId: text.target.value
+                    })
+                    // console.log(this.state.file)
+                    let temp = this.state.file.filter((item) => {
+                      return item.includes(text.target.value);
+                    })
+                    temp.length > 0 ? temp = temp[0].split(' ')[1] : temp = null
+                    this.setState({
+                      userOpCo: temp
+                    })
+                  } else {
+                    this.setState({
+                      userOpCo: null
+                    })
+                  }
                 }}
               />
               <CopyToClipboard

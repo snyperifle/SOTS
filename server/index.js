@@ -24,8 +24,6 @@ app.post('/updateUserConfigs', (req, res) => {
   servers.forEach((item) => {
     fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, function (err, res) {
       if (err) throw err;
-      // res.setHeader('Content-Type', 'application/json');
-      // res.send(JSON.stringify(`Writing to server ${item}`))
     });
   })
   res.send('test');

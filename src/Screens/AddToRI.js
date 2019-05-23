@@ -17,7 +17,7 @@ class AddToRI extends React.Component {
       selectedRouterNumber: null,
       file: [],
     };
-    this.updateUserConfigs = this.updateUserConfigs.bind(this);
+    this.addUser = this.addUser.bind(this);
   }
 
   componentDidMount() {
@@ -30,7 +30,7 @@ class AddToRI extends React.Component {
       })
   }
 
-  updateUserConfigs() {
+  addUser() {
     let temp = this.state.file;
     temp.push(`${this.props.userId} ${this.state.selectedOpCo.num}-${this.state.selectedRouterNumber.substring(8)}`)
     this.setState({
@@ -38,7 +38,7 @@ class AddToRI extends React.Component {
       selectedOpCoRouters: this.state.file.filter((item) => item.split(' ')[1].includes(String(this.state.selectedOpCo.num)))
     })
     axios.post('/updateUserConfigs', {
-      data: temp.join('\n')
+      data: temp.join("\n")
     })
       .then((response) => {
         console.log(response.data);
@@ -123,7 +123,7 @@ class AddToRI extends React.Component {
             color="primary"
             onClick={() => {
               if (this.props.userId !== '' && this.state.selectedOpCo !== '' && this.state.selectedRouterNumber !== null) {
-                this.updateUserConfigs();
+                this.addUser();
               }
             }}
           >

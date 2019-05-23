@@ -13,25 +13,24 @@ class RemoveFromRI extends React.Component {
   }
   //=============================================================
   componentDidMount() {
-    axios.get('/getFiles')
-      .then(res => {
-        let data = res.data.split('\n')
-        this.setState({
-          file: data
-        })
-      })
+    // axios.get('/getFiles')
+    //   .then(res => {
+    //     let data = res.data.split('\n')
+    //     this.setState({
+    //       file: data
+    //     })
+    //   })
   }
 
   removeUser() {
-    let temp = this.state.file.filter((item) => (
+    let temp = this.props.file.filter((item) => (
       !item.split(' ')[0].includes(this.props.userId)
     ));
-    if (temp.length !== this.state.file.length) {
+    if (temp.length !== this.props.file.length) {
       axios.post('/updateUserConfigs', {
         data: temp.join('\n')
       })
         .then((res) => {
-          console.log(res.data);
           this.props.updateOpCo();
         })
         .catch((err) => {
