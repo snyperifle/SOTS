@@ -1,5 +1,8 @@
-const express = require('express')
+const express = require('express');
 const bodyParser = require('body-parser');
+const sql = require('mssql');
+
+require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -8,7 +11,8 @@ const port = 3999
 app.listen(port, () => console.log(`Express server is running on localhost: ${port}`))
 //=============================================================
 let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', 'ms212rdctx12', 'ms212rdctx14', 'ms212rdctx15', 'ms212rdctx16'];
-let filePath = `//${servers[0]}/routing/UserConfigCalvinTest.txt`;
+// let filePath = `//${servers[0]}/routing/UserConfigCalvinTest.txt`;
+let filePath = `//${servers[0]}/routing/UserConfig.txt`;
 
 app.get('/getFiles', (req, res) => {
   let fs = require('fs');
@@ -18,13 +22,51 @@ app.get('/getFiles', (req, res) => {
     res.send(JSON.stringify(data))
   })
 })
-
+//=============================================================
 app.post('/updateUserConfigs', (req, res) => {
   let fs = require('fs');
   servers.forEach((item) => {
-    fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, function (err, res) {
+    // fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, function (err, res) {
+    fs.writeFile(`//${item}/routing/UserConfig.txt`, req.body.data, function (err, res) {
       if (err) throw err;
     });
   })
   res.send('test');
+})
+//=============================================================
+let config = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PW,
+  server: process.env.DB_HOST,
+  database: process.env.DB_NAME
+};
+
+sql.connect(config, function (err) {
+  if (err) {
+    console.log(err);
+  }
+  console.log('Connected to DB');
+  // app.use(opcoObjData);
+  // app.use(homeRoute);
+  // app.use(dispatchRoute);
+  // app.use(processRoute);
+  // app.use(equipmentRoute);
+});
+
+app.get('/gasboyEquipment', (req, res) => {
+
+
+  let db = new sql.Request();
+
+  db.query("select Equipment.EquipmentIdentifier, Equipment.Description, EquipmentExtended.ConstructionYear, Equipment.Manufacturer, Equipment.ModelNumber, Equipment.SerialNumber" +
+    "from ((Equipment INNER JOIN EquipmentExtended on Equipment.EquipmentID = EquipmentExtended.EquipmentID)" +
+    "INNER JOIN Company on Equipment.SiteCodeID = Company.SiteCodeID) where Company.Name = '" +
+    req.selectedOpCoNumber + "' and (Equipment.EquipmentIdentifier = " +
+    req.queryString + ")",
+    function (err, result) {
+      if (err) {
+        console.log(err)
+      }
+    })
+
 })
