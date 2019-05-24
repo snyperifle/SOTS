@@ -34,6 +34,66 @@ app.post('/updateUserConfigs', (req, res) => {
   res.send('test');
 })
 //=============================================================
+app.post('/routesNotFlowing', (req, res) => {
+  let fs = require('fs');
+  let found = {
+    sendable: true,
+    result: 'Route Not Found',
+    path: '',
+  };
+  let dlroutes = [];
+  let ulroutes = [];
+
+  function sendRoutes(path, file) {
+    res.json(found)
+  }
+
+  console.log(`Searching for route ${req.body.data.route}`);
+
+  servers.forEach((item) => {
+    let path = `//${item}/routing/${req.body.data.userOpCo}/RTRDL`;
+    fs.readdir(path, (err, res) => {
+      if (err) throw err;
+      res.forEach((item2) => {
+        fs.readFile(`${path}/${item2}`, 'utf8', (err, data) => {
+          if (err) throw err
+          let content = data.split('\n')
+          content.forEach((item3) => {
+            if (item3.slice(20, 24) === req.body.data.route && found.sendable === true) {
+              found.sendable = false
+              found.result = 'Route Found'
+              found.path = `${path}/${item2}`
+              sendRoutes();
+            };
+          })
+        })
+      })
+    })
+  })
+
+  servers.forEach((item) => {
+    let path = `//${item}/routing/${req.body.data.userOpCo}/RTRUL`;
+    fs.readdir(path, (err, res) => {
+      if (err) throw err;
+      res.forEach((item2) => {
+        fs.readFile(`${path}/${item2}`, 'utf8', (err, data) => {
+          if (err) throw err
+          let content = data.split('\n')
+          content.forEach((item3) => {
+            if (item3.slice(20, 24) === req.body.data.route && found.sendable === true) {
+              found.sendable = false
+              found.result = 'Route Found'
+              found.path = `${path}/${item2}`
+              sendRoutes();
+            };
+          })
+        })
+      })
+    })
+  })
+
+})
+//=============================================================
 let config = {
   user: process.env.DB_USER,
   password: process.env.DB_PW,

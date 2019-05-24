@@ -15,6 +15,7 @@ import AddToRoadnet from './Screens/AddToRoadnet';
 import AddToRI from './Screens/AddToRI'
 import AddToGasboy from './Screens/AddToGasboy';
 import RemoveFromRI from './Screens/RemoveFromRI';
+import RoutesNotFlowing from './Screens/RoutesNotFlowing';
 import GoToDev from './Screens/GoToDev';
 //=============================================================
 class App extends React.Component {
@@ -114,6 +115,7 @@ class App extends React.Component {
     this.AddToRoutingInterface = this.AddToRoutingInterface.bind(this);
     this.RemoveFromRoutingInterface = this.RemoveFromRoutingInterface.bind(this);
     this.RestoreColumns = this.RestoreColumns.bind(this);
+    this.RoutesNotFlowing = this.RoutesNotFlowing.bind(this);
     this.AddToGasboy = this.AddToGasboy.bind(this);
     this.GoToDev = this.GoToDev.bind(this);
     //=============================================================
@@ -196,6 +198,15 @@ class App extends React.Component {
   }
   RestoreColumns() {
     return <h2>Restore Columns Page</h2>
+  }
+  RoutesNotFlowing() {
+    return (
+      <RoutesNotFlowing
+        allOpCo={this.state.allOpCo}
+        userOpCo={this.state.userOpCo}
+
+      />
+    )
   }
   AddToGasboy() {
     return (
@@ -344,6 +355,9 @@ class App extends React.Component {
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/removeFromRoutingInterface">Remove User from Routing Interface</Link>
                   </li>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
+                    <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link>
+                  </li>
                   <li>
                     <h6 style={{ color: 'grey' }}>Restore Column Settings</h6>
                   </li>
@@ -371,6 +385,7 @@ class App extends React.Component {
               <Route path="/addToRoutingInterface" component={this.AddToRoutingInterface} />
               <Route path="/removeFromRoutingInterface" component={this.RemoveFromRoutingInterface} />
               <Route path="/restoreColumns" component={this.RestoreColumns} />
+              <Route path="/routesNotFlowing" component={this.RoutesNotFlowing} />
               <Route path="/addToGasboy" component={this.AddToGasboy} />
               <Route path="/goToDev" component={this.GoToDev} />
             </div>
