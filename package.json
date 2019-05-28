@@ -9,6 +9,7 @@
     "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
     "dotenv": "^8.0.0",
+    "jsonexport": "^2.4.1",
     "material-icons": "^0.3.1",
     "mssql": "^5.1.0",
     "node-env-run": "^3.0.2",
@@ -17,6 +18,7 @@
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.8",
     "react-copy-to-clipboard": "^5.0.1",
+    "react-csv": "^1.1.1",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
     "react-scripts": "3.0.0"

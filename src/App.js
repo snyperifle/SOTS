@@ -362,7 +362,7 @@ class App extends React.Component {
                 <ul>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     {/* <h6 style={{ color: 'grey' }}>Add User to Gasboy</h6> */}
-                    <Link to="/addToGasboy">Add User to Gasboy</Link>
+                    <Link to="/addToGasboy">Add to Gasboy</Link>
                   </li>
                 </ul>
                 <Divider variant="middle" />

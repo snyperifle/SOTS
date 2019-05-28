@@ -6,6 +6,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import { CSVLink } from "react-csv";
 //=============================================================
 class AddToGasboy extends React.Component {
   constructor(props) {
@@ -334,6 +335,7 @@ class AddToGasboy extends React.Component {
       number: "",
       queue: [],
       excelData: [],
+      downloadData: [],
     };
     this.generateEquipmentExcelFile = this.generateEquipmentExcelFile.bind(this);
     this.generateEmployeeExcelFile = this.generateEmployeeExcelFile.bind(this);
@@ -342,28 +344,27 @@ class AddToGasboy extends React.Component {
   }
 
   generateEquipmentExcelFile() {
-    this.setState({
-      queryString: this.state.queue.reduce((result, item) => {
-        if (item === this.state.queue[0]) return result
-        else {
-          return result += ` OR EquipmentIdentifier = '${item}'`
-        }
-      }, `'${this.state.queue[0]}'`)
+    axios.post('/gasboyEquipment', {
+      data: {
+        selectedOpCoNumber: this.state.selectedOpCo.num,
+        queue: this.state.queue,
+        opcoData: this.state.OpCoData[String(this.state.selectedOpCo.num)]
+      }
     })
-
-
-
-    // axios.post('/gasboyEquipment', {
-    //   data: {
-    //     selectedOpCoNumber: "test OpCoNum",
-    //     queryString:"test queryString",
-    //   }
-    // })
+      .then((response) => {
+        console.log(response.data);
+        this.setState({
+          downloadData: response.data
+        })
+      })
+      .catch((error) => {
+        console.log(error);
+      })
   }
 
   generateEmployeeExcelFile() {
     this.setState({
-      excelData: this.state.queue.map((item) => {
+      downloadData: this.state.queue.map((item) => {
         return {
           '// Action': 'R',
           'Record_type-Mean': 'Mean',
@@ -550,21 +551,39 @@ class AddToGasboy extends React.Component {
           onClick={() => {
             this.state.selectedDeviceType === this.state.deviceType[0] ?
               this.generateEquipmentExcelFile() : this.generateEmployeeExcelFile()
-
             this.setState({
               queue: []
             })
           }}
         >Create Excel file</Button> : null}
         {/* //============================================================= */}
-        <Button
+          {this.state.downloadData.length > 0 ? 
+          <CSVLink
+            data={this.state.downloadData}
+            filename={'export.csv'}
+          >Download File</CSVLink>
+          : null  
+        }
+
+
+
+
+
+
+
+
+
+
+
+        {/* //============================================================= */}
+        {/* <Button
           variant="contained"
           color="inherit"
           onClick={() => {
             this.state.excelData.forEach((item) => console.log(item))
             console.log(this.state.queryString)
           }}
-        >check state</Button>
+        >check state</Button> */}
       </div>
     )
   }
