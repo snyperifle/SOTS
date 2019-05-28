@@ -363,72 +363,20 @@ class AddToGasboy extends React.Component {
   }
 
   generateEmployeeExcelFile() {
-    this.setState({
-      downloadData: this.state.queue.map((item) => {
-        return {
-          '// Action': 'R',
-          'Record_type-Mean': 'Mean',
-          Name: `${item.split(',')[0]} ${this.state.OpCoData[String(this.state.selectedOpCo.num)].stationCode}`,
-          Status: '2',
-          Type: '2',
-          Hardware_type: '1',
-          'Auth-type': '21',
-          Employee_type: '1',
-          Vehicle_no: item.split(',')[1],
-          String: item.split(',')[1],
-          Fleet_name: this.state.OpCoData[String(this.state.selectedOpCo.num)].fleetName,
-          Department_name: `${this.state.OpCoData[String(this.state.selectedOpCo.num)].stationCode} Proxy`,
-          Rule_name: 'No Restriction',
-          Driver_id_type: '0',
-          Price_list_name: '',
-          Model_name: '98-PROXYID',
-          Pump_name: '',
-          Year: '0',
-          Capacity: '0',
-          Consumption: '0',
-          Odometer: '0',
-          Cust_id: '',
-          Address: '',
-          'Account-type': '0',
-          Available_amount: '0',
-          Use_pin_code: '0',
-          Pin_code: '0',
-          Auth_pin_from: '2',
-          Nr_pin_retries: '0',
-          Block_if_pin_retries_fail: '0',
-          OrPT_prompt_for_plate: '1',
-          OrPT_prompt_for_odometer: '0',
-          Do_odometer_reasonability_check: '0',
-          Max_odometer_delta_allowed: '0',
-          Nr_odometer_retries: '0',
-          Engine_hours: '0',
-          Original_engine_hours: '0',
-          Target_engine_hours: '0',
-          'Two-stage_list': '',
-          OrPT_prompt_for_engine_hours: '0',
-          Address2: '',
-          City: '',
-          State: '',
-          Zip: '',
-          Phone: '',
-          UserData1: '',
-          UserData2: '',
-          UserData3: '',
-          UserData4: '',
-          UserData5: '',
-          Start_odometer: '0',
-          EH_consumption: '0',
-          Allow_ID_replacement: '0',
-          Number_of_strings: '1',
-          String2: '',
-          String3: '',
-          String4: '',
-          String5: '',
-          Plate_check_type: '1',
-          Nr_plate_retries: '0',
-          Block_if_plate_retries_fail: '0'
-        }
+    axios.post('/gasboyUser', {
+      data: {
+        queue: this.state.queue,
+        opcoData: this.state.OpCoData[String(this.state.selectedOpCo.num)]
+      }
+    })
+    .then((response) => {
+      console.log(response.data);
+      this.setState({
+        downloadData:response.data
       })
+    })
+    .catch((error) => {
+      console.log(error);
     })
   }
 
