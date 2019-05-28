@@ -272,11 +272,6 @@ class App extends React.Component {
               </h3>
             </Navbar.Brand>
             <Form inline>
-              {/* {
-                this.state.userId ?
-                  null :
-                  <h5 style={{ color: "blue", marginRight: 10 }}>Who are you assisting?</h5>
-              } */}
               {this.state.userId.length > 0 ?
                 <div
                   style={{ marginRight: 10 }}

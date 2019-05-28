@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {Redirect} from "react-router-dom";
+import { Redirect } from "react-router-dom";
 //=============================================================
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -16,6 +16,7 @@ class AddToRI extends React.Component {
       selectedOpCoRouters: [],
       routerNumbers: ['ROADNET01', 'ROADNET02', 'ROADNET03', 'ROADNET04', 'ROADNET05'],
       selectedRouterNumber: null,
+      responseMessage: null,
     };
     this.addUser = this.addUser.bind(this);
   }
@@ -39,6 +40,7 @@ class AddToRI extends React.Component {
       .then((response) => {
         // console.log(response.data);
         this.props.updateOpCo();
+        this.setState({ responseMessage: response.data })
       })
       .catch((error) => {
         console.log(error);
@@ -125,6 +127,10 @@ class AddToRI extends React.Component {
             Add User
         </Button>
           : null}
+        {this.state.responseMessage ?
+          <h5>{this.state.responseMessage}</h5> :
+          null
+        }
         {/* //============================================================= */}
       </div>
     )

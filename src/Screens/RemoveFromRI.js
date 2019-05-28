@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {Redirect} from "react-router-dom";
+import { Redirect } from "react-router-dom";
 //=============================================================
 import Button from '@material-ui/core/Button';
 //=============================================================
@@ -9,6 +9,7 @@ class RemoveFromRI extends React.Component {
     super(props);
     this.state = {
       file: [],
+      responseMessage: null
     };
     this.removeUser = this.removeUser.bind(this);
   }
@@ -22,10 +23,11 @@ class RemoveFromRI extends React.Component {
     ));
     if (temp.length !== this.props.file.length) {
       axios.post('/updateUserConfigs', {
-        data: temp.join('\n')
+        data: temp.join('\r\n')
       })
         .then((res) => {
           this.props.updateOpCo();
+          this.setState({ responseMessage: res.data })
         })
         .catch((err) => {
           console.log(err);
@@ -54,6 +56,10 @@ class RemoveFromRI extends React.Component {
           >
             Confirm
           </Button>
+        }
+        {this.state.responseMessage ?
+          <h5>{this.state.responseMessage}</h5> :
+          null
         }
       </div>
     )

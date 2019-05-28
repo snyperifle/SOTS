@@ -15,6 +15,7 @@ let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', '
 let filePath = `//${servers[0]}/routing/UserConfig.txt`;
 
 app.get('/getFiles', (req, res) => {
+  console.log('Getting OpCo Info');
   let fs = require('fs');
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) throw err;
@@ -24,14 +25,15 @@ app.get('/getFiles', (req, res) => {
 })
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
+  console.log('Updating User Configs');
   let fs = require('fs');
   servers.forEach((item) => {
-    // fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, function (err, res) {
-    fs.writeFile(`//${item}/routing/UserConfig.txt`, req.body.data, function (err, res) {
+    // fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, (err, res) => {
+    fs.writeFile(`//${item}/routing/UserConfig.txt`, req.body.data, (err, res) => {
       if (err) throw err;
     });
   })
-  res.send('test');
+  res.send('User Configs updated');
 })
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
@@ -48,7 +50,7 @@ app.post('/routesNotFlowing', (req, res) => {
     res.json(found)
   }
 
-  console.log(`Searching for route ${req.body.data.route}`);
+  console.log(`Searching for route ${req.body.data.route} for ${req.body.data.userOpCo}`);
 
   servers.forEach((item) => {
     let path = `//${item}/routing/${req.body.data.userOpCo}/RTRDL`;
@@ -59,7 +61,36 @@ app.post('/routesNotFlowing', (req, res) => {
           if (err) throw err
           let content = data.split('\n')
           content.forEach((item3) => {
+            if (item3.slice(16, 20) === req.body.data.route && found.sendable === true) {
+              console.log('Download found');
+              found.sendable = false
+              found.result = 'Route Found'
+              found.path = `${path}/${item2}`
+              sendRoutes();
+            };
+          })
+        })
+      })
+    })
+  })
+  let serverCounter = 0;
+  servers.forEach((item) => {
+    serverCounter++;
+    let path = `//${item}/routing/${req.body.data.userOpCo}/RTRUL`;
+    fs.readdir(path, (err, res) => {
+      if (err) throw err;
+      let fileCounter = 0;
+      let fileCount = res.length
+      res.forEach((item2) => {
+        fileCounter++;
+        fs.readFile(`${path}/${item2}`, 'utf8', (err, data) => {
+          if (err) throw err
+          let content = data.split('\n')
+          let orderCounter = 0;
+          content.forEach((item3) => {
+            orderCounter++;
             if (item3.slice(20, 24) === req.body.data.route && found.sendable === true) {
+              console.log('Upload found');
               found.sendable = false
               found.result = 'Route Found'
               found.path = `${path}/${item2}`
@@ -71,26 +102,11 @@ app.post('/routesNotFlowing', (req, res) => {
     })
   })
 
-  servers.forEach((item) => {
-    let path = `//${item}/routing/${req.body.data.userOpCo}/RTRUL`;
-    fs.readdir(path, (err, res) => {
-      if (err) throw err;
-      res.forEach((item2) => {
-        fs.readFile(`${path}/${item2}`, 'utf8', (err, data) => {
-          if (err) throw err
-          let content = data.split('\n')
-          content.forEach((item3) => {
-            if (item3.slice(20, 24) === req.body.data.route && found.sendable === true) {
-              found.sendable = false
-              found.result = 'Route Found'
-              found.path = `${path}/${item2}`
-              sendRoutes();
-            };
-          })
-        })
-      })
-    })
-  })
+  setTimeout(() => {
+    if(found.sendable === true){
+      sendRoutes();
+    }
+  },10000)
 
 })
 //=============================================================
@@ -123,7 +139,7 @@ app.get('/gasboyEquipment', (req, res) => {
     "INNER JOIN Company on Equipment.SiteCodeID = Company.SiteCodeID) where Company.Name = '" +
     req.selectedOpCoNumber + "' and (Equipment.EquipmentIdentifier = " +
     req.queryString + ")",
-    function (err, result) {
+    (err, result) => {
       if (err) {
         console.log(err)
       }
