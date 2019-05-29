@@ -16,7 +16,6 @@ import AddToRI from './Screens/AddToRI'
 import AddToGasboy from './Screens/AddToGasboy';
 import RemoveFromRI from './Screens/RemoveFromRI';
 import RoutesNotFlowing from './Screens/RoutesNotFlowing';
-import GoToDev from './Screens/GoToDev';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -117,7 +116,6 @@ class App extends React.Component {
     this.RestoreColumns = this.RestoreColumns.bind(this);
     this.RoutesNotFlowing = this.RoutesNotFlowing.bind(this);
     this.AddToGasboy = this.AddToGasboy.bind(this);
-    this.GoToDev = this.GoToDev.bind(this);
     //=============================================================
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.updateOpCo = this.updateOpCo.bind(this);
@@ -154,8 +152,6 @@ class App extends React.Component {
           })
         }
       })
-
-
   }
   //=============================================================
   Home() {
@@ -182,6 +178,7 @@ class App extends React.Component {
         allOpCo={this.state.allOpCo}
         file={this.state.file}
         updateOpCo={this.updateOpCo}
+        
       />
     )
   }
@@ -212,15 +209,7 @@ class App extends React.Component {
     return (
       <AddToGasboy
         userId={this.state.userId}
-        allOpCo={this.state.allOpCo}
-      />
-    )
-  }
-
-  GoToDev() {
-    return (
-      <GoToDev
-        userId={this.state.userId}
+        userOpCo={this.state.userOpCo}
         allOpCo={this.state.allOpCo}
       />
     )
@@ -354,6 +343,12 @@ class App extends React.Component {
                     <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link>
                   </li>
                   <li>
+                    <h6 style={{ color: 'grey' }}>Mirror User Profile</h6>
+                  </li>
+                  <li>
+                    <h6 style={{ color: 'grey' }}>Replace RI Config File</h6>
+                  </li>
+                  <li>
                     <h6 style={{ color: 'grey' }}>Restore Column Settings</h6>
                   </li>
                 </ul>
@@ -368,7 +363,6 @@ class App extends React.Component {
                 <Divider variant="middle" />
                 <h3>Telogis</h3>
                 <Divider variant="middle" />
-                <Link to="/goToDev">Dev Screen</Link>
               </div>
             </nav>
             : null}
@@ -382,7 +376,6 @@ class App extends React.Component {
               <Route path="/restoreColumns" component={this.RestoreColumns} />
               <Route path="/routesNotFlowing" component={this.RoutesNotFlowing} />
               <Route path="/addToGasboy" component={this.AddToGasboy} />
-              <Route path="/goToDev" component={this.GoToDev} />
             </div>
             : null}
         </div>

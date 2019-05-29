@@ -341,6 +341,14 @@ class AddToGasboy extends React.Component {
     this.generateEmployeeExcelFile = this.generateEmployeeExcelFile.bind(this);
   }
   componentDidMount() {
+    if (this.props.userOpCo) {
+      console.log(this.props.userOpCo.substring(0,3));
+      console.log(this.state.OpCoData[this.props.userOpCo.substring(0,3)]);
+        this.setState({
+          selectedOpCo: this.state.OpCoData[this.props.userOpCo.substring(0,3)]
+        })
+
+    }
   }
 
   generateEquipmentExcelFile() {
@@ -369,15 +377,15 @@ class AddToGasboy extends React.Component {
         opcoData: this.state.OpCoData[String(this.state.selectedOpCo.num)]
       }
     })
-    .then((response) => {
-      console.log(response.data);
-      this.setState({
-        downloadData:response.data
+      .then((response) => {
+        console.log(response.data);
+        this.setState({
+          downloadData: response.data
+        })
       })
-    })
-    .catch((error) => {
-      console.log(error);
-    })
+      .catch((error) => {
+        console.log(error);
+      })
   }
 
 
@@ -386,7 +394,7 @@ class AddToGasboy extends React.Component {
       <div
         style={{ margin: 20 }}
       >
-        <h2>Gasboy Interface</h2>
+        <h2>Add to Gasboy</h2>
         {/* //============================================================= */}
         <form
           autoComplete="off"
@@ -401,7 +409,7 @@ class AddToGasboy extends React.Component {
                 this.setState({
                   selectedOpCo: event.target.value
                 })
-                console.log(`Selected OpCo: ${event.target.value.num}`)
+                // console.log(`Selected OpCo: ${event.target.value.num}`)
               }}
             >
               {this.props.allOpCo.map((item, i) => (
@@ -505,12 +513,16 @@ class AddToGasboy extends React.Component {
           }}
         >Create Excel file</Button> : null}
         {/* //============================================================= */}
-          {this.state.downloadData.length > 0 ? 
+        {this.state.downloadData.length > 0 ?
           <CSVLink
             data={this.state.downloadData}
             filename={'export.csv'}
+            style={{
+              color: 'green',
+              margin: 20
+            }}
           >Download File</CSVLink>
-          : null  
+          : null
         }
 
 

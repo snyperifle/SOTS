@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-concat */
 import React from 'react';
+import { Redirect, NavLink } from 'react-router-dom';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -35,7 +36,7 @@ class AddToRoadnet extends React.Component {
     };
   }
 
-  componentDidMount(){
+  componentDidMount() {
     // if(this.props.userId === '') alert('Please Enter a User ID')
   }
 
@@ -121,7 +122,12 @@ class AddToRoadnet extends React.Component {
           {/* //============================================================= */}
           {this.state.selectedOpcoType === this.state.BLOptions ?
             <li>
-              <h3>Go to <a href={'10.242.140.84:3001/login'}>Roadnet Support Dashboard</a></h3>
+              <h3>
+                <NavLink
+                to='/addToRoutingInterface'
+                >Add To Routing Interface</NavLink>
+              </h3>
+
               <h3>Select 'Add New RI User'</h3>
               <form autoComplete="off">
                 <FormControl>
