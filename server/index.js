@@ -14,10 +14,10 @@ app.listen(port, () => console.log(`Express server is running on localhost: ${po
 let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', 'ms212rdctx12', 'ms212rdctx14', 'ms212rdctx15', 'ms212rdctx16'];
 // let filePath = `//${servers[0]}/routing/UserConfigCalvinTest.txt`;
 let filePath = `//${servers[0]}/routing/UserConfig.txt`;
-
+let fs = require('fs');
+//=============================================================
 app.get('/getFiles', (req, res) => {
   console.log('Getting OpCo Info');
-  let fs = require('fs');
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) throw err;
     res.setHeader('Content-Type', 'application/json');
@@ -27,7 +27,6 @@ app.get('/getFiles', (req, res) => {
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
   console.log('Updating User Configs');
-  let fs = require('fs');
   servers.forEach((item) => {
     // fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, (err, res) => {
     fs.writeFile(`//${item}/routing/UserConfig.txt`, req.body.data, (err, res) => {
@@ -38,7 +37,6 @@ app.post('/updateUserConfigs', (req, res) => {
 })
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
-  let fs = require('fs');
   let found = {
     sendable: true,
     result: 'Route Not Found',
@@ -110,6 +108,25 @@ app.post('/routesNotFlowing', (req, res) => {
   }, 10000)
 
 })
+//=============================================================
+app.post('/restoreColumns', (req, res) => {
+  let fse = require('fs-extra');
+  let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
+
+  fse.pathExists(`//ms212rdfsc /${req.body.data}`, (err, exists) => {
+    console.log(req.body.data);
+    if (exists) {
+      files.forEach((item) => {
+        console.log(`From: //ms212rdfsc/RDsupport/ProfileAutomation/${req.body.data}/${item}`)
+        console.log(`To:   //ms212rdfsc/rdclient$/${req.body.data}/${item}`);
+        // fs.copy(`//ms212rdfsc/RDsupport/ProfileAutomation/${req.body.data}/${item}`,`//ms212rdfsc/rdclient$/${req.body.data}/${item}`)
+      })
+    } else console.log("Can't find");
+  })
+
+})
+
+
 //=============================================================
 let config = {
   user: process.env.DB_USER,
@@ -354,7 +371,7 @@ app.post('/gasboyEquipment', (req, res) => {
     })
 })
 
-app.post('/gasboyUser' ,(req, res) => {
+app.post('/gasboyUser', (req, res) => {
   res.send(
     req.body.data.queue.map((item) => {
       return {

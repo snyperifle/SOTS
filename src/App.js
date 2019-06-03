@@ -16,6 +16,7 @@ import AddToRI from './Screens/AddToRI'
 import AddToGasboy from './Screens/AddToGasboy';
 import RemoveFromRI from './Screens/RemoveFromRI';
 import RoutesNotFlowing from './Screens/RoutesNotFlowing';
+import RestoreColumns from './Screens/RestoreColumns';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -102,7 +103,8 @@ class App extends React.Component {
         { num: "293", name: "East Texas" },
         { num: "306", name: "Long Island" },
         { num: "320", name: "Riverside" },
-        { num: "338", name: "South Wetern Ontario" },
+        { num: "332", name: "Western Minnesota" },
+        { num: "338", name: "South Western Ontario" },
         { num: "348", name: "Sygma Fort Worth" },
       ],
       file: [],
@@ -131,7 +133,6 @@ class App extends React.Component {
     })
   }
   updateOpCo() {
-    console.log('Updating OpCos...');
     axios.get('/getFiles')
       .then(res => {
         let data = res.data.split('\r\n')
@@ -178,7 +179,7 @@ class App extends React.Component {
         allOpCo={this.state.allOpCo}
         file={this.state.file}
         updateOpCo={this.updateOpCo}
-        
+
       />
     )
   }
@@ -194,7 +195,11 @@ class App extends React.Component {
     )
   }
   RestoreColumns() {
-    return <h2>Restore Columns Page</h2>
+    return (
+      <RestoreColumns
+        userId={this.state.userId}
+      />
+    )
   }
   RoutesNotFlowing() {
     return (
@@ -314,20 +319,36 @@ class App extends React.Component {
           {this.state.drawer ?
             <nav className="side-drawer"
             >
-              <div style={{ margin: 20 }}>
-                <ListIcon
-                  style={{ alignSelf: 'flex-end' }}
-                  onClick={() => {
-                    this.setState({
-                      drawer: false,
-                      page: true
-                    })
-                  }}
-                />
+              <div style={{
+                margin: 20
+              }}>
+                <div
+                  className="drawer-icon"
+                >
+                  <div>
+                </div>
+                  <ListIcon
+                    onClick={() => {
+                      this.setState({
+                        drawer: false,
+                        page: true
+                      })
+                    }}
+                  />
+                </div>
                 <h3>Roadnet</h3>
                 <ul>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/addToRoadnet">Add User to Roadnet</Link>
+                  </li>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
+                    <Link to='/restoreColumns'>Restore User Columns</Link>
+                  </li>
+                  <li>
+                    <h6 style={{ color: 'grey' }}>Mirror User Profile</h6>
+                  </li>
+                  <li>
+                    <h6 style={{ color: 'grey' }}>Replace RI Config File</h6>
                   </li>
                 </ul>
                 <Divider variant="middle" />
@@ -341,15 +362,6 @@ class App extends React.Component {
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link>
-                  </li>
-                  <li>
-                    <h6 style={{ color: 'grey' }}>Mirror User Profile</h6>
-                  </li>
-                  <li>
-                    <h6 style={{ color: 'grey' }}>Replace RI Config File</h6>
-                  </li>
-                  <li>
-                    <h6 style={{ color: 'grey' }}>Restore Column Settings</h6>
                   </li>
                 </ul>
                 <Divider variant="middle" />

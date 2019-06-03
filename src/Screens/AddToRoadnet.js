@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-concat */
 import React from 'react';
-import { Redirect, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -91,7 +91,7 @@ class AddToRoadnet extends React.Component {
           {/* //============================================================= */}
           <li>
             <h3>Go to <a href={'https://myoffice.sysco.com/Citrix/Internal/'}>MyOffice Sysco</a> => 'Roadnet Enterprise'</h3>
-            <h3>Assign incident to 'Security Admin'</h3>
+            <h3>Assign incident to 'SD_Admin'</h3>
             <h3>Add this message into 'Work Notes'</h3>
             <CopyToClipboard
               text={this.state.selectedOpcoType ? this.state.selectedOpcoType.securityEmail : this.state.noOpcoSelected}>
@@ -124,7 +124,7 @@ class AddToRoadnet extends React.Component {
             <li>
               <h3>
                 <NavLink
-                to='/addToRoutingInterface'
+                  to='/addToRoutingInterface'
                 >Add To Routing Interface</NavLink>
               </h3>
 
