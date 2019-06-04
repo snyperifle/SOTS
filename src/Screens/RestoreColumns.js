@@ -27,7 +27,7 @@ class RestoreColumns extends React.Component {
   //=============================================================
   render() {
     return (
-      <div>
+      <div style={{ margin: 20 }}>
         <h2>Restoring User Column Settings</h2>
         {
           this.props.userId === '' ?
