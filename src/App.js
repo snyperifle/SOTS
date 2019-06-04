@@ -11,6 +11,7 @@ import ListIcon from '@material-ui/icons/List';
 import Divider from '@material-ui/core/Divider'
 import './App.css';
 //=============================================================
+import Home from './Screens/Home'
 import AddToRoadnet from './Screens/AddToRoadnet';
 import AddToRI from './Screens/AddToRI'
 import AddToGasboy from './Screens/AddToGasboy';
@@ -157,11 +158,7 @@ class App extends React.Component {
   //=============================================================
   Home() {
     return (
-      <div
-        style={{ margin: 20 }}
-      >
-        <h1>Welcome</h1>
-      </div>
+      <Home />
     )
   }
   AddToRoadnet() {
@@ -326,7 +323,7 @@ class App extends React.Component {
                   className="drawer-icon"
                 >
                   <div>
-                </div>
+                  </div>
                   <ListIcon
                     onClick={() => {
                       this.setState({

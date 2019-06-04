@@ -117,7 +117,7 @@ app.post('/restoreColumns', (req, res) => {
     console.log(req.body.data);
     if (exists) {
       files.forEach((item) => {
-        console.log(`From: //ms212rdfsc/RDsupport/ProfileAutomation/${req.body.data}/${item}`)
+        console.log(`From: //ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`)
         console.log(`To:   //ms212rdfsc/rdclient$/${req.body.data}/${item}`);
         // fs.copy(`//ms212rdfsc/RDsupport/ProfileAutomation/${req.body.data}/${item}`,`//ms212rdfsc/rdclient$/${req.body.data}/${item}`)
       })
@@ -125,8 +125,6 @@ app.post('/restoreColumns', (req, res) => {
   })
 
 })
-
-
 //=============================================================
 let config = {
   user: process.env.DB_USER,
@@ -136,15 +134,8 @@ let config = {
 };
 
 sql.connect(config, function (err) {
-  if (err) {
-    console.log(err);
-  }
+  if (err) throw err;
   console.log('Connected to Gasboy DB');
-  // app.use(opcoObjData);
-  // app.use(homeRoute);
-  // app.use(dispatchRoute);
-  // app.use(processRoute);
-  // app.use(equipmentRoute);
 });
 
 app.post('/gasboyEquipment', (req, res) => {
@@ -168,7 +159,7 @@ app.post('/gasboyEquipment', (req, res) => {
             let temp = {
               '// Action': 'R',
               'Record_type-Mean': 'Mean',
-              Name: item.EquipmentIdentifier + " " + item.Description,
+              Name: (item.EquipmentIdentifier + " " + item.Description).substring(0, 31),
               Status: '2',
               Type: '3',
               Hardware_type: '6',
@@ -235,7 +226,7 @@ app.post('/gasboyEquipment', (req, res) => {
             let temp = {
               '// Action': 'R',
               'Record_type-Mean': 'Mean',
-              Name: item.EquipmentIdentifier + " " + item.Description,
+              Name: (item.EquipmentIdentifier + " " + item.Description).substring(0, 31),
               Status: '2',
               Type: '3',
               Hardware_type: '6',
@@ -302,7 +293,7 @@ app.post('/gasboyEquipment', (req, res) => {
             var reeferObj = {
               '// Action': 'R',
               'Record_type-Mean': 'Mean',
-              Name: item.EquipmentIdentifier + " " + item.Description,
+              Name: (item.EquipmentIdentifier + " " + item.Description).substring(0, 31),
               Status: '2',
               Type: '3',
               Hardware_type: '6',
