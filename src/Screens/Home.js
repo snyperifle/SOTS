@@ -20,14 +20,14 @@ class Home extends React.Component {
         },
         {
           'Account Admin': [
-            { name: 'Sivakota Reddy Guduru', number: '' },
-            { name: 'Devi Pedamallu', number: '' },
-            { name: 'Louis Shields', number: '' },
+            { name: 'Sivakota Reddy Guduru', number: '91-95500-50009' },
+            { name: 'Devi Pedamallu', number: '91-70939-49686' },
+            { name: 'Louis Shields', number: '832-349-7595' },
           ]
         },
         {
           'CCOD': [
-            { name: 'Joy Aaron', number: '' },
+            { name: 'Joy Aaron', number: '213-435-1487' },
             { name: 'Jhansi Lakshmi Kondireddy', number: '' },
             { name: 'Chaganti Prathyusha', number: '' }
           ]
@@ -35,15 +35,15 @@ class Home extends React.Component {
         {
           'Citrix': [
             { name: 'Ramesh Nambaru', number: '' },
-            { name: 'Kashyap Santanu', number: '' },
+            { name: 'Kashyap Santanu', number: '91-95509-62424' },
             { name: 'Haribabu Vallabhaneni', number: '' },
           ]
         },
         {
           'DBA': [
-            { name: 'Manogyna Devarapalli', number: '' },
-            { name: 'Ravindrareddy Madireddy', number: '' },
-            { name: 'Rakesh Sivan', number: '' },
+            { name: 'Manogyna Devarapalli', number: '91-94944-90249' },
+            { name: 'Ravindrareddy Madireddy', number: '972-589-7877' },
+            { name: 'Rakesh Sivan', number: '91-98858-33025' },
           ]
         }
       ]
