@@ -5,7 +5,7 @@ class Home extends React.Component {
     this.state = {
       contacts: [
         {
-          Onshore: [
+          'Onshore': [
             { name: 'Geoffrey Bray', number: '281-615-6013' },
             { name: 'Ranuka Subramanian', number: '720-442-2495' },
             { name: 'Calvin Chui', number: '832-524-2831' },
@@ -13,34 +13,34 @@ class Home extends React.Component {
           ]
         },
         {
-          Offshore: [
+          'Offshore': [
             { name: 'Thella Ramya', number: '91-99866-97599' },
             { name: 'Mubeena Begum', number: '91-99416-49405' },
           ]
         },
         {
-          AccountAdmin: [
+          'Account Admin': [
             { name: 'Sivakota Reddy Guduru', number: '' },
             { name: 'Devi Pedamallu', number: '' },
             { name: 'Louis Shields', number: '' },
           ]
         },
         {
-          CCOD: [
+          'CCOD': [
             { name: 'Joy Aaron', number: '' },
             { name: 'Jhansi Lakshmi Kondireddy', number: '' },
             { name: 'Chaganti Prathyusha', number: '' }
           ]
         },
         {
-          Citrix: [
+          'Citrix': [
             { name: 'Ramesh Nambaru', number: '' },
             { name: 'Kashyap Santanu', number: '' },
             { name: 'Haribabu Vallabhaneni', number: '' },
           ]
         },
         {
-          DBA: [
+          'DBA': [
             { name: 'Manogyna Devarapalli', number: '' },
             { name: 'Ravindrareddy Madireddy', number: '' },
             { name: 'Rakesh Sivan', number: '' },
@@ -62,12 +62,13 @@ class Home extends React.Component {
             <h4>{Object.keys(item)}</h4>
             <ul>
               {this.state.contacts[i][Object.keys(item)].map((item2) => (
-                <li>{item2.name} {item2.number}</li>
+                <li>
+                  {item2.name}{item2.number ? `: ${item2.number}` : null}
+                </li>
               ))}
             </ul>
           </div>
         ))}
-        {/* {this.state.contacts[0]['onshoreMembers'][0]['name']} */}
       </div>
     )
   }
