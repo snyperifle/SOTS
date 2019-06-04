@@ -80,8 +80,8 @@ class AddToRoadnet extends React.Component {
         >
           {/* //============================================================= */}
           <li>
-            <h3>Email this message to requester:</h3>
-            <h4>{this.state.value}</h4>
+            <h5>Email this message to requester:</h5>
+            <h5>{this.state.value}</h5>
             <CopyToClipboard
               text={this.state.cleanupEmail}>
               <button>Copy</button>
@@ -90,9 +90,9 @@ class AddToRoadnet extends React.Component {
           </li>
           {/* //============================================================= */}
           <li>
-            <h3>Go to <a href={'https://myoffice.sysco.com/Citrix/Internal/'}>MyOffice Sysco</a> => 'Roadnet Enterprise'</h3>
-            <h3>Assign incident to 'SD_Admin'</h3>
-            <h3>Add this message into 'Work Notes'</h3>
+            <h5>Go to <a href={'https://myoffice.sysco.com/Citrix/Internal/'}>MyOffice Sysco</a> => 'Roadnet Enterprise'</h5>
+            <h5>Assign incident to 'SD_Admin'</h5>
+            <h5>Add this message into 'Work Notes'</h5>
             <CopyToClipboard
               text={this.state.selectedOpcoType ? this.state.selectedOpcoType.securityEmail : this.state.noOpcoSelected}>
               <button>Copy</button>
@@ -100,22 +100,22 @@ class AddToRoadnet extends React.Component {
           </li>
           {/* //============================================================= */}
           <li>
-            <h3>Go to <a href={'https://myoffice.sysco.com/Citrix/Internal/'}> Roadnet Enterprise</a></h3>
+            <h5>Go to <a href={'https://myoffice.sysco.com/Citrix/Internal/'}> Roadnet Enterprise</a></h5>
             <ul>
               <li>
-                <h4>'Administration' => 'List' => 'Users' => 'Add'</h4>
+                <h5>'Administration' => 'List' => 'Users' => 'Add'</h5>
               </li>
               <li>
-                <h4>Fill out information in 'General' tab (password is sysco123)</h4>
+                <h5>Fill out information in 'General' tab (password is sysco123)</h5>
               </li>
               <li>
-                <h4>Check 'Require Password Change on Next Login'</h4>
+                <h5>Check 'Require Password Change on Next Login'</h5>
               </li>
               <li>
-                <h4>Set Time Zone</h4>
+                <h5>Set Time Zone</h5>
               </li>
               <li>
-                <h4>Add 'User Group' in 'Membership' tab</h4>
+                <h5>Add 'User Group' in 'Membership' tab</h5>
               </li>
             </ul>
           </li>
@@ -153,7 +153,7 @@ class AddToRoadnet extends React.Component {
             : null}
           {/* //============================================================= */}
           <li>
-            <h3>Email this message to requester:</h3>
+            <h5>Email this message to requester:</h5>
             <CopyToClipboard
               text={this.state.selectedOpcoType ? this.state.selectedOpcoType.addedEmail : this.state.noOpcoSelected}
             >

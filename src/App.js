@@ -18,6 +18,7 @@ import AddToGasboy from './Screens/AddToGasboy';
 import RemoveFromRI from './Screens/RemoveFromRI';
 import RoutesNotFlowing from './Screens/RoutesNotFlowing';
 import RestoreColumns from './Screens/RestoreColumns';
+import TelogisInfo from './Screens/TelogisInfo';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -119,10 +120,10 @@ class App extends React.Component {
     this.RestoreColumns = this.RestoreColumns.bind(this);
     this.RoutesNotFlowing = this.RoutesNotFlowing.bind(this);
     this.AddToGasboy = this.AddToGasboy.bind(this);
+    this.TelogisInfo = this.TelogisInfo.bind(this);
     //=============================================================
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.updateOpCo = this.updateOpCo.bind(this);
-
   }
   //=============================================================
   componentDidMount() {
@@ -213,6 +214,13 @@ class App extends React.Component {
         userId={this.state.userId}
         userOpCo={this.state.userOpCo}
         allOpCo={this.state.allOpCo}
+      />
+    )
+  }
+  TelogisInfo() {
+    return (
+      <TelogisInfo
+
       />
     )
   }
@@ -371,6 +379,11 @@ class App extends React.Component {
                 </ul>
                 <Divider variant="middle" />
                 <h3>Telogis</h3>
+                <ul>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
+                    <Link to="/telogisInfo">Telogis Information</Link>
+                  </li>
+                </ul>
                 <Divider variant="middle" />
               </div>
             </nav>
@@ -385,6 +398,7 @@ class App extends React.Component {
               <Route path="/restoreColumns" component={this.RestoreColumns} />
               <Route path="/routesNotFlowing" component={this.RoutesNotFlowing} />
               <Route path="/addToGasboy" component={this.AddToGasboy} />
+              <Route path="/telogisInfo" component={this.TelogisInfo} />
             </div>
             : null}
         </div>
