@@ -5,7 +5,7 @@ class Home extends React.Component {
     this.state = {
       contacts: [
         {
-          onshoreMembers: [
+          Onshore: [
             { name: 'Geoffrey Bray', number: '281-615-6013' },
             { name: 'Ranuka Subramanian', number: '720-442-2495' },
             { name: 'Calvin Chui', number: '832-524-2831' },
@@ -13,34 +13,34 @@ class Home extends React.Component {
           ]
         },
         {
-          offshoreMembers: [
+          Offshore: [
             { name: 'Thella Ramya', number: '91-99866-97599' },
             { name: 'Mubeena Begum', number: '91-99416-49405' },
           ]
         },
         {
-          accountAdmin: [
+          AccountAdmin: [
             { name: 'Sivakota Reddy Guduru', number: '' },
             { name: 'Devi Pedamallu', number: '' },
             { name: 'Louis Shields', number: '' },
           ]
         },
         {
-          ccod: [
+          CCOD: [
             { name: 'Joy Aaron', number: '' },
             { name: 'Jhansi Lakshmi Kondireddy', number: '' },
             { name: 'Chaganti Prathyusha', number: '' }
           ]
         },
         {
-          citrix: [
+          Citrix: [
             { name: 'Ramesh Nambaru', number: '' },
             { name: 'Kashyap Santanu', number: '' },
             { name: 'Haribabu Vallabhaneni', number: '' },
           ]
         },
         {
-          dba: [
+          DBA: [
             { name: 'Manogyna Devarapalli', number: '' },
             { name: 'Ravindrareddy Madireddy', number: '' },
             { name: 'Rakesh Sivan', number: '' },
@@ -50,7 +50,6 @@ class Home extends React.Component {
     };
   }
   render() {
-    console.log(`Render Home`, this.props);
     return (
       <div
         style={{
@@ -58,9 +57,17 @@ class Home extends React.Component {
         }}
       >
         <h1>Welcome</h1>
-        {this.state.contacts.map((item) => (
-          <h2>{item}</h2>
+        {this.state.contacts.map((item, i) => (
+          <div>
+            <h4>{Object.keys(item)}</h4>
+            <ul>
+              {this.state.contacts[i][Object.keys(item)].map((item2) => (
+                <li>{item2.name} {item2.number}</li>
+              ))}
+            </ul>
+          </div>
         ))}
+        {/* {this.state.contacts[0]['onshoreMembers'][0]['name']} */}
       </div>
     )
   }
