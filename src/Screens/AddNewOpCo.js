@@ -15,40 +15,58 @@ class AddNewOpCo extends React.Component {
 
   }
   //=============================================================
-  createOpCo () {
+  createOpCo() {
     alert('FIRING');
   }
   //=============================================================
   render() {
     return (
-      <div style={{margin:20}}>
+      <div style={{ margin: 20 }}>
         <Form inline >
           <FormControl
-          type="text"
-          placeholder="Enter the new OpCo Number"
-          style={{width:350}}
-          onChange={(input) => {
-            if( input.target.value.length) {
-              this.setState({
-                OpCoNum: input.target.value
-              })
-            }
-          }}
+            type="text"
+            placeholder="Enter the new OpCo Number"
+            style={{ width: 350 }}
+            onChange={(input) => {
+              if (input.target.value.length) {
+                this.setState({
+                  OpCoNum: input.target.value
+                })
+              }
+            }}
           />
           <FormControl
-          type="text"
-          placeholder="Enter the new OpCo Name"
-          style={{width:350}}
-          onChange={(input) => {
-            if( input.target.value.length) {
-              this.setState({
-                OpCoName: input.target.value
-              })
-            }
-          }}
+            type="text"
+            placeholder="Enter the new OpCo Name"
+            style={{ width: 350 }}
+            onChange={(input) => {
+              if (input.target.value.length) {
+                this.setState({
+                  OpCoName: input.target.value
+                })
+              }
+            }}
           />
         </Form>
-
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => {
+            axios.post('/createNewOpCo',
+              {
+                data: {
+                  OpCoNum: this.state.OpCoNum,
+                  OpCoName: this.state.OpCoName,
+                }
+              })
+              .then((response) => {
+                console.log(response.data);
+              })
+              .catch((error) => {
+                console.log(error);
+              })
+          }}
+        >Create New OpCo</Button>
         <button
           onClick={() => console.log(this.state)}
         >test</button>

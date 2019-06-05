@@ -431,3 +431,15 @@ app.post('/gasboyUser', (req, res) => {
     })
   )
 })
+//=============================================================
+app.post('/createNewOpCo', (req, res) => {
+
+  console.log('Num',req.body.data.OpCoNum);
+  console.log('Name',req.body.data.OpCoName);;
+  
+  let item = 'ms212rdctx16'
+  fs.mkdir( `//${item}/routing/1111CALVINTEST`,(err,exist) => {
+    if(err) throw err;
+    if(exist) console.log(exist);
+  })
+})
