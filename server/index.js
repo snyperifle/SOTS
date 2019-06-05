@@ -438,8 +438,10 @@ app.post('/createNewOpCo', (req, res) => {
   console.log('Name',req.body.data.OpCoName);;
   
   let item = 'ms212rdctx16'
-  fs.mkdirSync( `//${item}/routing/1111CALVINTEST`,(err,exist) => {
-    if(err) throw err;
-    if(exist) console.log(exist);
-  })
+  for(let i = 1; i < 5; i++){
+    fs.mkdirSync( `//${item}/routing/${req.body.data.OpCoName}-${i}`,(err,exist) => {
+      if(err) throw err;
+      if(exist) console.log(exist);
+    })
+  }
 })
