@@ -446,7 +446,10 @@ app.post('/createNewOpCo', (req, res) => {
     })
     let folders = ['CUSTDL','RTRDL','RTRUL'];
     folders.forEach((folder) => {
-      fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}/${folder}`)
+      fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}/${folder}`, (err, exist) => {
+        if(err) throw err;
+        if(exist) console.log(exist);
+      })
     })
   }
 
