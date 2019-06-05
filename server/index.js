@@ -462,6 +462,24 @@ app.post('/createNewOpCo', (req, res) => {
     fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/CONFIG.tmp`, config, (err, res) => {
       if (err) throw err;
     })
+    //=============================================================
+    let lockout = ''
+    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/LOCKOUT.tmp`, lockout, (err, res) => {
+      if (err) throw err;
+    })
+    //=============================================================
+    let optmenu =
+      ''.padStart(270, ' ') +
+      `Delivery Day Upload ÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN15PG.exe                     ` +
+      `ÿÿNormal              MANÌí2rLå@Custmr Profit Reportÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN16PG.EXE                     ÿÿNormal              MANW)QN­ëä@`
+    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/OPTMENU.tmp`, optmenu, (err, res) => {
+      if (err) throw err;
+    })
+    //=============================================================
+    let rtrsetup = ''
+    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/RTRSETUP.tmp`, rtrsetup, (err, res) => {
+      if (err) throw err;
+    })
   }
 
 
