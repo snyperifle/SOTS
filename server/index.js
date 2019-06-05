@@ -476,7 +476,13 @@ app.post('/createNewOpCo', (req, res) => {
       if (err) throw err;
     })
     //=============================================================
-    let rtrsetup = ''
+    let rtrsetup =
+      `AS429A   *NONE 0${i}\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\TRANSFER                         ` +
+      `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\CUSTDL                                             ` +
+      `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\RTRDL                                              ` +
+      `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\RTRUL                                              ` +
+      `SCDBFP10  *NONE     IBMDA400  537524510513523514539593505555597530523520523524532523555555` +
+      `ÿÿÿÿÿÿ  …ëQ¸°Lå@[°…±Lå@Ï… å@”Iªµå@1u¹½Mä@ò‹%?.ä@          `
     fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/RTRSETUP.tmp`, rtrsetup, (err, res) => {
       if (err) throw err;
     })
