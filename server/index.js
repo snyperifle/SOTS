@@ -438,10 +438,20 @@ app.post('/createNewOpCo', (req, res) => {
   console.log('Name',req.body.data.OpCoName);;
   
   let item = 'ms212rdctx16'
+
   for(let i = 1; i <= 5; i++){
     fs.mkdirSync( `//${item}/routing/${req.body.data.OpCoNum}-${i}`,(err,exist) => {
       if(err) throw err;
       if(exist) console.log(exist);
     })
+    let folders = ['CUSTDL','RTRDL','RTRUL'];
+    folders.forEach((folder) => {
+      fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}/${folder}`)
+    })
   }
+
+  fs.writeFile(`//${item}/routing/UserConfig.txt`, req.body.data, (err, res) => {
+      if (err) throw err;
+    });
+
 })
