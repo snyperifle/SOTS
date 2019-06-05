@@ -473,7 +473,7 @@ app.post('/createNewOpCo', (req, res) => {
       `Delivery Day Upload ÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN15PG.exe`.padEnd(105, ' ') +
       `ÿÿNormal              MANÌí2rLå@Custmr Profit Reportÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN16PG.EXE`.padEnd(126, ' ') +
       `ÿÿNormal              MANW)QN­ëä@`
-    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/OPTMENU.tmp`, optmenu, (err, res) => {
+    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/OPTMENU.DTA`, optmenu, (err, res) => {
       if (err) throw err;
     })
     //=============================================================
@@ -485,7 +485,7 @@ app.post('/createNewOpCo', (req, res) => {
       `SCDBFP10  *NONE     IBMDA400  537524510513523514539593505555597530523520523524532523555555   ` +
       `ÿÿÿÿÿÿ  …ëQ¸°Lå@[°…±Lå@Ï… å@”Iªµå@1u¹½Mä@ò‹%?.ä@          `
       
-    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/RTRSETUP.tmp`, rtrsetup, (err, res) => {
+    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/RTRSETUP.DTA`, rtrsetup, (err, res) => {
       if (err) throw err;
     })
   }
