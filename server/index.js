@@ -455,7 +455,7 @@ app.post('/createNewOpCo', (req, res) => {
     let config =
       'IW,"  ' +
       // '429DOERLE FOOD SERVICE, LLC      '
-      req.body.data.OpCoName.padEnd(33, ' ')
+      `${req.body.data.OpCoNum}${req.body.data.OpCoName}`.padEnd(33, ' ')
       + `AS${req.body.data.OpCoNum}A    "\r\n` +
       'FV,"ROADNET        RDNY5 Y200010007"\r\n'
 
