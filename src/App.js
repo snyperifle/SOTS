@@ -19,6 +19,7 @@ import RemoveFromRI from './Screens/RemoveFromRI';
 import RoutesNotFlowing from './Screens/RoutesNotFlowing';
 import RestoreColumns from './Screens/RestoreColumns';
 import TelogisInfo from './Screens/TelogisInfo';
+import AddNewOpCo from './Screens/AddNewOpCo';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -108,6 +109,7 @@ class App extends React.Component {
         { num: "332", name: "Western Minnesota" },
         { num: "338", name: "South Western Ontario" },
         { num: "348", name: "Sygma Fort Worth" },
+        { num: "429", name: "Doerle Foods" },
       ],
       file: [],
       drawer: false,
@@ -121,6 +123,7 @@ class App extends React.Component {
     this.RoutesNotFlowing = this.RoutesNotFlowing.bind(this);
     this.AddToGasboy = this.AddToGasboy.bind(this);
     this.TelogisInfo = this.TelogisInfo.bind(this);
+    this.AddNewOpCo = this.AddNewOpCo.bind(this);
     //=============================================================
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.updateOpCo = this.updateOpCo.bind(this);
@@ -220,6 +223,14 @@ class App extends React.Component {
   TelogisInfo() {
     return (
       <TelogisInfo
+
+      />
+    )
+  }
+
+  AddNewOpCo() {
+    return (
+      <AddNewOpCo
 
       />
     )
@@ -347,12 +358,13 @@ class App extends React.Component {
                     <Link to="/addToRoadnet">Add User to Roadnet</Link>
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to='/restoreColumns'>Restore User Columns</Link>
+                    {/* <Link to='/restoreColumns'>Restore User Columns</Link> */}
+                    <h6 style={{ color: 'grey' }}>Restore User Columns</h6>
                   </li>
-                  <li>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <h6 style={{ color: 'grey' }}>Mirror User Profile</h6>
                   </li>
-                  <li>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <h6 style={{ color: 'grey' }}>Replace RI Config File</h6>
                   </li>
                 </ul>
@@ -385,6 +397,12 @@ class App extends React.Component {
                   </li>
                 </ul>
                 <Divider variant="middle" />
+                <h4>DEV</h4>
+                <ul>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
+                    <Link to="/addNewOpCo">Add New OpCo</Link>
+                  </li>
+                </ul>
               </div>
             </nav>
             : null}
@@ -399,6 +417,7 @@ class App extends React.Component {
               <Route path="/routesNotFlowing" component={this.RoutesNotFlowing} />
               <Route path="/addToGasboy" component={this.AddToGasboy} />
               <Route path="/telogisInfo" component={this.TelogisInfo} />
+              <Route path="/addNewOpCo" component={this.AddNewOpCo} />
             </div>
             : null}
         </div>
