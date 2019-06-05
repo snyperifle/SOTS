@@ -456,8 +456,8 @@ app.post('/createNewOpCo', (req, res) => {
       'IW,"  ' +
       // '429DOERLE FOOD SERVICE, LLC      '
       req.body.data.OpCoName.padEnd(33, ' ')
-      + `AS${req.body.data.OpCoNum}A    "\n` +
-      'FV,"ROADNET        RDNY5 Y200010007"\n'
+      + `AS${req.body.data.OpCoNum}A    "\r\n` +
+      'FV,"ROADNET        RDNY5 Y200010007"\r\n'
 
     fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/CONFIG.tmp`, config, (err, res) => {
       if (err) throw err;
