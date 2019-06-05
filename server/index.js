@@ -451,14 +451,16 @@ app.post('/createNewOpCo', (req, res) => {
         if(exist) console.log(`${folder} created`);
       })
     })
+    //=============================================================
+    let config = 
+    'IW,"  429DOERLE FOOD SERVICE, LLC      AS429A    "\n' +
+    'FV,"ROADNET        RDNY5 Y200010007"\n'
+  
+    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/CONFIG.txt`, config, (err, res) => {
+      if(err) throw err;
+    })
   }
-  let config = 
-  'IW,"  429DOERLE FOOD SERVICE, LLC      AS429A    "\n' +
-  'FV,"ROADNET        RDNY5 Y200010007"\n'
 
-  fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/CONFIG.txt`, config, (err, res) => {
-    if(err) throw err;
-  })
 
 
 
