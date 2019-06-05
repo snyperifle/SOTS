@@ -434,30 +434,30 @@ app.post('/gasboyUser', (req, res) => {
 //=============================================================
 app.post('/createNewOpCo', (req, res) => {
 
-  console.log('Num',req.body.data.OpCoNum);
-  console.log('Name',req.body.data.OpCoName);;
-  
+  console.log('Num', req.body.data.OpCoNum);
+  console.log('Name', req.body.data.OpCoName);;
+
   let item = 'ms212rdctx16'
 
-  for(let i = 1; i <= 5; i++){
-    fs.mkdirSync( `//${item}/routing/${req.body.data.OpCoNum}-${i}`,(err,exist) => {
-      if(err) throw err;
-      if(exist) console.log(`${req.body.data.OpCoNum}-${i} created`);
+  for (let i = 1; i <= 5; i++) {
+    fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}`, (err, exist) => {
+      if (err) throw err;
+      if (exist) console.log(`${req.body.data.OpCoNum}-${i} created`);
     })
-    let folders = ['CUSTDL','RTRDL','RTRUL'];
+    let folders = ['CUSTDL', 'RTRDL', 'RTRUL'];
     folders.forEach((folder) => {
       fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}/${folder}`, (err, exist) => {
-        if(err) throw err;
-        if(exist) console.log(`${folder} created`);
+        if (err) throw err;
+        if (exist) console.log(`${folder} created`);
       })
     })
     //=============================================================
-    let config = 
-    'IW,"  429DOERLE FOOD SERVICE, LLC      AS429A    "\n' +
-    'FV,"ROADNET        RDNY5 Y200010007"\n'
-  
-    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/CONFIG.txt`, config, (err, res) => {
-      if(err) throw err;
+    let config =
+      'IW,"  429DOERLE FOOD SERVICE, LLC      AS429A    "\n' +
+      'FV,"ROADNET        RDNY5 Y200010007"\n'
+
+    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/CONFIG.tmp`, config, (err, res) => {
+      if (err) throw err;
     })
   }
 
