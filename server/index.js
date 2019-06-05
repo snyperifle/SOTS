@@ -438,7 +438,7 @@ app.post('/createNewOpCo', (req, res) => {
   console.log('Name',req.body.data.OpCoName);;
   
   let item = 'ms212rdctx16'
-  fs.mkdir( `//${item}/routing/1111CALVINTEST`,(err,exist) => {
+  fs.mkdirSync( `//${item}/routing/1111CALVINTEST`,(err,exist) => {
     if(err) throw err;
     if(exist) console.log(exist);
   })
