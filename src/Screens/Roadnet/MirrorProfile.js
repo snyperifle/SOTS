@@ -16,6 +16,9 @@ class MirrorProfile extends React.Component {
     this.mirrorProfile = this.mirrorProfile.bind(this);
   }
   //=============================================================
+  componentDidMount() {
+    console.log(this.props.file);
+  }
   mirrorProfile() {
     this.setState({
       loading: true,

@@ -117,7 +117,7 @@ app.post('/restoreColumns', (req, res) => {
   let backupFolder = '//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/'
   let destinationFolder = '//ms212rdfsc/rdclient$/'
 
-  fse.pathExistsSync(`${backupFolder}${req.body.data}`, (err, exists) => {
+  fse.pathExists(`${backupFolder}${req.body.data}`, (err, exists) => {
     if (err) throw err;
     if (exists) {
       files.forEach((item) => {
@@ -139,7 +139,9 @@ app.post('/restoreColumns', (req, res) => {
       console.log(`${req.body.data} does not exist in ${backupFolder}`)
     }
   })
-  res.send(copied);
+  this.setTimeout(() => {
+    res.send(copied);
+  }, 3000)
 })
 //=============================================================
 app.post('/mirrorProfile', (req, res) => {
@@ -149,30 +151,32 @@ app.post('/mirrorProfile', (req, res) => {
   let backupFolder = '//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/'
   let destinationFolder = '//ms212rdfsc/rdclient$/'
 
-  fse.pathExists(`${backupFolder}${req.body.data.fromProfile}`,(err, exists) => {
-    if(err) throw err;
-    if(exists){
+  fse.pathExists(`${backupFolder}${req.body.data.fromProfile}`, (err, exists) => {
+    if (err) throw err;
+    if (exists) {
       files.forEach((item) => {
         fse.pathExists(`${backupFolder}${req.body.data.fromProfile}/${item}`, (err, exists) => {
-          if(err) throw err;
-          if(exists){
+          if (err) throw err;
+          if (exists) {
             fse.copy(`${backupFolder}${req.body.data.fromProfile}/${item}`, `${destinationFolder}${req.body.data.toProfile}/${item}`)
-            .then(() => {
-              console.log(`${item} copied from ${backupFolder} to ${destinationFolder}`);
-              copied.push(item);
-            })
-            .catch((error) => {
-              console.log(error);
-            })
+              .then(() => {
+                console.log(`${item} copied from ${backupFolder} to ${destinationFolder}`);
+                copied.push(item);
+              })
+              .catch((error) => {
+                console.log(error);
+              })
           } else console.log(`${item} not found in ${backupFolder}${req.body.data.fromProfile}`);
         })
       })
     }
-    else{
+    else {
       console.log(`${req.body.data.fromProfile} does not exist in ${backupFolder}`);
     }
   })
-  res.send(copied);
+  this.setTimeout(() => {
+    res.send(copied);
+  }, 3000)
 })
 //=============================================================
 let config = {

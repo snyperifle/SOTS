@@ -209,6 +209,7 @@ class App extends React.Component {
       <MirrorProfile
         userId={this.state.userId}
         userOpCo={this.state.userOpCo}
+        file={this.state.file}
       />
     )
   }
