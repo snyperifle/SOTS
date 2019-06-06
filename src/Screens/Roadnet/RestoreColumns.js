@@ -14,7 +14,10 @@ class RestoreColumns extends React.Component {
   }
   //=============================================================
   restoreColumns() {
-    this.setState({ loading: true, restoredFiles: [] })
+    this.setState({ 
+      loading: true, 
+      restoredFiles: [] 
+    })
     axios.post('/restoreColumns',
       {
         data: this.props.userId

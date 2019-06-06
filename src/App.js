@@ -20,6 +20,7 @@ import RoutesNotFlowing from './Screens/RoutingInterface/RoutesNotFlowing';
 import RestoreColumns from './Screens/Roadnet/RestoreColumns';
 import TelogisInfo from './Screens/Telogis/TelogisInfo';
 import AddNewOpCo from './Screens/Development/AddNewOpCo';
+import MirrorProfile from './Screens/Roadnet/MirrorProfile';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -202,6 +203,13 @@ class App extends React.Component {
       />
     )
   }
+  MirrorProfile() {
+    return (
+      <MirrorProfile
+
+      />
+    )
+  }
   RoutesNotFlowing() {
     return (
       <RoutesNotFlowing
@@ -369,7 +377,8 @@ class App extends React.Component {
                     {/* <h6 style={{ color: 'grey' }}>Restore User Columns</h6> */}
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <h6 style={{ color: 'grey' }}>Mirror User Profile</h6>
+                    {/* <h6 style={{ color: 'grey' }}>Mirror User Profile</h6> */}
+                    <Link to='/mirrorProfile'>Mirror User Config</Link>
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <h6 style={{ color: 'grey' }}>Replace RI Config File</h6>
@@ -424,6 +433,7 @@ class App extends React.Component {
               <Route path="/addToGasboy" component={this.AddToGasboy} />
               <Route path="/telogisInfo" component={this.TelogisInfo} />
               <Route path="/addNewOpCo" component={this.AddNewOpCo} />
+              <Route path="/mirrorProfile" component={this.MirrorProfile} />
             </div>
             : null}
         </div>

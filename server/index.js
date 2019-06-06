@@ -15,6 +15,7 @@ let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', '
 // let filePath = `//${servers[0]}/routing/UserConfigCalvinTest.txt`;
 let filePath = `//${servers[0]}/routing/UserConfig.txt`;
 let fs = require('fs');
+let fse = require('fs-extra');
 //=============================================================
 app.get('/getFiles', (req, res) => {
   console.log('Getting OpCo Info');
@@ -110,10 +111,8 @@ app.post('/routesNotFlowing', (req, res) => {
 })
 //=============================================================
 app.post('/restoreColumns', (req, res) => {
-  let fse = require('fs-extra');
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
-  let notCopied = [];
 
   fse.pathExists(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}`, (err, exists) => {
     if (err) throw err;
@@ -132,17 +131,19 @@ app.post('/restoreColumns', (req, res) => {
               })
           } else console.log(`${item} not found in rdclient-backup`);
         })
-        if(item === files[files.length-1]) console.log('LAST');
       })
     } else {
       console.log(`${item} is not in rdclient-backup`)
     }
-
     setTimeout(() => {
       res.send(copied);
-    }, 5000)
-
+    }, 3000)
   })
+})
+//=============================================================
+app.post('/mirrorProfile', (req, res) => {
+  let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
+  let copied = [];
 })
 //=============================================================
 let config = {
