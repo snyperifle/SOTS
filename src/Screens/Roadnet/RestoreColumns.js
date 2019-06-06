@@ -7,7 +7,7 @@ class RestoreColumns extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-
+      restoredFiles: [],
     };
     this.restoreColumns = this.restoreColumns.bind(this);
   }
@@ -18,7 +18,7 @@ class RestoreColumns extends React.Component {
         data: this.props.userId
       })
       .then((response) => {
-        console.log(response.data);
+        this.setState({ restoredFiles: response.data })
       })
       .catch((error) => {
         console.log(error);
@@ -46,7 +46,18 @@ class RestoreColumns extends React.Component {
           </Button>
             </div>
         }
-
+        {
+          this.state.restoredFiles ?
+            <div>
+              <h4>Files found and restored: </h4>
+              <ul>
+                {this.state.restoredFiles.map((item) => {
+                  <li>{item}</li>
+                })}
+              </ul>
+            </div> :
+            null
+        }
       </div>
     )
   }

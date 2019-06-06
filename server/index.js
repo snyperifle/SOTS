@@ -113,6 +113,7 @@ app.post('/restoreColumns', (req, res) => {
   let fse = require('fs-extra');
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
+  let notCopied = [];
 
   fse.pathExists(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}`, (err, exists) => {
     if (err) throw err;
