@@ -27,13 +27,13 @@ class AddToRI extends React.Component {
   addUser() {
     let temp = this.props.file;
     temp.push(`${this.props.userId} ${this.state.selectedOpCo.num}-${this.state.selectedRouterNumber.substring(8)}`)
-    console.log(temp[temp.length - 1])
+    // console.log(temp[temp.length - 1])
     this.setState({
       file: temp,
       selectedOpCoRouters: this.props.file.filter((item) => item.split(' ')[1].includes(String(this.state.selectedOpCo.num)))
     })
     temp = temp.join("\r\n")
-    console.log(temp);
+    // console.log(temp);
     axios.post('/updateUserConfigs', {
       data: temp
     })
