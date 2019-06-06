@@ -132,6 +132,7 @@ app.post('/restoreColumns', (req, res) => {
               })
           } else console.log(`${item} not found in rdclient-backup`);
         })
+        if(item === files[files.length-1]) console.log('LAST');
       })
     } else {
       console.log(`${item} is not in rdclient-backup`)
