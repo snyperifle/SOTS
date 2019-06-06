@@ -122,19 +122,25 @@ app.post('/restoreColumns', (req, res) => {
         fse.pathExists(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`, (err, exists) => {
           if (err) throw err;
           if (exists) {
-            fs.copyFile(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`, `//ms212rdfsc/rdclient$/${req.body.data}/${item}`, (err) => {
-              if (err) throw err;
-              console.log(`File ${item} copied from rdclient-backup to rdclient$`)
-              copied.push(item);
-            })
+            fse.copy(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`, `//ms212rdfsc/rdclient$/${req.body.data}/${item}`)
+              .then(() => {
+                copied.push(item);
+              })
+              .catch((error) => {
+                console.log(error);
+              })
           }
         })
       })
-    } else console.log("Can't find");
+    } else {
+      console.log(`${item} is not in rdclient-backup`)
+    }
+
+    setTimeout(() => {
+      res.send(copied);
+    }, 5000)
+
   })
-  setTimeout(() => {
-    res.send(copied);
-  },5000)
 })
 //=============================================================
 let config = {
