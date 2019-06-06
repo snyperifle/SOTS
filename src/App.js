@@ -365,8 +365,8 @@ class App extends React.Component {
                     <Link to="/addToRoadnet">Add User to Roadnet</Link>
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    {/* <Link to='/restoreColumns'>Restore User Columns</Link> */}
-                    <h6 style={{ color: 'grey' }}>Restore User Columns</h6>
+                    <Link to='/restoreColumns'>Restore User Columns</Link>
+                    {/* <h6 style={{ color: 'grey' }}>Restore User Columns</h6> */}
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <h6 style={{ color: 'grey' }}>Mirror User Profile</h6>
@@ -392,7 +392,6 @@ class App extends React.Component {
                 <h3>GasBoy</h3>
                 <ul>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    {/* <h6 style={{ color: 'grey' }}>Add User to Gasboy</h6> */}
                     <Link to="/addToGasboy">Add to Gasboy</Link>
                   </li>
                 </ul>

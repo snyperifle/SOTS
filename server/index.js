@@ -437,58 +437,58 @@ app.post('/createNewOpCo', (req, res) => {
   console.log('Num', req.body.data.OpCoNum);
   console.log('Name', req.body.data.OpCoName);;
 
-  let item = 'ms212rdctx16'
+  // let item = 'ms212rdctx16'
 
-  for (let i = 1; i <= 5; i++) {
-    fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}`, (err, exist) => {
-      if (err) throw err;
-      if (exist) console.log(`${req.body.data.OpCoNum}-${i} created`);
-    })
-    let folders = ['CUSTDL', 'RTRDL', 'RTRUL'];
-    folders.forEach((folder) => {
-      fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}/${folder}`, (err, exist) => {
-        if (err) throw err;
-        if (exist) console.log(`${folder} created`);
-      })
-    })
-    //=============================================================
-    let config =
-      'IW,"  ' +
-      // '429DOERLE FOOD SERVICE, LLC      '
-      `${req.body.data.OpCoNum}${req.body.data.OpCoName}`.padEnd(33, ' ')
-      + `AS${req.body.data.OpCoNum}A    "\r\n` +
-      'FV,"ROADNET        RDNY5 Y200010007"\r\n'
+  // for (let i = 1; i <= 5; i++) {
+  //   fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}`, (err, exist) => {
+  //     if (err) throw err;
+  //     if (exist) console.log(`${req.body.data.OpCoNum}-${i} created`);
+  //   })
+  //   let folders = ['CUSTDL', 'RTRDL', 'RTRUL'];
+  //   folders.forEach((folder) => {
+  //     fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}/${folder}`, (err, exist) => {
+  //       if (err) throw err;
+  //       if (exist) console.log(`${folder} created`);
+  //     })
+  //   })
+  //   //=============================================================
+  //   let config =
+  //     'IW,"  ' +
+  //     // '429DOERLE FOOD SERVICE, LLC      '
+  //     `${req.body.data.OpCoNum}${req.body.data.OpCoName}`.padEnd(33, ' ')
+  //     + `AS${req.body.data.OpCoNum}A    "\r\n` +
+  //     'FV,"ROADNET        RDNY5 Y200010007"\r\n'
 
-    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/CONFIG.tmp`, config, (err, res) => {
-      if (err) throw err;
-    })
-    //=============================================================
-    let lockout = ''
-    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/LOCKOUT.tmp`, lockout, (err, res) => {
-      if (err) throw err;
-    })
-    //=============================================================
-    let optmenu =
-      ''.padStart(270, ' ') +
-      `Delivery Day Upload ÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN15PG.exe`.padEnd(105, ' ') +
-      `ÿÿNormal              MANÌí2rLå@Custmr Profit Reportÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN16PG.EXE`.padEnd(126, ' ') +
-      `ÿÿNormal              MANW)QN­ëä@`
-    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/OPTMENU.DTA`, optmenu, (err, res) => {
-      if (err) throw err;
-    })
-    //=============================================================
-    let rtrsetup =
-      `AS429A   *NONE 0${i}\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\TRANSFER                         ` +
-      `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\CUSTDL                                             ` +
-      `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\RTRDL                                              ` +
-      `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\RTRUL                                              ` +
-      `SCDBFP10  *NONE     IBMDA400  537524510513523514539593505555597530523520523524532523555555   ` +
-      `ÿÿÿÿÿÿ  …ëQ¸°Lå@[°…±Lå@Ï… å@”Iªµå@1u¹½Mä@ò‹%?.ä@          `
+  //   fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/CONFIG.tmp`, config, (err, res) => {
+  //     if (err) throw err;
+  //   })
+  //   //=============================================================
+  //   let lockout = ''
+  //   fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/LOCKOUT.tmp`, lockout, (err, res) => {
+  //     if (err) throw err;
+  //   })
+  //   //=============================================================
+  //   let optmenu =
+  //     ''.padStart(270, ' ') +
+  //     `Delivery Day Upload ÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN15PG.exe`.padEnd(105, ' ') +
+  //     `ÿÿNormal              MANÌí2rLå@Custmr Profit Reportÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN16PG.EXE`.padEnd(126, ' ') +
+  //     `ÿÿNormal              MANW)QN­ëä@`
+  //   fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/OPTMENU.DTA`, optmenu, (err, res) => {
+  //     if (err) throw err;
+  //   })
+  //   //=============================================================
+  //   let rtrsetup =
+  //     `AS429A   *NONE 0${i}\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\TRANSFER                         ` +
+  //     `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\CUSTDL                                             ` +
+  //     `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\RTRDL                                              ` +
+  //     `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\RTRUL                                              ` +
+  //     `SCDBFP10  *NONE     IBMDA400  537524510513523514539593505555597530523520523524532523555555   ` +
+  //     `ÿÿÿÿÿÿ  …ëQ¸°Lå@[°…±Lå@Ï… å@”Iªµå@1u¹½Mä@ò‹%?.ä@          `
       
-    fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/RTRSETUP.DTA`, rtrsetup, (err, res) => {
-      if (err) throw err;
-    })
-  }
+  //   fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/RTRSETUP.DTA`, rtrsetup, (err, res) => {
+  //     if (err) throw err;
+  //   })
+  // }
 
   //Delivery Day Upload ÿÿ\\isibld\RD_Transfer\ern-sus\335\OPRN15PG.exe                                   
 
