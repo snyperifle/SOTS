@@ -73,10 +73,9 @@ app.post('/routesNotFlowing', (req, res) => {
       })
     })
   })
-  let serverCounter = 0;
   servers.forEach((item) => {
     let path = `//${item}/routing/${req.body.data.userOpCo}/RTRUL`;
-    res.write(`Searching in ${path}`)
+    // res.write(`Searching in ${path}`)
     fs.readdir(path, (err, res) => {
       if (err) throw err;
       res.forEach((item2) => {
