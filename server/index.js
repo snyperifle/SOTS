@@ -118,10 +118,10 @@ app.post('/restoreColumns', (req, res) => {
     if (err) throw err;
     if (exists) {
       files.forEach((item) => {
-        // console.log(`From: //ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`)
-        // console.log(`To:   //ms212rdfsc/rdclient$/${req.body.data}/${item}`);
-        fs.copyFile(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`,`//ms212rdfsc/rdclient$/${req.body.data}/${item}`, (err) => {
-          if(err) throw err;
+        console.log(`From: //ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`)
+        console.log(`To:   //ms212rdfsc/rdclient$/${req.body.data}/${item}`);
+        fs.copyFile(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`, `//ms212rdfsc/rdclient$/${req.body.data}/${item}`, (err) => {
+          if (err) throw err;
           console.log(`File ${item} copied from rdclient-backup to rdclient$`)
         })
       })
