@@ -47,7 +47,7 @@ class RestoreColumns extends React.Component {
             </div>
         }
         {
-          this.state.restoredFiles ?
+          this.state.restoredFiles.length > 0 ?
             <div>
               <h4>Files found and restored: </h4>
               <ul>
