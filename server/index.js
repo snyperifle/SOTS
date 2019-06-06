@@ -113,8 +113,9 @@ app.post('/restoreColumns', (req, res) => {
   let fse = require('fs-extra');
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
 
-  fse.pathExists(`//ms212rdfsc /${req.body.data}`, (err, exists) => {
+  fse.pathExists(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}`, (err, exists) => {
     console.log(req.body.data);
+    if (err) throw err;
     if (exists) {
       files.forEach((item) => {
         console.log(`From: //ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`)
@@ -484,7 +485,7 @@ app.post('/createNewOpCo', (req, res) => {
   //     `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\RTRUL                                              ` +
   //     `SCDBFP10  *NONE     IBMDA400  537524510513523514539593505555597530523520523524532523555555   ` +
   //     `ÿÿÿÿÿÿ  …ëQ¸°Lå@[°…±Lå@Ï… å@”Iªµå@1u¹½Mä@ò‹%?.ä@          `
-      
+
   //   fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/RTRSETUP.DTA`, rtrsetup, (err, res) => {
   //     if (err) throw err;
   //   })
