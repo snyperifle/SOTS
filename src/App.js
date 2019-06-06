@@ -125,6 +125,7 @@ class App extends React.Component {
     this.AddToGasboy = this.AddToGasboy.bind(this);
     this.TelogisInfo = this.TelogisInfo.bind(this);
     this.AddNewOpCo = this.AddNewOpCo.bind(this);
+    this.MirrorProfile = this.MirrorProfile.bind(this);
     //=============================================================
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.updateOpCo = this.updateOpCo.bind(this);
