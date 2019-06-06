@@ -11,13 +11,24 @@ class MirrorProfile extends React.Component {
     this.state = {
       loading: false,
       fromProfile: '',
+      fromProfileExists: false,
       copiedFiles: [],
     };
+    this.fromProfileChecker = this.fromProfileChecker.bind(this);
     this.mirrorProfile = this.mirrorProfile.bind(this);
   }
   //=============================================================
   componentDidMount() {
     console.log(this.props.file);
+  }
+  fromProfileChecker(input) {
+
+    if (this.props.filter((item) => item.split(' ')[0] === input).length === 1) {
+      this.setState({
+        fromProfileExists: true,
+        fromProfile: input
+      })
+    }
   }
   mirrorProfile() {
     this.setState({
@@ -54,11 +65,7 @@ class MirrorProfile extends React.Component {
                 placeholder="User ID to mirror from"
                 style={{ width: 350 }}
                 onChange={(input) => {
-                  if (input.target.value.length === 8) {
-                    this.setState({
-                      fromProfile: input.target.value
-                    })
-                  }
+                  this.fromProfileChecker(input.target.value);
                 }}
               />
             </Form>
