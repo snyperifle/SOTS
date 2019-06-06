@@ -206,7 +206,7 @@ class App extends React.Component {
   MirrorProfile() {
     return (
       <MirrorProfile
-
+        userId={this.state.userId}
       />
     )
   }

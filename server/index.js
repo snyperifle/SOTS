@@ -114,7 +114,7 @@ app.post('/restoreColumns', (req, res) => {
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
 
-  fse.pathExists(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}`, (err, exists) => {
+  fse.pathExistsSync(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}`, (err, exists) => {
     if (err) throw err;
     if (exists) {
       files.forEach((item) => {
@@ -133,17 +133,19 @@ app.post('/restoreColumns', (req, res) => {
         })
       })
     } else {
-      console.log(`${item} is not in rdclient-backup`)
+      console.log(`${req.body.data} is not in rdclient-backup`)
     }
-    setTimeout(() => {
-      res.send(copied);
-    }, 3000)
   })
+  res.send(copied);
 })
 //=============================================================
 app.post('/mirrorProfile', (req, res) => {
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
+
+  fse.pathExists(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data.fromProfile}`,(err, exist) => {
+    
+  })
 })
 //=============================================================
 let config = {
