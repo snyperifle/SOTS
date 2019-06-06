@@ -75,20 +75,14 @@ app.post('/routesNotFlowing', (req, res) => {
   })
   let serverCounter = 0;
   servers.forEach((item) => {
-    serverCounter++;
     let path = `//${item}/routing/${req.body.data.userOpCo}/RTRUL`;
     fs.readdir(path, (err, res) => {
       if (err) throw err;
-      let fileCounter = 0;
-      let fileCount = res.length
       res.forEach((item2) => {
-        fileCounter++;
         fs.readFile(`${path}/${item2}`, 'utf8', (err, data) => {
           if (err) throw err
           let content = data.split('\n')
-          let orderCounter = 0;
           content.forEach((item3) => {
-            orderCounter++;
             if (item3.slice(20, 24) === req.body.data.route && found.sendable === true) {
               console.log('Upload found');
               found.sendable = false
