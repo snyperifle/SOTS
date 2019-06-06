@@ -280,11 +280,6 @@ class App extends React.Component {
                 }}
               >Sysco Outbound Transportation Support Dashboard
               </h3>
-              <button
-                onClick={() => {
-                  console.log(this.state.userOpCo)
-                }}
-              >test</button>
             </Navbar.Brand>
             <Form inline>
               {this.state.userId.length > 0 ?
