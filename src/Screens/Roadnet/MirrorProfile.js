@@ -22,11 +22,14 @@ class MirrorProfile extends React.Component {
     console.log(this.props.file);
   }
   fromProfileChecker(input) {
-
     if (this.props.file.filter((item) => item.split(' ')[0] === input).length === 1) {
       this.setState({
         fromProfileExists: true,
         fromProfile: input
+      })
+    } else {
+      this.setState({
+        fromProfileExists: false,
       })
     }
   }
@@ -72,11 +75,11 @@ class MirrorProfile extends React.Component {
         }
         {
           this.props.userId !== '' && this.state.fromProfile.length === 8 ?
-            <h4>Copy profile from {this.state.fromProfile} to {this.props.userId}</h4>
+            <h4>Copy profile from {this.state.fromProfile} to {this.props.userId}?</h4>
             : null
         }
         {
-          this.props.userId.length > 0 && this.state.fromProfile.length > 0 ?
+          this.props.userId.length > 0 && this.state.fromProfile.length > 0 && this.state.fromProfileExists === true ?
             <Button
               variant="contained"
               color="secondary"
