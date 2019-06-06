@@ -23,7 +23,7 @@ class MirrorProfile extends React.Component {
   }
   fromProfileChecker(input) {
 
-    if (this.props.filter((item) => item.split(' ')[0] === input).length === 1) {
+    if (this.props.file.filter((item) => item.split(' ')[0] === input).length === 1) {
       this.setState({
         fromProfileExists: true,
         fromProfile: input
