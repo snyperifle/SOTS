@@ -48,6 +48,7 @@ class RoutesNotFlowing extends React.Component {
         style={{ margin: 20 }}
       >
         <h2>Routes Not Flowing to SUS</h2>
+        <h4>Enter a route number to search through RTRDL and RTRUL folders</h4>
         <Form
           style={{ width: 400, margin: 20 }}
         >
