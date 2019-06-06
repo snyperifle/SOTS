@@ -21,6 +21,8 @@ class RoutesNotFlowing extends React.Component {
   getRoutes() {
     this.setState({
       loading: true,
+      message: '',
+      path: '',
     })
     axios.post('/routesNotFlowing', {
       data: {
