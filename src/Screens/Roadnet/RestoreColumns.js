@@ -51,9 +51,9 @@ class RestoreColumns extends React.Component {
             <div>
               <h4>Files found and restored: </h4>
               <ul>
-                {this.state.restoredFiles.map((item) => {
+                {this.state.restoredFiles.map((item) => (
                   <li>{item}</li>
-                })}
+                ))}
               </ul>
             </div> :
             null
