@@ -42,7 +42,7 @@ class MirrorProfile extends React.Component {
           Mirror Profile Configs
           </h2>
         {
-          this.props.userId === '' ?
+          this.props.userId === '' || this.props.userOpCo === null ?
             <h2 style={{ color: 'red' }}>Please enter the Caller ID</h2>
             : null
         }
@@ -50,6 +50,7 @@ class MirrorProfile extends React.Component {
           <FormControl
             type='text'
             placeholder="User ID to mirror from"
+            style={{ width: 350 }}
             onChange={(input) => {
               if (input.target.value.length === 8) {
                 this.setState({

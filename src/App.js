@@ -208,6 +208,7 @@ class App extends React.Component {
     return (
       <MirrorProfile
         userId={this.state.userId}
+        userOpCo={this.state.userOpCo}
       />
     )
   }
