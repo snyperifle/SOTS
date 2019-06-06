@@ -13,6 +13,7 @@ class RestoreColumns extends React.Component {
   }
   //=============================================================
   restoreColumns() {
+    console.log('firing')
     axios.post('/restoreColumns',
       {
         data: this.props.userId
