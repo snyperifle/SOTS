@@ -139,7 +139,7 @@ app.post('/restoreColumns', (req, res) => {
       console.log(`${req.body.data} does not exist in ${backupFolder}`)
     }
   })
-  this.setTimeout(() => {
+  setTimeout(() => {
     res.send(copied);
   }, 3000)
 })
@@ -174,7 +174,7 @@ app.post('/mirrorProfile', (req, res) => {
       console.log(`${req.body.data.fromProfile} does not exist in ${backupFolder}`);
     }
   })
-  this.setTimeout(() => {
+  setTimeout(() => {
     res.send(copied);
   }, 3000)
 })
