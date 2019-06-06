@@ -295,7 +295,7 @@ class App extends React.Component {
                   </h5>
                   <h5>
                     {this.state.userOpCo ?
-                      `Timezone: `
+                      `Timezone: ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].timezone}`
                       : null}
                   </h5>
                 </div>
