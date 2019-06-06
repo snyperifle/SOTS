@@ -55,9 +55,11 @@ class RoutesNotFlowing extends React.Component {
             type="text"
             placeholder="Route Number, ex:1234"
             onChange={(text) => {
-              this.setState({
-                route: text.target.value
-              })
+              if (text.target.value.length === 4) {
+                this.setState({
+                  route: text.target.value
+                })
+              }
             }}
           ></FormControl>
         </Form>
