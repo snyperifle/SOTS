@@ -56,7 +56,7 @@ class MirrorProfile extends React.Component {
     return (
       <div style={{ margin: 20 }}>
         <h2>
-          Mirror Profile Configs
+          Mirror User Profile
           </h2>
         {
           this.props.userId === '' || this.props.userOpCo === null ?

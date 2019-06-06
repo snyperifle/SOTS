@@ -381,7 +381,7 @@ class App extends React.Component {
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     {/* <h6 style={{ color: 'grey' }}>Mirror User Profile</h6> */}
-                    <Link to='/mirrorProfile'>Mirror User Config</Link>
+                    <Link to='/mirrorProfile'>Mirror User Profile</Link>
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <h6 style={{ color: 'grey' }}>Replace RI Config File</h6>
