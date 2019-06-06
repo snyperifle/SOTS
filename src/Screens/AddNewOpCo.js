@@ -12,11 +12,24 @@ class AddNewOpCo extends React.Component {
       OpCoNum: 0,
       OpCoName: '',
     };
-
+    this.createOpCo = this.createOpCo.bind(this);
   }
   //=============================================================
   createOpCo() {
     alert('FIRING');
+    axios.post('/createNewOpCo',
+              {
+                data: {
+                  OpCoNum: this.state.OpCoNum,
+                  OpCoName: this.state.OpCoName,
+                }
+              })
+              .then((response) => {
+                console.log(response.data);
+              })
+              .catch((error) => {
+                console.log(error);
+              })
   }
   //=============================================================
   render() {
@@ -52,19 +65,7 @@ class AddNewOpCo extends React.Component {
           variant="contained"
           color="secondary"
           onClick={() => {
-            axios.post('/createNewOpCo',
-              {
-                data: {
-                  OpCoNum: this.state.OpCoNum,
-                  OpCoName: this.state.OpCoName,
-                }
-              })
-              .then((response) => {
-                console.log(response.data);
-              })
-              .catch((error) => {
-                console.log(error);
-              })
+            this.createOpCo();
           }}
         >Create New OpCo</Button>
         <button
