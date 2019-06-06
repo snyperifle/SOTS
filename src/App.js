@@ -12,14 +12,14 @@ import Divider from '@material-ui/core/Divider'
 import './App.css';
 //=============================================================
 import Home from './Screens/Home'
-import AddToRoadnet from './Screens/AddToRoadnet';
-import AddToRI from './Screens/AddToRI'
-import AddToGasboy from './Screens/AddToGasboy';
-import RemoveFromRI from './Screens/RemoveFromRI';
-import RoutesNotFlowing from './Screens/RoutesNotFlowing';
-import RestoreColumns from './Screens/RestoreColumns';
-import TelogisInfo from './Screens/TelogisInfo';
-import AddNewOpCo from './Screens/AddNewOpCo';
+import AddToRoadnet from './Screens/Roadnet/AddToRoadnet';
+import AddToRI from './Screens/RoutingInterface/AddToRI'
+import AddToGasboy from './Screens/Gasboy/AddToGasboy';
+import RemoveFromRI from './Screens/RoutingInterface/RemoveFromRI';
+import RoutesNotFlowing from './Screens/RoutingInterface/RoutesNotFlowing';
+import RestoreColumns from './Screens/Roadnet/RestoreColumns';
+import TelogisInfo from './Screens/Telogis/TelogisInfo';
+import AddNewOpCo from './Screens/Development/AddNewOpCo';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
