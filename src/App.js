@@ -292,6 +292,9 @@ class App extends React.Component {
                     {this.state.userOpCo ?
                       `OpCo: ${this.state.userOpCo.split('-')[0]} ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].name}`
                       : null}
+                    {this.state.userOpCo ?
+                      `Timezone: `
+                      : null}
                   </h5>
                 </div>
                 : null}
@@ -310,7 +313,6 @@ class App extends React.Component {
                     this.setState({
                       userOpCo: temp
                     })
-                    console.log(temp);
                   } else {
                     this.setState({
                       userOpCo: null
