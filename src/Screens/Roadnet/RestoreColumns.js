@@ -54,7 +54,7 @@ class RestoreColumns extends React.Component {
         {
           this.state.restoredFiles.length > 0 ?
             <div>
-              <h4>Files found and restored: </h4>
+              <h4>Files found and restored:</h4>
               <ul>
                 {this.state.restoredFiles.map((item) => (
                   <li>{item}</li>

@@ -45,7 +45,7 @@ class MirrorProfile extends React.Component {
       }
     })
       .then((response) => {
-        console.log(response.data);
+        this.setState({ copiedFiles: response.data, loading: false })
       })
       .catch((error) => {
         console.log(error);
@@ -87,6 +87,18 @@ class MirrorProfile extends React.Component {
                 this.mirrorProfile();
               }}
             >Confirm</Button>
+            : null
+        }
+        {
+          this.state.copiedFiles.length > 0 ?
+            <div>
+              <h4>Files copied:</h4>
+              <ul>
+                {this.state.copiedFiles.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
             : null
         }
       </div>
