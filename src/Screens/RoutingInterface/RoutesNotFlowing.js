@@ -9,6 +9,7 @@ class RoutesNotFlowing extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      loading: false,
       routes: [],
       route: '',
       message: '',
@@ -18,6 +19,9 @@ class RoutesNotFlowing extends React.Component {
   }
 
   getRoutes() {
+    this.setState({
+      loading: true,
+    })
     axios.post('/routesNotFlowing', {
       data: {
         userOpCo: this.props.userOpCo,
@@ -28,7 +32,8 @@ class RoutesNotFlowing extends React.Component {
       console.log(res.data)
       this.setState({
         message: res.data.result,
-        path: res.data.path
+        path: res.data.path,
+        loading: false
       })
     })
       .catch((err) => console.log(err))
@@ -73,6 +78,11 @@ class RoutesNotFlowing extends React.Component {
             <h5>{this.state.path}</h5>
           </div>
           : null
+        }
+        {
+          this.state.loading === true ?
+            <h3>Loading...</h3>
+            : null
         }
       </div>
     )
