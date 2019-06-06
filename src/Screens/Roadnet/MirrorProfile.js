@@ -44,22 +44,27 @@ class MirrorProfile extends React.Component {
         {
           this.props.userId === '' || this.props.userOpCo === null ?
             <h2 style={{ color: 'red' }}>Please enter the Caller ID</h2>
+            :
+            <Form>
+              <FormControl
+                type='text'
+                placeholder="User ID to mirror from"
+                style={{ width: 350 }}
+                onChange={(input) => {
+                  if (input.target.value.length === 8) {
+                    this.setState({
+                      fromProfile: input.target.value
+                    })
+                  }
+                }}
+              />
+            </Form>
+        }
+        {
+          this.props.userId !== '' && this.state.fromProfile.length === 8 ?
+            <h4>Copy profile from {this.state.fromProfile} to {this.props.userId}</h4>
             : null
         }
-        <Form>
-          <FormControl
-            type='text'
-            placeholder="User ID to mirror from"
-            style={{ width: 350 }}
-            onChange={(input) => {
-              if (input.target.value.length === 8) {
-                this.setState({
-                  fromProfile: input.target.value
-                })
-              }
-            }}
-          />
-        </Form>
         {
           this.props.userId.length > 0 && this.state.fromProfile.length > 0 ?
             <Button

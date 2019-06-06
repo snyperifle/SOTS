@@ -147,7 +147,7 @@ app.post('/mirrorProfile', (req, res) => {
   let backupFolder = '//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/'
   let destinationFolder = '//ms212rdfsc/rdclient$/'
 
-  fse.pathExists(`${backupFolder}${req.body.data.fromProfile}`,(err, exists) => {
+  fse.pathExistsSync(`${backupFolder}${req.body.data.fromProfile}`,(err, exists) => {
     if(err) throw err;
     if(exists){
       files.forEach((item) => {
