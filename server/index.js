@@ -111,7 +111,7 @@ app.post('/routesNotFlowing', (req, res) => {
 })
 //=============================================================
 app.post('/restoreColumns', (req, res) => {
-  console.log('Restoring Profile...');
+  console.log(`Restoring Profile for ${req.body.data}`);
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
   let backupFolder = '//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/'
@@ -143,7 +143,7 @@ app.post('/restoreColumns', (req, res) => {
 })
 //=============================================================
 app.post('/mirrorProfile', (req, res) => {
-  console.log('Mirroring Profile...');
+  console.log(`Mirroring Profile from ${req.body.data.fromProfile} to ${req.body.data.toProfile}`);
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
   let backupFolder = '//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/'
