@@ -303,7 +303,6 @@ class App extends React.Component {
                     this.setState({
                       userId: text.target.value
                     })
-                    // console.log(this.state.file)
                     let temp = this.state.file.filter((item) => {
                       return item.includes(text.target.value);
                     })
@@ -311,6 +310,7 @@ class App extends React.Component {
                     this.setState({
                       userOpCo: temp
                     })
+                    console.log(temp);
                   } else {
                     this.setState({
                       userOpCo: null
