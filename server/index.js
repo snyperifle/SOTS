@@ -112,22 +112,28 @@ app.post('/routesNotFlowing', (req, res) => {
 app.post('/restoreColumns', (req, res) => {
   let fse = require('fs-extra');
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
+  let copied = [];
 
   fse.pathExists(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}`, (err, exists) => {
-    // console.log(req.body.data);
     if (err) throw err;
     if (exists) {
       files.forEach((item) => {
-        console.log(`From: //ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`)
-        console.log(`To:   //ms212rdfsc/rdclient$/${req.body.data}/${item}`);
-        fs.copyFile(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`, `//ms212rdfsc/rdclient$/${req.body.data}/${item}`, (err) => {
+        fse.pathExists(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`, (err, exists) => {
           if (err) throw err;
-          console.log(`File ${item} copied from rdclient-backup to rdclient$`)
+          if (exists) {
+            fs.copyFile(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`, `//ms212rdfsc/rdclient$/${req.body.data}/${item}`, (err) => {
+              if (err) throw err;
+              console.log(`File ${item} copied from rdclient-backup to rdclient$`)
+              copied.push(item);
+            })
+          }
         })
       })
     } else console.log("Can't find");
   })
-
+  setTimeout(() => {
+    res.send(copied);
+  },5000)
 })
 //=============================================================
 let config = {
