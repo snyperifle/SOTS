@@ -124,12 +124,13 @@ app.post('/restoreColumns', (req, res) => {
           if (exists) {
             fse.copy(`//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/${req.body.data}/${item}`, `//ms212rdfsc/rdclient$/${req.body.data}/${item}`)
               .then(() => {
+                console.log(`Copying ${item} from rdclient-backup to rdclient$`)
                 copied.push(item);
               })
               .catch((error) => {
                 console.log(error);
               })
-          }
+          } else console.log(`${item} not found in rdclient-backup`);
         })
       })
     } else {
