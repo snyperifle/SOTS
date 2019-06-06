@@ -54,7 +54,6 @@ app.post('/routesNotFlowing', (req, res) => {
 
   servers.forEach((item) => {
     let path = `//${item}/routing/${req.body.data.userOpCo}/RTRDL`;
-    console.log(`PATH: ${path}`);
     fs.readdir(path, (err, res) => {
       if (err) throw err;
       res.forEach((item2) => {
@@ -76,7 +75,6 @@ app.post('/routesNotFlowing', (req, res) => {
   })
   servers.forEach((item) => {
     let path = `//${item}/routing/${req.body.data.userOpCo}/RTRUL`;
-    console.log(`PATH: ${path}`);
     fs.readdir(path, (err, res) => {
       if (err) throw err;
       res.forEach((item2) => {
@@ -101,7 +99,7 @@ app.post('/routesNotFlowing', (req, res) => {
     if (found.sendable === true) {
       sendRoutes();
     }
-  }, 10000)
+  }, 5000)
 
 })
 //=============================================================
