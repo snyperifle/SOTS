@@ -293,9 +293,11 @@ class App extends React.Component {
                       `OpCo: ${this.state.userOpCo.split('-')[0]} ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].name}`
                       : null}
                   </h5>
-                  <h5>
+                  <h5
+                    style={{ color: 'blue' }}
+                  >
                     {this.state.userOpCo ?
-                      `Timezone: ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].timezone}`
+                      `${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].timezone}`
                       : null}
                   </h5>
                 </div>
