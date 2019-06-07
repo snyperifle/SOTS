@@ -21,6 +21,7 @@ import RestoreColumns from './Screens/Roadnet/RestoreColumns';
 import TelogisInfo from './Screens/Telogis/TelogisInfo';
 import AddNewOpCo from './Screens/Development/AddNewOpCo';
 import MirrorProfile from './Screens/Roadnet/MirrorProfile';
+import GS1Barcode from './Screens/GS1/GS1Barcode';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -126,6 +127,7 @@ class App extends React.Component {
     this.TelogisInfo = this.TelogisInfo.bind(this);
     this.AddNewOpCo = this.AddNewOpCo.bind(this);
     this.MirrorProfile = this.MirrorProfile.bind(this);
+    this.GS1Barcode = this.GS1Barcode.bind(this);
     //=============================================================
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.updateOpCo = this.updateOpCo.bind(this);
@@ -242,6 +244,14 @@ class App extends React.Component {
   AddNewOpCo() {
     return (
       <AddNewOpCo
+
+      />
+    )
+  }
+
+  GS1Barcode(){
+    return(
+      <GS1Barcode
 
       />
     )
@@ -421,6 +431,13 @@ class App extends React.Component {
                     <Link to="/addNewOpCo">Add New OpCo</Link>
                   </li>
                 </ul>
+                <Divider variant="middle" />
+                <h4>GS1 Barcode</h4>
+                <ul>
+                  <li onClick={() => this.setState({ drawer: false, page: true})}>
+                    <Link to="/gs1Barcode">Manual Process</Link>
+                  </li>
+                </ul>
               </div>
             </nav>
             : null}
@@ -437,6 +454,7 @@ class App extends React.Component {
               <Route path="/telogisInfo" component={this.TelogisInfo} />
               <Route path="/addNewOpCo" component={this.AddNewOpCo} />
               <Route path="/mirrorProfile" component={this.MirrorProfile} />
+              <Route path="/gs1Barcode" component={this.GS1Barcode}/>
             </div>
             : null}
         </div>

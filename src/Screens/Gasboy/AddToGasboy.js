@@ -337,18 +337,44 @@ class AddToGasboy extends React.Component {
       excelData: [],
       downloadData: [],
     };
+    this.connectoToGBDB = this.connectoToGBDB.bind(this);
+    this.disconnectFromGBDB = this.disconnectFromGBDB.bind(this);
     this.generateEquipmentExcelFile = this.generateEquipmentExcelFile.bind(this);
     this.generateEmployeeExcelFile = this.generateEmployeeExcelFile.bind(this);
   }
   componentDidMount() {
     if (this.props.userOpCo) {
-      console.log(this.props.userOpCo.substring(0,3));
-      console.log(this.state.OpCoData[this.props.userOpCo.substring(0,3)]);
-        this.setState({
-          selectedOpCo: this.state.OpCoData[this.props.userOpCo.substring(0,3)]
-        })
-
+      console.log(this.props.userOpCo.substring(0, 3));
+      console.log(this.state.OpCoData[this.props.userOpCo.substring(0, 3)]);
+      this.setState({
+        selectedOpCo: this.state.OpCoData[this.props.userOpCo.substring(0, 3)]
+      })
     }
+    this.connectoToGBDB();
+  }
+
+  componentWillUnmount() {
+    this.disconnectFromGBDB();
+  }
+
+  connectoToGBDB() {
+    axios.get('/connectToGBDB', {})
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  disconnectFromGBDB() {
+    axios.get('/disconnectFromGBDB', {})
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
   }
 
   generateEquipmentExcelFile() {

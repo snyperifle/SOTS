@@ -172,17 +172,23 @@ app.post('/mirrorProfile', (req, res) => {
   }, 3000)
 })
 //=============================================================
-let config = {
+let gbconfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PW,
   server: process.env.DB_HOST,
   database: process.env.DB_NAME
 };
-
-sql.connect(config, function (err) {
-  if (err) throw err;
-  console.log('Connected to Gasboy DB');
-});
+app.get('/connectToGBDB', (req, res) => {
+  sql.connect(gbconfig, (err) => {
+    if (err) throw err;
+    console.log('Connected to Gasboy DB');
+    res.send('Connected to Gasboy Database');
+  });
+})
+app.get('/disconnectFromGBDB', (req, res) => {
+  sql.close(gbconfig);
+  res.send('Disconnected from Gasboy Database')
+})
 
 app.post('/gasboyEquipment', (req, res) => {
   let query = req.body.data.queue.reduce((result, item) => {
@@ -545,4 +551,24 @@ app.post('/createNewOpCo', (req, res) => {
   //     if (err) throw err;
   //   });
 
+})
+//=============================================================
+let gs1config = {
+  user: process.env.GS1_USER,
+  password: process.env.GS1_PW,
+  server: process.env.GS1_HOST,
+  database: process.env.GS1_NAME
+}
+app.get('/connectToGS1DB', (req, res) => {
+  sql.connect(gs1config, (err) => {
+    if (err) throw err;
+    console.log('Connected to STS DB');
+    res.send('Connected to STS Database');
+  })
+})
+
+app.get('/disconnectFromGS1DB', (req, res) => {
+  sql.close(gs1config);
+  console.log('Disconnected from STS DB');
+  res.send('Disconnected from Gasboy Database')
 })
