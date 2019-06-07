@@ -15,11 +15,11 @@ class GS1Barcode extends React.Component {
 
   componentDidMount() {
 
-    this.connectToGS1DB();
+    // this.connectToGS1DB();
   }
   componentWillUnmount() {
 
-    this.disconnectedFromGS1DB();
+    // this.disconnectedFromGS1DB();
   }
   connectToGS1DB() {
     axios.get('/connectToGS1DB', {})
