@@ -1,17 +1,10 @@
 .App{
-  /* display: 'flex'; */
-  /* margin:40px */
-}
 
-/* .drawer-icon{
-  display:flex;
-  flex-direction: row;
-  justify-content: space-between
-} */
+}
 
 .side-drawer {
   height:100%;
-  background:white;
+  background:lightskyblue;
   box-shadow: 2px 0px 5px black;
   position: fixed;
   top: 0;
