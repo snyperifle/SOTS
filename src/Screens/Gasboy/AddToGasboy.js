@@ -418,139 +418,139 @@ class AddToGasboy extends React.Component {
 
   render() {
     return (
-      <Container>
+      <Container className="MainPage">
         <Row>
-          <h2>Add to Gasboy</h2>
+          <h2 className="title">Add to Gasboy</h2>
         </Row>
         <Row>
-        <form
-          autoComplete="off"
-          style={{ marginBottom: 5 }}
-        >
-          <FormControl>
-            <InputLabel >Select OpCo</InputLabel>
-            <Select
-              style={{ width: 250 }}
-              value={this.state.selectedOpCo || "No Opco Selected"}
-              onChange={(event) => {
-                this.setState({
-                  selectedOpCo: event.target.value
-                })
-                // console.log(`Selected OpCo: ${event.target.value.num}`)
-              }}
-            >
-              {this.props.allOpCo.map((item, i) => (
-                <MenuItem key={item.num} value={item}>{item.num} - {item.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </form>
-        {/* //============================================================= */}
-        <form
-          autoComplete="off"
-          style={{ marginBottom: 5 }}
-        >
-          <FormControl>
-            {this.state.selectedOpCo ? null : <InputLabel >Select Device Type</InputLabel>}
-            <Select
-              style={{ width: 250 }}
-              value={this.state.selectedDeviceType || "No Device Type Selected"}
-              onChange={(event) => {
-                this.setState({
-                  selectedDeviceType: event.target.value
-                })
-              }}
-            >
-              {this.state.deviceType.map((item, i) => (
-                <MenuItem key={item.type} value={item}>{item.type}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </form>
-        {/* //============================================================= */}
-        {this.state.selectedDeviceType === this.state.deviceType[1] ?
-          <form>
-            <TextField
-              label="Employee Name"
-              required
-              value={this.state.employeeName}
-              onChange={(event) => {
-                this.setState({ employeeName: event.target.value })
-              }}
-            />
+          <form
+            autoComplete="off"
+            style={{ marginBottom: 5 }}
+          >
+            <FormControl>
+              <InputLabel >Select OpCo</InputLabel>
+              <Select
+                style={{ width: 250 }}
+                value={this.state.selectedOpCo || "No Opco Selected"}
+                onChange={(event) => {
+                  this.setState({
+                    selectedOpCo: event.target.value
+                  })
+                  // console.log(`Selected OpCo: ${event.target.value.num}`)
+                }}
+              >
+                {this.props.allOpCo.map((item, i) => (
+                  <MenuItem key={item.num} value={item}>{item.num} - {item.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </form>
-          : null
-        }
-        {/* //============================================================= */}
-        {this.state.selectedDeviceType ?
-          <form>
-            <TextField
-              label="ID"
-              required
-              value={this.state.number}
-              onChange={(event) => {
-                this.setState({ number: event.target.value })
-              }}
-              style={{ marginBottom: 10 }}
-            />
-          </form> : null}
-        {/* //============================================================= */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            let temp = this.state.queue;
-            if (this.state.employeeName && this.state.number) {
-              temp.push(`${this.state.employeeName},${this.state.number}`)
-              this.setState({
-                queue: temp,
-                employeeName: '',
-                number: '',
-              })
-            } else if (!this.state.employeeName && this.state.number) {
-              temp.push(`${this.state.number}`)
-              this.setState({
-                queue: temp,
-                number: '',
-              })
-            }
-            else {
-              console.log("Require input")
-            }
-          }}
-        >Add</Button>
-        {/* //============================================================= */}
-        {this.state.queue.length ?
-          <ul>
-            {this.state.queue.map((item, i) => (
-              <li key={item[i]}>{item}</li>
-            ))}
-          </ul>
-          : null}
-        {/* //============================================================= */}
-        {this.state.queue.length ? <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            this.state.selectedDeviceType === this.state.deviceType[0] ?
-              this.generateEquipmentExcelFile() : this.generateEmployeeExcelFile()
-            this.setState({
-              queue: []
-            })
-          }}
-        >Create Excel file</Button> : null}
-        {/* //============================================================= */}
-        {this.state.downloadData.length > 0 ?
-          <CSVLink
-            data={this.state.downloadData}
-            filename={'export.csv'}
-            style={{
-              color: 'green',
-              margin: 20
+          {/* //============================================================= */}
+          <form
+            autoComplete="off"
+            style={{ marginBottom: 5 }}
+          >
+            <FormControl>
+              {this.state.selectedOpCo ? null : <InputLabel >Select Device Type</InputLabel>}
+              <Select
+                style={{ width: 250 }}
+                value={this.state.selectedDeviceType || "No Device Type Selected"}
+                onChange={(event) => {
+                  this.setState({
+                    selectedDeviceType: event.target.value
+                  })
+                }}
+              >
+                {this.state.deviceType.map((item, i) => (
+                  <MenuItem key={item.type} value={item}>{item.type}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </form>
+          {/* //============================================================= */}
+          {this.state.selectedDeviceType === this.state.deviceType[1] ?
+            <form>
+              <TextField
+                label="Employee Name"
+                required
+                value={this.state.employeeName}
+                onChange={(event) => {
+                  this.setState({ employeeName: event.target.value })
+                }}
+              />
+            </form>
+            : null
+          }
+          {/* //============================================================= */}
+          {this.state.selectedDeviceType ?
+            <form>
+              <TextField
+                label="ID"
+                required
+                value={this.state.number}
+                onChange={(event) => {
+                  this.setState({ number: event.target.value })
+                }}
+                style={{ marginBottom: 10 }}
+              />
+            </form> : null}
+          {/* //============================================================= */}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              let temp = this.state.queue;
+              if (this.state.employeeName && this.state.number) {
+                temp.push(`${this.state.employeeName},${this.state.number}`)
+                this.setState({
+                  queue: temp,
+                  employeeName: '',
+                  number: '',
+                })
+              } else if (!this.state.employeeName && this.state.number) {
+                temp.push(`${this.state.number}`)
+                this.setState({
+                  queue: temp,
+                  number: '',
+                })
+              }
+              else {
+                console.log("Require input")
+              }
             }}
-          >Download File</CSVLink>
-          : null
-        }
+          >Add</Button>
+          {/* //============================================================= */}
+          {this.state.queue.length ?
+            <ul>
+              {this.state.queue.map((item, i) => (
+                <li key={item[i]}>{item}</li>
+              ))}
+            </ul>
+            : null}
+          {/* //============================================================= */}
+          {this.state.queue.length ? <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              this.state.selectedDeviceType === this.state.deviceType[0] ?
+                this.generateEquipmentExcelFile() : this.generateEmployeeExcelFile()
+              this.setState({
+                queue: []
+              })
+            }}
+          >Create Excel file</Button> : null}
+          {/* //============================================================= */}
+          {this.state.downloadData.length > 0 ?
+            <CSVLink
+              data={this.state.downloadData}
+              filename={'export.csv'}
+              style={{
+                color: 'green',
+                margin: 20
+              }}
+            >Download File</CSVLink>
+            : null
+          }
         </Row>
       </Container>
     )

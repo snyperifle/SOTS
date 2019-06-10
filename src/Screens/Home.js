@@ -61,7 +61,9 @@ class Home extends React.Component {
     return (
       <Container className="MainPage">
         <Row>
-          <h1 className='title'>Welcome</h1>
+          <Col>
+            <h1 className='title'>Welcome</h1>
+          </Col>
         </Row>
         <Row>
           <Col>
