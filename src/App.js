@@ -490,7 +490,7 @@ class App extends React.Component {
             </div>
             :
             <Container>
-              <Row style={{ marginTop: 20 }}>
+              <Row style={{ marginTop: 100 }}>
                 <Col></Col>
                 <Col>
                   <ClipLoader
