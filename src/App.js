@@ -10,6 +10,8 @@ import AddIcon from '@material-ui/icons/Add';
 import ListIcon from '@material-ui/icons/List';
 import Divider from '@material-ui/core/Divider'
 import './App.css';
+import { css } from '@emotion/core';
+import { ClipLoader } from 'react-spinners';
 //=============================================================
 import Home from './Screens/Home'
 
@@ -124,6 +126,7 @@ class App extends React.Component {
       drawer: false,
       page: true,
       date: '',
+      loading: true,
     };
     this.Home = this.Home.bind(this);
     this.AddToRoadnet = this.AddToRoadnet.bind(this);
@@ -484,7 +487,20 @@ class App extends React.Component {
               <Route path="/addNewOpCo" component={this.AddNewOpCo} />
               <Route path="/gs1Barcode" component={this.GS1Barcode} />
             </div>
-            : null}
+            :
+            <ClipLoader
+              css={
+                `display:block;
+                margin:0 auto;
+                border-color:red;
+                `
+              }
+              size={150}
+              sizeUnit={"px"}
+              color={'red'}
+              loading={this.state.loading}
+            />
+          }
         </div>
       </Router >
     )
