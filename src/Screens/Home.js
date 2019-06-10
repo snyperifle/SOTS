@@ -80,7 +80,10 @@ class Home extends React.Component {
             ))}
           </div>
           <div
-            style={{ justifySelf: 'center' }}
+            style={{
+              // justifySelf: 'center' 
+              textAlign: 'center'
+            }}
           >
             <h4>Onshore Time</h4>
             <Clock
