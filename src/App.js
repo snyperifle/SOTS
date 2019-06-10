@@ -173,7 +173,7 @@ class App extends React.Component {
         }
       })
   }
-  getDate(){
+  getDate() {
     let date = new Date();
     let today = `${date.getFullYear()}`
   }
@@ -469,7 +469,9 @@ class App extends React.Component {
             : null}
           {/* //============================================================= */}
           {this.state.page ?
-            <div>
+            <div
+              style={{ margin: 20 }}
+            >
               <Route exact path="/" component={this.Home} />
               <Route path="/addToRoadnet" component={this.AddToRoadnet} />
               <Route path="/restoreColumns" component={this.RestoreColumns} />
