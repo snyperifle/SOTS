@@ -461,7 +461,7 @@ class App extends React.Component {
             </nav>
             : null}
           {/* //============================================================= */}
-          {this.state.page ?
+          {this.state.page === true || this.state.page === false ?
             <div
               style={{ margin: 20 }}
             >
