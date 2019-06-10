@@ -60,9 +60,9 @@ class Home extends React.Component {
   render() {
     return (
       <Container className="MainPage">
-        <Row>
+        <Row className="Title">
           <Col>
-            <h1 className='title'>Welcome</h1>
+            <h1>Welcome</h1>
           </Col>
         </Row>
         <Row>
