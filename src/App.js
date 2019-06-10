@@ -29,7 +29,6 @@ import RoutesToTelogis from './Screens/Telogis/RoutesToTelogis';
 import AddNewOpCo from './Screens/Development/AddNewOpCo';
 
 import GS1Barcode from './Screens/GS1/GS1Barcode';
-import RoutesToTelogis from './Screens/Telogis/RoutesToTelogis';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
