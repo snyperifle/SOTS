@@ -79,7 +79,10 @@ class Home extends React.Component {
               </div>
             ))}
           </div>
-          <div style={{ alignSelf: 'center' }}>
+          <div
+            // style={{ alignSelf: 'center' }}
+            align="center"
+          >
             <h4>Onshore Time</h4>
             <Clock
               format={'HH:mm:ss'}
