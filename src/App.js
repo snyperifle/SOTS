@@ -446,17 +446,10 @@ class App extends React.Component {
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/telogisInfo">Telogis Information</Link>
                   </li>
-                  <li onClick={() => { }}>
+                  <li onClick={() => { this.setState({ drawer: false, page: true }) }}>
                     <Link to="/routesToTelogis">Routes not Flowing to Telogis</Link>
                   </li>
                 </ul>
-                {/* <Divider variant="middle" />
-                <h5>DEV</h5>
-                <ul>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/addNewOpCo">Add New OpCo</Link>
-                  </li>
-                </ul> */}
                 <Divider variant="middle" />
                 <h5>GS1 Barcode</h5>
                 <ul>
