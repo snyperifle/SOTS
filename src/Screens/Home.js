@@ -59,24 +59,12 @@ class Home extends React.Component {
   }
   render() {
     return (
-      <div
-      // style={{ backgroundColor: 'orange' }}
-      >
-        <h1
-          className='title'
-        >Welcome</h1>
-        <Container
-          style={{
-            // backgroundColor: 'red',
-          }}
-        >
-          <Row
-          // style={{ backgroundColor: 'blue' }}
-          >
-
-            <Col
-            // style={{ backgroundColor: 'green' }}
-            >
+        <Container>
+          <Row>
+            <h1>Welcome</h1>
+          </Row>
+          <Row>
+            <Col>
               {this.state.contacts.map((item, i) => (
                 <div>
                   <h4>{Object.keys(item)}</h4>
@@ -90,7 +78,6 @@ class Home extends React.Component {
                 </div>
               ))}
             </Col>
-
             <Col
             // style={{ backgroundColor: 'yellow' }}
             >
@@ -107,11 +94,8 @@ class Home extends React.Component {
                 timezone={'Indian/Cocos'}
               />
             </Col>
-
           </Row>
-
         </Container>
-      </div>
     )
   }
 }
