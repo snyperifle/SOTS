@@ -7,6 +7,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { CSVLink } from "react-csv";
+import { Container, Row, Col } from 'react-bootstrap';
 //=============================================================
 class AddToGasboy extends React.Component {
   constructor(props) {
@@ -417,9 +418,11 @@ class AddToGasboy extends React.Component {
 
   render() {
     return (
-      <div>
-        <h2>Add to Gasboy</h2>
-        {/* //============================================================= */}
+      <Container>
+        <Row>
+          <h2>Add to Gasboy</h2>
+        </Row>
+        <Row>
         <form
           autoComplete="off"
           style={{ marginBottom: 5 }}
@@ -548,27 +551,8 @@ class AddToGasboy extends React.Component {
           >Download File</CSVLink>
           : null
         }
-
-
-
-
-
-
-
-
-
-
-
-        {/* //============================================================= */}
-        {/* <Button
-          variant="contained"
-          color="inherit"
-          onClick={() => {
-            this.state.excelData.forEach((item) => console.log(item))
-            console.log(this.state.queryString)
-          }}
-        >check state</Button> */}
-      </div>
+        </Row>
+      </Container>
     )
   }
 }

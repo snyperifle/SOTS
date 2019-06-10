@@ -60,7 +60,7 @@ class Home extends React.Component {
   render() {
     return (
       <Container className="MainPage">
-        <Row fluid={true}>
+        <Row>
           <h1 className='title'>Welcome</h1>
         </Row>
         <Row>
