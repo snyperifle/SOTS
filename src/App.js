@@ -494,7 +494,7 @@ class App extends React.Component {
                 <Col>
                   <ClipLoader
                     css={
-                      `display:block; margin:0 auto; border-color:red;`
+                      css`display:block; margin:0 auto; border-color:red;`
                     }
                     size={150}
                     sizeUnit={"px"}
