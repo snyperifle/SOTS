@@ -83,7 +83,7 @@ class Home extends React.Component {
             style={{
               // justifySelf: 'center' 
               // textAlign: 'center'
-              paddingRight: 200
+              alignContent: 'start'
             }}
           >
             <h4>Onshore Time</h4>
