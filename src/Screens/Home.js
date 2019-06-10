@@ -79,10 +79,17 @@ class Home extends React.Component {
             </div>
           ))}
           </div>
+          <h4>Onshore Time</h4>
           <Clock
             format={'HH:mm:ss'}
             ticking={true}
             timezone={'US/Central'}
+          />
+          <h4>Offshore Time</h4>
+          <Clock
+            format={'HH:mm:ss'}
+            ticking={true}
+            timezone={''}
           />
         </div>
       </div>
