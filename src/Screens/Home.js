@@ -1,6 +1,7 @@
 import React from 'react';
 //=============================================================
-import Clock from 'react-live-clock'
+import { Container, Row, Col } from 'react-bootstrap';
+import Clock from 'react-live-clock';
 //=============================================================
 import '../App.css';
 //=============================================================
@@ -64,7 +65,7 @@ class Home extends React.Component {
         }}
       >
         <h1>Welcome</h1>
-        <div className="MainColumn">
+        <div>
           <div>
             {this.state.contacts.map((item, i) => (
               <div>
