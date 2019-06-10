@@ -3,6 +3,7 @@ import axios from 'axios';
 //=============================================================
 import Button from '@material-ui/core/Button';
 import { CSVLink } from "react-csv";
+import { Container, Row, Col } from 'react-bootstrap';
 //=============================================================
 class GS1Barcode extends React.Component {
   constructor(props) {
@@ -44,17 +45,29 @@ class GS1Barcode extends React.Component {
   //=============================================================
   render() {
     return (
-      <div>
-        <h2>GS1 Barcode</h2>
-        <h4>Manually Process?</h4>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
+      <Container>
+        <Row>
+          <Col></Col>
+          <Col>
+            <h2>GS1 Barcode</h2>
+          </Col>
+          <Col></Col>
+        </Row>
+        <Row>
+          <Col></Col>
+          <Col>
+            <h4>Manually Process?</h4>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
 
-          }}
-        >Process</Button>
-      </div>
+              }}
+            >Process</Button>
+          </Col>
+          <Col></Col>
+        </Row>
+      </Container>
     )
   }
 }

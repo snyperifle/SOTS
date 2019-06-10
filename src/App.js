@@ -145,7 +145,7 @@ class App extends React.Component {
   //=============================================================
   componentDidMount() {
     this.updateOpCo();
-    console.log(window.location.hostname);
+    // console.log(window.location.hostname);
   }
   changeSelectedRouterNumber(e) {
     this.setState({
