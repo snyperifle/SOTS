@@ -420,7 +420,11 @@ class AddToGasboy extends React.Component {
     return (
       <Container className="MainPage">
         <Row>
-          <h2 className="title">Add to Gasboy</h2>
+          <Col></Col>
+          <Col>
+            <h2 className="title">Add to Gasboy</h2>
+          </Col>
+          <Col></Col>
         </Row>
         <Row>
           <Col></Col>
