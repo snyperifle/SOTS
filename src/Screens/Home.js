@@ -59,10 +59,14 @@ class Home extends React.Component {
   }
   render() {
     return (
-      <div>
+      <div
+        style={{ backgroundColor: 'orange' }}
+      >
         <h1>Welcome</h1>
         <Container
-          style={{ backgroundColor: 'red' }}
+          style={{
+            backgroundColor: 'red',
+          }}
         >
           <Row
             style={{ backgroundColor: 'blue' }}
