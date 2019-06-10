@@ -59,11 +59,7 @@ class Home extends React.Component {
   }
   render() {
     return (
-      <div
-        style={{
-          margin: 20
-        }}
-      >
+      <div>
         <h1>Welcome</h1>
         <Container>
           <Row>

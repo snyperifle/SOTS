@@ -18,23 +18,23 @@ class AddNewOpCo extends React.Component {
   createOpCo() {
     alert('FIRING');
     axios.post('/createNewOpCo',
-              {
-                data: {
-                  OpCoNum: this.state.OpCoNum,
-                  OpCoName: this.state.OpCoName,
-                }
-              })
-              .then((response) => {
-                console.log(response.data);
-              })
-              .catch((error) => {
-                console.log(error);
-              })
+      {
+        data: {
+          OpCoNum: this.state.OpCoNum,
+          OpCoName: this.state.OpCoName,
+        }
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
   }
   //=============================================================
   render() {
     return (
-      <div style={{ margin: 20 }}>
+      <div>
         <Form inline >
           <FormControl
             type="text"

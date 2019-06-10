@@ -44,9 +44,7 @@ class GS1Barcode extends React.Component {
   //=============================================================
   render() {
     return (
-      <div
-        style={{ margin: 20 }}
-      >
+      <div>
         <h2>GS1 Barcode</h2>
         <h4>Manually Process?</h4>
         <Button

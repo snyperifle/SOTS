@@ -11,12 +11,11 @@ class RoutesToTelogis extends React.Component {
 
   }
   //=============================================================
-  
+
   //=============================================================
   render() {
-    console.log(`Render RoutesToTelogis`, this.props);
     return (
-      <div style={{ margin: 20 }}>
+      <div>
         <h2>Routes Not Flowing to Telogis</h2>
       </div>
     )

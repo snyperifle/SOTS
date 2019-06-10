@@ -54,7 +54,7 @@ class MirrorProfile extends React.Component {
   //=============================================================
   render() {
     return (
-      <div style={{ margin: 20 }}>
+      <div>
         <h2>
           Mirror User Profile
           </h2>

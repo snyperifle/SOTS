@@ -417,9 +417,7 @@ class AddToGasboy extends React.Component {
 
   render() {
     return (
-      <div
-        style={{ margin: 20 }}
-      >
+      <div>
         <h2>Add to Gasboy</h2>
         {/* //============================================================= */}
         <form

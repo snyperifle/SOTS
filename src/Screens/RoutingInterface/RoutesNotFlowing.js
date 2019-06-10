@@ -44,9 +44,7 @@ class RoutesNotFlowing extends React.Component {
 
   render() {
     return (
-      <div
-        style={{ margin: 20 }}
-      >
+      <div>
         <h2>Routes Not Flowing to SUS</h2>
         <h4>Enter a route number to search through RTRDL and RTRUL folders</h4>
         <Form

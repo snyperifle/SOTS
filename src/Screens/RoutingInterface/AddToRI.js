@@ -50,9 +50,7 @@ class AddToRI extends React.Component {
   render() {
     if (this.props.file.length === 0) return <Redirect to='/' />
     return (
-      <div
-        style={{ margin: 20 }}
-      >
+      <div>
         <h2>Add {this.props.userId ? this.props.userId : 'user'} to Routing Interface</h2>
         {this.props.userId === '' ? <h2 style={{ color: 'red' }}>Please enter a User ID</h2> : null}
         {/* //============================================================= */}

@@ -10,7 +10,7 @@ class TelogisInfo extends React.Component {
   }
   render() {
     return (
-      <div style={{ margin: 20 }}>
+      <div>
         <h2>Telogis Information</h2>
         <h5>Email this message to Caller</h5>
         <CopyToClipboard
