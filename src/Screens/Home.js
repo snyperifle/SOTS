@@ -2,6 +2,8 @@ import React from 'react';
 //=============================================================
 import Clock from 'react-live-clock'
 //=============================================================
+import '../App.css';
+//=============================================================
 class Home extends React.Component {
   constructor(props) {
     super(props);
@@ -62,7 +64,7 @@ class Home extends React.Component {
         }}
       >
         <h1>Welcome</h1>
-        <div>
+        <div className="MainColumn">
           {this.state.contacts.map((item, i) => (
             <div>
               <h4>{Object.keys(item)}</h4>
