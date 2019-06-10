@@ -59,41 +59,41 @@ class Home extends React.Component {
   }
   render() {
     return (
-        <Container className="MainPage">
-          <Row fluid={true}>
-            <h1>Welcome</h1>
-          </Row>
-          <Row>
-            <Col>
-              {this.state.contacts.map((item, i) => (
-                <div>
-                  <h4>{Object.keys(item)}</h4>
-                  <ul>
-                    {this.state.contacts[i][Object.keys(item)].map((item2) => (
-                      <li>
-                        {item2.name}{item2.number ? `: ${item2.number}` : null}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </Col>
-            <Col>
-              <h4>Onshore Time</h4>
-              <Clock
-                format={'HH:mm:ss'}
-                ticking={true}
-                timezone={'US/Central'}
-              />
-              <h4>Offshore Time</h4>
-              <Clock
-                format={'HH:mm:ss'}
-                ticking={true}
-                timezone={'Indian/Cocos'}
-              />
-            </Col>
-          </Row>
-        </Container>
+      <Container className="MainPage">
+        <Row fluid={true}>
+          <h1 className='title'>Welcome</h1>
+        </Row>
+        <Row>
+          <Col>
+            {this.state.contacts.map((item, i) => (
+              <div>
+                <h4>{Object.keys(item)}</h4>
+                <ul>
+                  {this.state.contacts[i][Object.keys(item)].map((item2) => (
+                    <li>
+                      {item2.name}{item2.number ? `: ${item2.number}` : null}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </Col>
+          <Col>
+            <h4>Onshore Time</h4>
+            <Clock
+              format={'HH:mm:ss'}
+              ticking={true}
+              timezone={'US/Central'}
+            />
+            <h4>Offshore Time</h4>
+            <Clock
+              format={'HH:mm:ss'}
+              ticking={true}
+              timezone={'Indian/Cocos'}
+            />
+          </Col>
+        </Row>
+      </Container>
     )
   }
 }
