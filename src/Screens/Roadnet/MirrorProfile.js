@@ -92,7 +92,7 @@ class MirrorProfile extends React.Component {
         {
           this.state.copiedFiles.length > 0 ?
             <div>
-              <h4>Files copied:</h4>
+              <h4>Files mirrored:</h4>
               <ul>
                 {this.state.copiedFiles.map((item) => (
                   <li>{item}</li>

@@ -47,7 +47,8 @@ class Home extends React.Component {
             { name: 'Rakesh Sivan', number: '91-98858-33025' },
           ]
         }
-      ]
+      ],
+      
     };
   }
   render() {

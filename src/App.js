@@ -12,16 +12,24 @@ import Divider from '@material-ui/core/Divider'
 import './App.css';
 //=============================================================
 import Home from './Screens/Home'
+
 import AddToRoadnet from './Screens/Roadnet/AddToRoadnet';
+import RestoreColumns from './Screens/Roadnet/RestoreColumns';
+import MirrorProfile from './Screens/Roadnet/MirrorProfile';
+
 import AddToRI from './Screens/RoutingInterface/AddToRI'
-import AddToGasboy from './Screens/Gasboy/AddToGasboy';
 import RemoveFromRI from './Screens/RoutingInterface/RemoveFromRI';
 import RoutesNotFlowing from './Screens/RoutingInterface/RoutesNotFlowing';
-import RestoreColumns from './Screens/Roadnet/RestoreColumns';
+
+import AddToGasboy from './Screens/Gasboy/AddToGasboy';
+
 import TelogisInfo from './Screens/Telogis/TelogisInfo';
+import RoutesToTelogis from './Screens/Telogis/RoutesToTelogis';
+
 import AddNewOpCo from './Screens/Development/AddNewOpCo';
-import MirrorProfile from './Screens/Roadnet/MirrorProfile';
+
 import GS1Barcode from './Screens/GS1/GS1Barcode';
+import RoutesToTelogis from './Screens/Telogis/RoutesToTelogis';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -116,21 +124,24 @@ class App extends React.Component {
       file: [],
       drawer: false,
       page: true,
+      date: '',
     };
     this.Home = this.Home.bind(this);
     this.AddToRoadnet = this.AddToRoadnet.bind(this);
+    this.RestoreColumns = this.RestoreColumns.bind(this);
+    this.MirrorProfile = this.MirrorProfile.bind(this);
     this.AddToRoutingInterface = this.AddToRoutingInterface.bind(this);
     this.RemoveFromRoutingInterface = this.RemoveFromRoutingInterface.bind(this);
-    this.RestoreColumns = this.RestoreColumns.bind(this);
     this.RoutesNotFlowing = this.RoutesNotFlowing.bind(this);
     this.AddToGasboy = this.AddToGasboy.bind(this);
     this.TelogisInfo = this.TelogisInfo.bind(this);
+    this.RoutesToTelogis = this.RoutesToTelogis.bind(this);
     this.AddNewOpCo = this.AddNewOpCo.bind(this);
-    this.MirrorProfile = this.MirrorProfile.bind(this);
     this.GS1Barcode = this.GS1Barcode.bind(this);
     //=============================================================
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.updateOpCo = this.updateOpCo.bind(this);
+    this.getDate = this.getDate.bind(this);
   }
   //=============================================================
   componentDidMount() {
@@ -163,12 +174,17 @@ class App extends React.Component {
         }
       })
   }
+  getDate(){
+    let date = new Date();
+    let today = `${date.getFullYear()}`
+  }
   //=============================================================
   Home() {
     return (
       <Home />
     )
   }
+  //=============================================================
   AddToRoadnet() {
     return (
       <AddToRoadnet
@@ -176,28 +192,6 @@ class App extends React.Component {
         selectedRouterNumber={this.state.selectedRouterNumber}
         changeSelectedRouterNumber={this.changeSelectedRouterNumber}
       />);
-  }
-  AddToRoutingInterface() {
-    return (
-      <AddToRI
-        userId={this.state.userId}
-        allOpCo={this.state.allOpCo}
-        file={this.state.file}
-        updateOpCo={this.updateOpCo}
-
-      />
-    )
-  }
-  RemoveFromRoutingInterface() {
-    return (
-      <RemoveFromRI
-        userId={this.state.userId}
-        allOpCo={this.state.allOpCo}
-        file={this.state.file}
-        updateOpCo={this.updateOpCo}
-        userOpCo={this.state.userOpCo}
-      />
-    )
   }
   RestoreColumns() {
     return (
@@ -215,15 +209,37 @@ class App extends React.Component {
       />
     )
   }
+  //=============================================================
+  AddToRoutingInterface() {
+    return (
+      <AddToRI
+        userId={this.state.userId}
+        allOpCo={this.state.allOpCo}
+        file={this.state.file}
+        updateOpCo={this.updateOpCo}
+      />
+    )
+  }
+  RemoveFromRoutingInterface() {
+    return (
+      <RemoveFromRI
+        userId={this.state.userId}
+        allOpCo={this.state.allOpCo}
+        file={this.state.file}
+        updateOpCo={this.updateOpCo}
+        userOpCo={this.state.userOpCo}
+      />
+    )
+  }
   RoutesNotFlowing() {
     return (
       <RoutesNotFlowing
         allOpCo={this.state.allOpCo}
         userOpCo={this.state.userOpCo}
-
       />
     )
   }
+  //=============================================================
   AddToGasboy() {
     return (
       <AddToGasboy
@@ -233,6 +249,7 @@ class App extends React.Component {
       />
     )
   }
+  //=============================================================
   TelogisInfo() {
     return (
       <TelogisInfo
@@ -240,7 +257,7 @@ class App extends React.Component {
       />
     )
   }
-
+  //=============================================================
   AddNewOpCo() {
     return (
       <AddNewOpCo
@@ -248,9 +265,16 @@ class App extends React.Component {
       />
     )
   }
+  RoutesToTelogis() {
+    return (
+      <RoutesToTelogis
 
-  GS1Barcode(){
-    return(
+      />
+    )
+  }
+  //=============================================================
+  GS1Barcode() {
+    return (
       <GS1Barcode
 
       />
@@ -423,18 +447,21 @@ class App extends React.Component {
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/telogisInfo">Telogis Information</Link>
                   </li>
+                  <li onClick={() => { }}>
+                    <Link to="/routesToTelogis">Routes not Flowing to Telogis</Link>
+                  </li>
                 </ul>
-                <Divider variant="middle" />
+                {/* <Divider variant="middle" />
                 <h5>DEV</h5>
                 <ul>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/addNewOpCo">Add New OpCo</Link>
                   </li>
-                </ul>
+                </ul> */}
                 <Divider variant="middle" />
                 <h5>GS1 Barcode</h5>
                 <ul>
-                  <li onClick={() => this.setState({ drawer: false, page: true})}>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/gs1Barcode">Manual Process</Link>
                   </li>
                 </ul>
@@ -446,15 +473,16 @@ class App extends React.Component {
             <div>
               <Route exact path="/" component={this.Home} />
               <Route path="/addToRoadnet" component={this.AddToRoadnet} />
+              <Route path="/restoreColumns" component={this.RestoreColumns} />
+              <Route path="/mirrorProfile" component={this.MirrorProfile} />
               <Route path="/addToRoutingInterface" component={this.AddToRoutingInterface} />
               <Route path="/removeFromRoutingInterface" component={this.RemoveFromRoutingInterface} />
-              <Route path="/restoreColumns" component={this.RestoreColumns} />
               <Route path="/routesNotFlowing" component={this.RoutesNotFlowing} />
               <Route path="/addToGasboy" component={this.AddToGasboy} />
               <Route path="/telogisInfo" component={this.TelogisInfo} />
+              <Route path="/routesToTelogis" component={this.RoutesToTelogis} />
               <Route path="/addNewOpCo" component={this.AddNewOpCo} />
-              <Route path="/mirrorProfile" component={this.MirrorProfile} />
-              <Route path="/gs1Barcode" component={this.GS1Barcode}/>
+              <Route path="/gs1Barcode" component={this.GS1Barcode} />
             </div>
             : null}
         </div>
