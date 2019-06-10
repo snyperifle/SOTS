@@ -65,6 +65,7 @@ class Home extends React.Component {
       >
         <h1>Welcome</h1>
         <div className="MainColumn">
+          <div>
           {this.state.contacts.map((item, i) => (
             <div>
               <h4>{Object.keys(item)}</h4>
@@ -77,6 +78,7 @@ class Home extends React.Component {
               </ul>
             </div>
           ))}
+          </div>
           <Clock
             format={'HH:mm:ss'}
             ticking={true}
