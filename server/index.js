@@ -187,7 +187,8 @@ app.get('/connectToGBDB', (req, res) => {
 })
 app.get('/disconnectFromGBDB', (req, res) => {
   sql.close(gbconfig);
-  res.send('Disconnected from Gasboy Database')
+  console.log('Disconnected from Gasboy DB');
+  res.send('Disconnected from Gasboy Database');
 })
 
 app.post('/gasboyEquipment', (req, res) => {
