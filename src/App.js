@@ -392,6 +392,11 @@ class App extends React.Component {
               }}>
                 <div
                   className="drawer-icon"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
                 >
                   <div>
                   </div>
