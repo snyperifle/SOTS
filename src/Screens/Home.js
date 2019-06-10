@@ -96,7 +96,7 @@ class Home extends React.Component {
             <Clock
               format={'HH:mm:ss'}
               ticking={true}
-              timezone={'Indian'}
+              timezone={'Indian/Cocos'}
             />
           </div>
           <div>
