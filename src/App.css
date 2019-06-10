@@ -1,10 +1,10 @@
 .App{
-
+  
 }
 
 .side-drawer {
   height:100%;
-  background:lightskyblue;
+  background:white;
   box-shadow: 2px 0px 5px black;
   position: fixed;
   top: 0;
