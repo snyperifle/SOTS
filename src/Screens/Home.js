@@ -59,7 +59,7 @@ class Home extends React.Component {
   }
   render() {
     return (
-        <Container>
+        <Container className="MainPage">
           <Row fluid={true}>
             <h1>Welcome</h1>
           </Row>
@@ -78,9 +78,7 @@ class Home extends React.Component {
                 </div>
               ))}
             </Col>
-            <Col
-            // style={{ backgroundColor: 'yellow' }}
-            >
+            <Col>
               <h4>Onshore Time</h4>
               <Clock
                 format={'HH:mm:ss'}

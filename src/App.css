@@ -3,6 +3,10 @@
   /* margin:40px */
 }
 
+.MainPage{
+  background: grey
+}
+
 .title{
   align-self: center;
 }
