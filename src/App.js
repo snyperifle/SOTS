@@ -491,10 +491,11 @@ class App extends React.Component {
             :
             <Container>
               <Row>
+                <Col></Col>
                 <Col>
                   <ClipLoader
                     css={
-                      css`display:block; margin:0 auto; border-color:red;`
+                      css`display:block; margin:0 auto; border-color:black;`
                     }
                     size={150}
                     sizeUnit={"px"}
@@ -502,6 +503,7 @@ class App extends React.Component {
                     loading={this.state.loading}
                   />
                 </Col>
+                <Col></Col>
               </Row>
             </Container>
           }
