@@ -83,7 +83,8 @@ class Home extends React.Component {
             style={{
               // justifySelf: 'center' 
               // textAlign: 'center'
-              alignContent: 'start'
+              alignContent: 'start',
+              backgroundColor: 'yellow'
             }}
           >
             <h4>Onshore Time</h4>
