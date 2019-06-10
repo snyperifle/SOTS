@@ -3,6 +3,10 @@
   /* margin:40px */
 }
 
+.title{
+  align-self: center;
+}
+
 .drawer-icon{
   display:flex;
   flex-direction: row;

@@ -60,20 +60,22 @@ class Home extends React.Component {
   render() {
     return (
       <div
-        // style={{ backgroundColor: 'orange' }}
+      // style={{ backgroundColor: 'orange' }}
       >
-        <h1>Welcome</h1>
+        <h1
+          className='title'
+        >Welcome</h1>
         <Container
           style={{
             // backgroundColor: 'red',
           }}
         >
           <Row
-            // style={{ backgroundColor: 'blue' }}
+          // style={{ backgroundColor: 'blue' }}
           >
 
             <Col
-              // style={{ backgroundColor: 'green' }}
+            // style={{ backgroundColor: 'green' }}
             >
               {this.state.contacts.map((item, i) => (
                 <div>
@@ -90,7 +92,7 @@ class Home extends React.Component {
             </Col>
 
             <Col
-              // style={{ backgroundColor: 'yellow' }}
+            // style={{ backgroundColor: 'yellow' }}
             >
               <h4>Onshore Time</h4>
               <Clock
