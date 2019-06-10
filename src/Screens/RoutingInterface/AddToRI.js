@@ -51,7 +51,7 @@ class AddToRI extends React.Component {
     return (
       <Container className="MainPage">
         <Row className="Title">
-          <Col style={{ alignSelf: 'center' }}>
+          <Col style={{ justifySelf: 'center' }}>
             <h2>Add {this.props.userId ? this.props.userId : 'user'} to Routing Interface</h2>
           </Col>
         </Row>
