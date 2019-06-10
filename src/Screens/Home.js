@@ -68,7 +68,9 @@ class Home extends React.Component {
         <Container>
           <Row>
 
-            <Col>
+            <Col
+              style={{ backgroundColor: 'green' }}
+            >
               {this.state.contacts.map((item, i) => (
                 <div>
                   <h4>{Object.keys(item)}</h4>
@@ -84,6 +86,7 @@ class Home extends React.Component {
             </Col>
 
             <Col
+              style={{ backgroundColor: 'yellow' }}
             >
               <h4>Onshore Time</h4>
               <Clock
