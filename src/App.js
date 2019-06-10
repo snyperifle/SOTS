@@ -10,6 +10,7 @@ import AddIcon from '@material-ui/icons/Add';
 import ListIcon from '@material-ui/icons/List';
 import Divider from '@material-ui/core/Divider'
 import './App.css';
+import { Container, Row, Col } from 'react-bootstrap';
 import { css } from '@emotion/core';
 import { ClipLoader } from 'react-spinners';
 //=============================================================
@@ -488,18 +489,21 @@ class App extends React.Component {
               <Route path="/gs1Barcode" component={this.GS1Barcode} />
             </div>
             :
-            <ClipLoader
-              css={
-                `display:block;
-                margin:0 auto;
-                border-color:red;
-                `
-              }
-              size={150}
-              sizeUnit={"px"}
-              color={'red'}
-              loading={this.state.loading}
-            />
+            <Container>
+              <Row>
+                <Col>
+                  <ClipLoader
+                    css={
+                      `display:block; margin:0 auto; border-color:red;`
+                    }
+                    size={150}
+                    sizeUnit={"px"}
+                    color={'red'}
+                    loading={this.state.loading}
+                  />
+                </Col>
+              </Row>
+            </Container>
           }
         </div>
       </Router >
