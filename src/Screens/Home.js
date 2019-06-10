@@ -1,4 +1,7 @@
 import React from 'react';
+//=============================================================
+import Clock from 'react-live-clock'
+//=============================================================
 class Home extends React.Component {
   constructor(props) {
     super(props);
@@ -48,7 +51,7 @@ class Home extends React.Component {
           ]
         }
       ],
-      
+
     };
   }
   render() {
@@ -59,18 +62,25 @@ class Home extends React.Component {
         }}
       >
         <h1>Welcome</h1>
-        {this.state.contacts.map((item, i) => (
-          <div>
-            <h4>{Object.keys(item)}</h4>
-            <ul>
-              {this.state.contacts[i][Object.keys(item)].map((item2) => (
-                <li>
-                  {item2.name}{item2.number ? `: ${item2.number}` : null}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div>
+          {this.state.contacts.map((item, i) => (
+            <div>
+              <h4>{Object.keys(item)}</h4>
+              <ul>
+                {this.state.contacts[i][Object.keys(item)].map((item2) => (
+                  <li>
+                    {item2.name}{item2.number ? `: ${item2.number}` : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          <Clock
+            format={'HH:mm:ss'}
+            ticking={true}
+            timezone={'US/Central'}
+          />
+        </div>
       </div>
     )
   }
