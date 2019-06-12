@@ -2,6 +2,10 @@ import React from 'react';
 import axios from 'axios';
 //=============================================================
 import Button from '@material-ui/core/Button';
+import { Container, Row, Col } from 'react-bootstrap';
+import { PulseLoader } from 'react-spinners';
+import { css } from '@emotion/core';
+import '../../App.css'
 //=============================================================
 class RestoreColumns extends React.Component {
   constructor(props) {
@@ -14,15 +18,16 @@ class RestoreColumns extends React.Component {
   }
   //=============================================================
   restoreColumns() {
-    this.setState({ 
-      loading: true, 
-      restoredFiles: [] 
+    this.setState({
+      loading: true,
+      restoredFiles: []
     })
     axios.post('/restoreColumns',
       {
         data: this.props.userId
       })
       .then((response) => {
+        console.log(response.data)
         this.setState({ restoredFiles: response.data, loading: false })
       })
       .catch((error) => {
@@ -32,38 +37,53 @@ class RestoreColumns extends React.Component {
   //=============================================================
   render() {
     return (
-      <div>
-        <h2>Restoring User Column Settings</h2>
-        {
-          this.props.userId === '' ?
-            <h2 style={{ color: 'red' }}>Please enter a User ID</h2>
-            :
-            <div>
-              <h3>Restore column settings for {this.props.userId}?</h3>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => {
-                  this.restoreColumns();
-                }}
-              >
-                Confirm
-          </Button>
-            </div>
-        }
-        {
-          this.state.restoredFiles.length > 0 ?
-            <div>
-              <h4>Files found and restored:</h4>
-              <ul>
-                {this.state.restoredFiles.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            </div> :
-            null
-        }
-      </div>
+      <Container className="MainPage">
+        <Row className="Title">
+          <Col>
+            <h2>Restoring User Column Settings</h2>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {
+              this.props.userId === '' ?
+                <h2 style={{ color: 'red' }}>Please enter a User ID</h2>
+                :
+                <div>
+                  <h3>Restore column settings for {this.props.userId}?</h3>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => {
+                      this.restoreColumns();
+                    }}
+                  >
+                    Confirm
+                  </Button>
+                </div>
+            }
+          </Col>
+          <Col>
+            {
+              this.state.restoredFiles.length > 0 ?
+                <div>
+                  <h4>Files found and restored:</h4>
+                  <ul>
+                    {this.state.restoredFiles.map((item) => (
+                      <li>{item}</li>
+                    ))}
+                  </ul>
+                </div> :
+                null
+            }
+            {
+              this.state.loading === true ? 
+              <PulseLoader/>
+              : null
+            }
+          </Col>
+        </Row>
+      </Container>
     )
   }
 }

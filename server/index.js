@@ -34,7 +34,7 @@ app.post('/updateUserConfigs', (req, res) => {
       if (err) throw err;
     });
   })
-  res.send('User Configs updated');
+  res.send(`User Configs updated!`);
 })
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
@@ -134,7 +134,7 @@ app.post('/restoreColumns', (req, res) => {
   })
   setTimeout(() => {
     res.send(copied);
-  }, 3000)
+  }, 5000)
 })
 //=============================================================
 app.post('/mirrorProfile', (req, res) => {
@@ -169,7 +169,7 @@ app.post('/mirrorProfile', (req, res) => {
   })
   setTimeout(() => {
     res.send(copied);
-  }, 3000)
+  }, 5000)
 })
 //=============================================================
 let gbconfig = {

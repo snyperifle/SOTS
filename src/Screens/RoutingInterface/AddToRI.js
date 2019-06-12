@@ -8,6 +8,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
+import { PulseLoader } from 'react-spinners';
+import '../../App.css'
 //=============================================================
 class AddToRI extends React.Component {
   constructor(props) {
@@ -18,10 +20,11 @@ class AddToRI extends React.Component {
       routerNumbers: ['ROADNET01', 'ROADNET02', 'ROADNET03', 'ROADNET04', 'ROADNET05'],
       selectedRouterNumber: null,
       responseMessage: null,
+      loading: false,
     };
     this.addUser = this.addUser.bind(this);
   }
-
+  //=============================================================
   componentDidMount() {
   }
 
@@ -31,7 +34,8 @@ class AddToRI extends React.Component {
     // console.log(temp[temp.length - 1])
     this.setState({
       file: temp,
-      selectedOpCoRouters: this.props.file.filter((item) => item.split(' ')[1].includes(String(this.state.selectedOpCo.num)))
+      selectedOpCoRouters: this.props.file.filter((item) => item.split(' ')[1].includes(String(this.state.selectedOpCo.num))),
+      loading: true,
     })
     temp = temp.join("\r\n")
     axios.post('/updateUserConfigs', {
@@ -39,13 +43,16 @@ class AddToRI extends React.Component {
     })
       .then((response) => {
         this.props.updateOpCo();
-        this.setState({ responseMessage: response.data })
+        this.setState({
+          loading: false,
+          responseMessage: response.data,
+        })
       })
       .catch((error) => {
         console.log(error);
       })
-
   }
+  //=============================================================
   render() {
     if (this.props.file.length === 0) return <Redirect to='/' />
     return (
@@ -128,11 +135,18 @@ class AddToRI extends React.Component {
                 }}
               >
                 Add User
-        </Button>
+              </Button>
               : null}
+          </Col>
+          <Col>
             {this.state.responseMessage ?
               <h5>{this.state.responseMessage}</h5> :
               null
+            }
+            {
+              this.state.loading === true ?
+                <PulseLoader />
+                : null
             }
           </Col>
         </Row>

@@ -490,20 +490,22 @@ class App extends React.Component {
             </div>
             :
             <Container>
-              <Row style={{ marginTop: 100 }}>
-                <Col></Col>
-                <Col>
+              <Row style={{ margin: 150 }}>
+                <Col
+                  style={{
+                    textAlign:'center'
+                  }}
+                >
                   <ClipLoader
                     css={
                       css`display:block; margin:0 auto; border-color:black;`
                     }
-                    size={150}
+                    size={100}
                     sizeUnit={"px"}
-                    color={'red'}
+                    color={'blue'}
                     loading={this.state.loading}
                   />
                 </Col>
-                <Col></Col>
               </Row>
             </Container>
           }
