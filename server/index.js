@@ -36,6 +36,9 @@ app.post('/updateUserConfigs', (req, res) => {
   })
   res.send(`User Configs updated!`);
 })
+app.post('/replaceRIConfig', (req, res) => {
+  console.log(req.body.data);
+})
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
   let found = {
@@ -557,7 +560,6 @@ let gs1config = {
   database: process.env.GS1_DB,
   driver: process.env.GS1_DRIVER,
   server: process.env.GS1_SERVER,
-
 }
 app.get('/processGS1', (req, res) => {
   console.log('Disconnecting from all database connections');
@@ -566,17 +568,11 @@ app.get('/processGS1', (req, res) => {
     "select " +
     "driverpro.DeliveredGS1Barcode.GS1Barcode, " +
     "driverpro.DeliveredGS1Barcode.ScheduledDate as 'Shipped Date', " +
-    // "SUBSTRING(driverpro.DeliveredGS1Barcode.GS1Barcode,1,2) as SSCC, " +
-    // "SUBSTRING(driverpro.DeliveredGS1Barcode.GS1Barcode,3,14) as GTIN, " +
-    // "SUBSTRING(driverpro.DeliveredGS1Barcode.GS1Barcode,27,10) as 'Product Lot', " +
     "driverpro.DeliveryItem.ItemID as 'Product Serial Number', " +
     "driverpro.DeliveryItem.ItemUOM as 'Product Quantity Units', " +
     "driverpro.DeliveryItem.DeliveredQuantity as 'Product Quantity Amount', " +
     "driverpro.Invoice.InvoiceNumber as 'PO Number' " +
-    // "convert(varchar,(convert(datetime, SUBSTRING(driverpro.DeliveredGS1Barcode.GS1Barcode,19,6))) ,101)as 'Pack Date' " +
-
     "from driverpro.DeliveredGS1Barcode " +
-
     "inner join driverpro.Invoice " +
     "on (driverpro.DeliveredGS1Barcode.DCID = driverpro.Invoice.DCID " +
     "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.Invoice.RouteID ) " +
@@ -587,8 +583,6 @@ app.get('/processGS1', (req, res) => {
     "and driverpro.DeliveredGS1Barcode.ItemID = driverpro.DeliveryItem.ItemID) " +
     "where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
 
-  let gs1Test = "select * from driverpro.DeliveredGS1Barcode where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
-
   sql.connect(gs1config, (err) => {
     if (err) throw err;
     console.log('Connected to GS1 DB');
@@ -598,8 +592,6 @@ app.get('/processGS1', (req, res) => {
       if (result) {
         let CSVstring = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2,\r\n'
         result.recordset.forEach((item) => {
-          // console.log(item['GS1Barcode'])
-          // console.log(item['GS1Barcode'].substring(16, 18));
           if (
             item['GS1Barcode'].substring(16, 18) === '11' ||
             item['GS1Barcode'].substring(16, 18) === '13' ||
@@ -638,4 +630,17 @@ app.get('/processGS1', (req, res) => {
       sql.close();
     })
   });
+})
+
+app.post('/routesToTelogis', (req, res) => {
+  let path = `//isibld/RD_Transfer/OBC/Routes/Archive`;
+  fs.readdir(path, (err, files) => {
+    if (err) console.log(err);
+    if (files) {
+      res.send(files.filter((item) => {
+        return item.substring(0, 8) === req.body.data
+      })
+      )
+    }
+  })
 })

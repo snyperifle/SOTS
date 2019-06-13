@@ -22,6 +22,7 @@ import MirrorProfile from './Screens/Roadnet/MirrorProfile';
 
 import AddToRI from './Screens/RoutingInterface/AddToRI'
 import RemoveFromRI from './Screens/RoutingInterface/RemoveFromRI';
+import ReplaceRIConfig from './Screens/RoutingInterface/ReplaceRIConfig';
 import RoutesNotFlowing from './Screens/RoutingInterface/RoutesNotFlowing';
 
 import AddToGasboy from './Screens/Gasboy/AddToGasboy';
@@ -135,6 +136,7 @@ class App extends React.Component {
     this.MirrorProfile = this.MirrorProfile.bind(this);
     this.AddToRoutingInterface = this.AddToRoutingInterface.bind(this);
     this.RemoveFromRoutingInterface = this.RemoveFromRoutingInterface.bind(this);
+    this.ReplaceRIConfig = this.ReplaceRIConfig.bind(this);
     this.RoutesNotFlowing = this.RoutesNotFlowing.bind(this);
     this.AddToGasboy = this.AddToGasboy.bind(this);
     this.TelogisInfo = this.TelogisInfo.bind(this);
@@ -235,6 +237,14 @@ class App extends React.Component {
       />
     )
   }
+  ReplaceRIConfig() {
+    return (
+      <ReplaceRIConfig
+        userId={this.state.userId}
+        userOpCo={this.state.userOpCo}
+      />
+    )
+  }
   RoutesNotFlowing() {
     return (
       <RoutesNotFlowing
@@ -272,7 +282,8 @@ class App extends React.Component {
   RoutesToTelogis() {
     return (
       <RoutesToTelogis
-
+        userOpCo={this.state.userOpCo}
+        allOpCo={this.state.allOpCo}
       />
     )
   }
@@ -426,9 +437,6 @@ class App extends React.Component {
                     {/* <h6 style={{ color: 'grey' }}>Mirror User Profile</h6> */}
                     <Link to='/mirrorProfile'>Mirror User Profile</Link>
                   </li>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <h6 style={{ color: 'grey' }}>Replace RI Config File</h6>
-                  </li>
                 </ul>
                 <Divider variant="middle" />
                 <h5>Routing Interface</h5>
@@ -438,6 +446,9 @@ class App extends React.Component {
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/removeFromRoutingInterface">Remove User from Routing Interface</Link>
+                  </li>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
+                    <Link to="/replaceRIConfig">Replace RI Config File</Link>
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link>
@@ -481,6 +492,7 @@ class App extends React.Component {
               <Route path="/mirrorProfile" component={this.MirrorProfile} />
               <Route path="/addToRoutingInterface" component={this.AddToRoutingInterface} />
               <Route path="/removeFromRoutingInterface" component={this.RemoveFromRoutingInterface} />
+              <Route path="/replaceRIConfig" component={this.ReplaceRIConfig} />
               <Route path="/routesNotFlowing" component={this.RoutesNotFlowing} />
               <Route path="/addToGasboy" component={this.AddToGasboy} />
               <Route path="/telogisInfo" component={this.TelogisInfo} />
@@ -493,7 +505,7 @@ class App extends React.Component {
               <Row style={{ margin: 150 }}>
                 <Col
                   style={{
-                    textAlign:'center'
+                    textAlign: 'center'
                   }}
                 >
                   <ClipLoader
