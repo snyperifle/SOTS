@@ -38,26 +38,20 @@ class AddToRoadnet extends React.Component {
       },
     };
   }
-
-  componentDidMount() {
-    // if(this.props.userId === '') alert('Please Enter a User ID')
-  }
-
+  //=============================================================
   componentWillReceiveProps(prevProps, prevState) {
     if (prevProps.selectedRouterNumber !== this.props.selectedRouterNumber) {
       this.setState({ BLOptions: this.state.BLOptions })
     }
   }
-
+  //=============================================================
   render() {
     return (
       <Container>
         <Row>
-          <Col></Col>
           <Col>
             <h2>Add user to Roadnet</h2>
           </Col>
-          <Col></Col>
         </Row>
         <Row>
           <Col>

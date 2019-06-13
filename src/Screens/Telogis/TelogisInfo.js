@@ -2,6 +2,7 @@ import React from 'react';
 //=============================================================
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Container, Row, Col } from 'react-bootstrap';
+import { Button } from '@material-ui/core'
 import '../../App.css';
 //=============================================================
 class TelogisInfo extends React.Component {
@@ -17,32 +18,36 @@ class TelogisInfo extends React.Component {
     return (
       <Container>
         <Row>
-          <Col></Col>
           <Col>
             <h2>Telogis Information</h2>
           </Col>
-          <Col></Col>
         </Row>
         <Row>
-          <Col></Col>
           <Col>
             <h5>Email this message to Caller</h5>
             <Row>
               <CopyToClipboard
                 text={this.state.message}
+                style={{ marginLeft: 15 }}
               >
-                <button
+                {/* <button
                   onClick={() => {
                     this.setState({ copied: true })
                   }}
-                >Copy</button>
+                >Copy</button> */}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    this.setState({ copied: true })
+                  }}
+                >Copy</Button>
               </CopyToClipboard>
               {this.state.copied === true ?
                 <h6 style={{ marginLeft: 10 }}>Copied to Clipboard</h6>
                 : null}
             </Row>
           </Col>
-          <Col></Col>
         </Row>
       </Container>
     )

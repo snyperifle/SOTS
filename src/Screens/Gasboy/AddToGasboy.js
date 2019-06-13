@@ -339,7 +339,6 @@ class AddToGasboy extends React.Component {
       downloadData: [],
     };
     this.connectoToGBDB = this.connectoToGBDB.bind(this);
-    this.disconnectFromGBDB = this.disconnectFromGBDB.bind(this);
     this.generateEquipmentExcelFile = this.generateEquipmentExcelFile.bind(this);
     this.generateEmployeeExcelFile = this.generateEmployeeExcelFile.bind(this);
   }
@@ -354,10 +353,6 @@ class AddToGasboy extends React.Component {
     this.connectoToGBDB();
   }
 
-  componentWillUnmount() {
-    this.disconnectFromGBDB();
-  }
-
   connectoToGBDB() {
     axios.get('/connectToGBDB', {})
       .then((response) => {
@@ -366,16 +361,6 @@ class AddToGasboy extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-  }
-
-  disconnectFromGBDB() {
-    axios.get('/disconnectFromGBDB', {})
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
   }
 
   generateEquipmentExcelFile() {
@@ -414,20 +399,16 @@ class AddToGasboy extends React.Component {
         console.log(error);
       })
   }
-
-
+  //=============================================================
   render() {
     return (
       <Container className="MainPage">
         <Row>
-          <Col></Col>
           <Col>
             <h2 className="title">Add to Gasboy</h2>
           </Col>
-          <Col></Col>
         </Row>
         <Row>
-          <Col></Col>
           <Col>
             <form
               autoComplete="off"
@@ -534,17 +515,18 @@ class AddToGasboy extends React.Component {
               </ul>
               : null}
             {/* //============================================================= */}
-            {this.state.queue.length ? <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => {
-                this.state.selectedDeviceType === this.state.deviceType[0] ?
-                  this.generateEquipmentExcelFile() : this.generateEmployeeExcelFile()
-                this.setState({
-                  queue: []
-                })
-              }}
-            >Create Excel file</Button> : null}
+            {this.state.queue.length ?
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  this.state.selectedDeviceType === this.state.deviceType[0] ?
+                    this.generateEquipmentExcelFile() : this.generateEmployeeExcelFile()
+                  this.setState({
+                    queue: []
+                  })
+                }}
+              >Create Excel file</Button> : null}
             {/* //============================================================= */}
             {this.state.downloadData.length > 0 ?
               <CSVLink
@@ -558,7 +540,6 @@ class AddToGasboy extends React.Component {
               : null
             }
           </Col>
-          <Col></Col>
         </Row>
       </Container>
     )

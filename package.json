@@ -13,6 +13,7 @@
     "fs-extra": "^8.0.1",
     "jsonexport": "^2.4.1",
     "material-icons": "^0.3.1",
+    "msnodesqlv8": "^0.7.2",
     "mssql": "^5.1.0",
     "node-env-run": "^3.0.2",
     "nodemon": "^1.19.0",
@@ -25,7 +26,8 @@
     "react-live-clock": "^3.1.0",
     "react-router-dom": "^5.0.0",
     "react-scripts": "3.0.0",
-    "react-spinners": "^0.5.4"
+    "react-spinners": "^0.5.4",
+    "tedious": "^6.1.2"
   },
   "proxy": "http://localhost:3999",
   "scripts": {

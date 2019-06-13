@@ -18,7 +18,7 @@ let fs = require('fs');
 let fse = require('fs-extra');
 //=============================================================
 app.get('/getFiles', (req, res) => {
-  console.log('Getting OpCo Info');
+  // console.log('Getting OpCo Info');
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) throw err;
     res.setHeader('Content-Type', 'application/json');
@@ -179,16 +179,13 @@ let gbconfig = {
   database: process.env.DB_NAME
 };
 app.get('/connectToGBDB', (req, res) => {
+  console.log('Disconnecting from all database connections');
+  sql.close();
   sql.connect(gbconfig, (err) => {
-    if (err) throw err;
+    if (err) console.log(err);
     console.log('Connected to Gasboy DB');
     res.send('Connected to Gasboy Database');
   });
-})
-app.get('/disconnectFromGBDB', (req, res) => {
-  sql.close(gbconfig);
-  console.log('Disconnected from Gasboy DB');
-  res.send('Disconnected from Gasboy Database');
 })
 
 app.post('/gasboyEquipment', (req, res) => {
@@ -406,7 +403,6 @@ app.post('/gasboyEquipment', (req, res) => {
               Nr_plate_retries: '0',
               Block_if_plate_retries_fail: '0'
             }
-
             excelData.push(reeferObj);
           }
         })
@@ -557,19 +553,89 @@ app.post('/createNewOpCo', (req, res) => {
 let gs1config = {
   user: process.env.GS1_USER,
   password: process.env.GS1_PW,
-  server: process.env.GS1_HOST,
-  database: process.env.GS1_NAME
+  domain: process.env.GS1_DOMAIN,
+  database: process.env.GS1_DB,
+  driver: process.env.GS1_DRIVER,
+  server: process.env.GS1_SERVER,
+
 }
-app.get('/connectToGS1DB', (req, res) => {
+app.get('/processGS1', (req, res) => {
+  console.log('Disconnecting from all database connections');
+  sql.close();
+  let gs1Query =
+    "select " +
+    "driverpro.DeliveredGS1Barcode.GS1Barcode, " +
+    "driverpro.DeliveredGS1Barcode.ScheduledDate as 'Shipped Date', " +
+    // "SUBSTRING(driverpro.DeliveredGS1Barcode.GS1Barcode,1,2) as SSCC, " +
+    // "SUBSTRING(driverpro.DeliveredGS1Barcode.GS1Barcode,3,14) as GTIN, " +
+    // "SUBSTRING(driverpro.DeliveredGS1Barcode.GS1Barcode,27,10) as 'Product Lot', " +
+    "driverpro.DeliveryItem.ItemID as 'Product Serial Number', " +
+    "driverpro.DeliveryItem.ItemUOM as 'Product Quantity Units', " +
+    "driverpro.DeliveryItem.DeliveredQuantity as 'Product Quantity Amount', " +
+    "driverpro.Invoice.InvoiceNumber as 'PO Number' " +
+    // "convert(varchar,(convert(datetime, SUBSTRING(driverpro.DeliveredGS1Barcode.GS1Barcode,19,6))) ,101)as 'Pack Date' " +
+
+    "from driverpro.DeliveredGS1Barcode " +
+
+    "inner join driverpro.Invoice " +
+    "on (driverpro.DeliveredGS1Barcode.DCID = driverpro.Invoice.DCID " +
+    "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.Invoice.RouteID ) " +
+    "inner join driverpro.DeliveryItem " +
+    "on (driverpro.DeliveredGS1Barcode.DCID = driverpro.DeliveryItem.DCID " +
+    "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.DeliveryItem.RouteID " +
+    "and driverpro.DeliveredGS1Barcode.StopSequenceNumber = driverpro.DeliveryItem.StopSequenceNumber " +
+    "and driverpro.DeliveredGS1Barcode.ItemID = driverpro.DeliveryItem.ItemID) " +
+    "where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
+
+  let gs1Test = "select * from driverpro.DeliveredGS1Barcode where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
+
   sql.connect(gs1config, (err) => {
     if (err) throw err;
-    console.log('Connected to STS DB');
-    res.send('Connected to STS Database');
-  })
-})
-
-app.get('/disconnectFromGS1DB', (req, res) => {
-  sql.close(gs1config);
-  console.log('Disconnected from STS DB');
-  res.send('Disconnected from Gasboy Database')
+    console.log('Connected to GS1 DB');
+    let db = new sql.Request();
+    db.query(gs1Query, (err, result) => {
+      if (err) throw err;
+      if (result) {
+        let CSVstring = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2,\r\n'
+        result.recordset.forEach((item) => {
+          // console.log(item['GS1Barcode'])
+          // console.log(item['GS1Barcode'].substring(16, 18));
+          if (
+            item['GS1Barcode'].substring(16, 18) === '11' ||
+            item['GS1Barcode'].substring(16, 18) === '13' ||
+            item['GS1Barcode'].substring(16, 18) === '15' ||
+            item['GS1Barcode'].substring(16, 18) === '17'
+          ) {
+            let date = new Date(item['Shipped Date'])
+            CSVstring = CSVstring.concat(
+              `${date.getMonth()}/${date.getDate()}/${date.getFullYear()},` + //Date - REQUIRED
+              `${item['GS1Barcode'].substring(0, 2)},` +                      //SSCC - REQUIRED
+              ',' +                                                           //GLN  - REQUIRED
+              ',' +                                                           //blank
+              ',' +                                                           //Destination GLN - REQUIRED
+              ',' +                                                           //blank
+              `${item['GS1Barcode'].substring(2, 16)},` +                     //GTIN
+              `${item['GS1Barcode'].substring(26, 36) || ''},` +              //Product Lot
+              `${item['Product Serial Number']},` +                           //Product Serial Number
+              `${item['Product Quantity Units']},` +                          //Product Quantity Units
+              `${item['Product Quantity Amount']},` +                         //Product Quantity Amount
+              `${item['PO Number']},` +                                       //poNumber
+              `${item['GS1Barcode'].substring(16, 18) === '13' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
+              `${item['GS1Barcode'].substring(16, 18) === '17' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
+              ',' +                                                           //blank
+              `${item['GS1Barcode'].substring(16, 18) === '11' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
+              `${item['GS1Barcode'].substring(16, 18) === '15' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
+              ',' +                                                           //poNumber 2 - if Applicable
+              '\r\n'
+            )
+          }
+        })
+        res.send({
+          CSVstring: CSVstring,
+        })
+      }
+      console.log('Disconnecting from all database connections');
+      sql.close();
+    })
+  });
 })

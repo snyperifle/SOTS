@@ -9,61 +9,63 @@ class GS1Barcode extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      downloadData: '',
     };
-    this.connectToGS1DB = this.connectToGS1DB.bind(this);
-    this.disconnectedFromGS1DB = this.disconnectedFromGS1DB.bind(this);
+    this.processGS1 = this.processGS1.bind(this);
   }
 
   componentDidMount() {
-    this.connectToGS1DB();
-  }
-  componentWillUnmount() {
-    this.disconnectedFromGS1DB();
-  }
-  connectToGS1DB() {
-    axios.get('/connectToGS1DB', {})
-      .then((response) => {
-        console.log(response.data);;
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-  }
-  disconnectedFromGS1DB() {
-    axios.get('/disconnectFromGS1DB', {})
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+    // this.processGS1();
   }
 
+  processGS1() {
+    this.setState({
+      downloadData: '',
+    })
+    axios.get('/processGS1', {})
+      .then((response) => {
+        console.log(response.data.CSVstring);
+        this.setState({
+          downloadData: response.data.CSVstring
+        })
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  }
 
   //=============================================================
   render() {
     return (
       <Container>
         <Row>
-          <Col></Col>
           <Col>
             <h2>GS1 Barcode</h2>
           </Col>
-          <Col></Col>
         </Row>
         <Row>
-          <Col></Col>
           <Col>
             <h4>Manually Process?</h4>
             <Button
               variant="contained"
               color="primary"
               onClick={() => {
-
+                this.processGS1();
               }}
             >Process</Button>
+            {
+              this.state.downloadData.length > 0 ?
+                <CSVLink
+                  data={this.state.downloadData}
+                  filename={'GS1BarcodeData.csv'}
+                  style={{
+                    color: 'green',
+                    margin: 20
+                  }}
+                >Download File</CSVLink>
+                : null
+            }
           </Col>
-          <Col></Col>
         </Row>
       </Container>
     )
