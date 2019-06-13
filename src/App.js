@@ -242,6 +242,7 @@ class App extends React.Component {
       <ReplaceRIConfig
         userId={this.state.userId}
         userOpCo={this.state.userOpCo}
+        allOpCo={this.state.allOpCo}
       />
     )
   }

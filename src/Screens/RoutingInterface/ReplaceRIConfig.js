@@ -9,21 +9,34 @@ class ReplaceRIConfig extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      loading: false,
+      filesReplaced: [],
     };
     this.replaceConfig = this.replaceConfig.bind(this);
   }
   //=============================================================
   replaceConfig() {
+    this.setState({
+      loading: true,
+      filesReplaced: [],
+    })
     axios.post('/replaceRIConfig',
-    {
-    data: this.props.userOpCo
-    })
-    .then( (response) => {
-    console.log(response.data);
-    })
-    .catch( (error) => {
-    console.log(error);
-    })
+      {
+        data: {
+          OpCo: this.props.userOpCo,
+          name: this.props.allOpCo.filter((item) => item.num === this.props.userOpCo.substring(0, 3))
+        }
+      })
+      .then((response) => {
+        console.log(response.data);
+        this.setState({
+          filesReplaced: response.data,
+          loading: false,
+        })
+      })
+      .catch((error) => {
+        console.log(error);
+      })
   }
   //=============================================================
   render() {
@@ -50,9 +63,24 @@ class ReplaceRIConfig extends React.Component {
                 </div>
             }
           </Col>
+          <Col>
+            {this.state.filesReplaced.length > 0 ?
+              <div>
+                <h5>Files replaced: </h5>
+                <ul>
+                  {this.state.filesReplaced.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              : null
+            }
+            {this.state.loading === true ? <PulseLoader /> : null}
+          </Col>
         </Row>
         <Row>
           <Col>
+
           </Col>
         </Row>
       </Container>

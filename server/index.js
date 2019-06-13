@@ -27,7 +27,7 @@ app.get('/getFiles', (req, res) => {
 })
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
-  console.log('Updating User Configs');
+  // console.log('Updating User Configs');
   servers.forEach((item) => {
     // fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, (err, res) => {
     fs.writeFile(`//${item}/routing/UserConfig.txt`, req.body.data, (err, res) => {
@@ -37,7 +37,36 @@ app.post('/updateUserConfigs', (req, res) => {
   res.send(`User Configs updated!`);
 })
 app.post('/replaceRIConfig', (req, res) => {
-  console.log(req.body.data);
+  let filesReplaced = [];
+  servers.forEach((server) => {
+    let path = `//ms212rdctx06/ROUTING/XXX-${req.body.data.OpCo.substring(4)}`
+    fs.readdir(path, (err, res) => {
+      if (err) console.log(err);;
+      if (res) {
+        res.forEach((file) => {
+          filesReplaced.push(`${server} - ${file}`);
+          fs.readFile(`${path}/${file}`, 'utf8', (err, data) => {
+            if (err) console.log(err);
+            if (data) {
+              data = data.split('XXX').join(`${req.body.data.OpCo.substring(0, 3)}`)
+                .split('YYYYY').join(`${req.body.data.OpCo}`)
+                .split('ZZZZZ').join(`${req.body.data.name[0].name}`.padEnd(30, ' '))
+                .split('SERVER').join(`${server}`)
+              fs.writeFile(`//${server}/ROUTING/${req.body.data.OpCo}/${file}`, data, (err, res) => {
+                if (err) console.log(err);;
+              })
+            }
+          })
+        })
+      }
+    })
+    fs.writeFile(`//${server}/ROUTING/${req.body.data.OpCo}/LOCKOUT.TMP`, '', (err, res) => {
+      if (err) console.log(err);
+    })
+  })
+  setTimeout(() => {
+    res.send(filesReplaced)
+  }, 2000)
 })
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
