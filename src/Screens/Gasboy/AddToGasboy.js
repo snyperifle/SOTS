@@ -544,7 +544,7 @@ class AddToGasboy extends React.Component {
             {this.state.downloadData.length > 0 ?
               <CSVLink
                 data={this.state.downloadData}
-                filename={'export.csv'}
+                filename={'GasboyExport.csv'}
                 style={{
                   color: 'green',
                   margin: 20

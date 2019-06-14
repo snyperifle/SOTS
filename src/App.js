@@ -181,8 +181,6 @@ class App extends React.Component {
       })
   }
   getDate() {
-    let date = new Date();
-    let today = `${date.getFullYear()}`
   }
   //=============================================================
   Home() {
@@ -336,7 +334,7 @@ class App extends React.Component {
             >
               <h3
                 style={{
-                  color: "blue",
+                  color: "#2F8FD9",
                   alignSelf: 'center'
                 }}
               >Sysco Outbound Transportation Support Dashboard
@@ -348,14 +346,14 @@ class App extends React.Component {
                   style={{ marginRight: 10 }}
                 >
                   <h5
-                    style={{ color: 'blue' }}
+                    style={{ color: '#2F8FD9' }}
                   >
                     {this.state.userOpCo ?
                       `OpCo: ${this.state.userOpCo.split('-')[0]} ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].name}`
                       : null}
                   </h5>
                   <h5
-                    style={{ color: 'blue' }}
+                    style={{ color: '#2F8FD9' }}
                   >
                     {this.state.userOpCo ?
                       `${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].timezone}`
