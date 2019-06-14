@@ -50,10 +50,10 @@ app.post('/replaceRIConfig', (req, res) => {
             if (data) {
               data = data.split('XXX').join(`${req.body.data.OpCo.substring(0, 3)}`)
                 .split('YYYYY').join(`${req.body.data.OpCo}`)
-                .split('ZZZZZ').join(`${req.body.data.name[0].name}`.padEnd(30, ' '))
+                .split('ZZZZZ').join(`${req.body.data.name[0].OpCoName}`.padEnd(30, ' '))
                 .split('SERVER').join(`${server}`)
               fs.writeFile(`//${server}/ROUTING/${req.body.data.OpCo}/${file}`, data, (err, res) => {
-                if (err) console.log(err);;
+                if (err) console.log(err);
               })
             }
           })
