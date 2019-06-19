@@ -57,7 +57,7 @@ class GS1Barcode extends React.Component {
               this.state.downloadData.length > 0 ?
                 <CSVLink
                   data={this.state.downloadData}
-                  filename={'GS1BarcodeData.csv'}
+                  filename={`GS1BarcodeData.csv`}
                   style={{
                     color: 'green',
                     margin: 20

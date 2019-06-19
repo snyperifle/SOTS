@@ -1,11 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const sql = require('mssql');
-const jsonexport = require('jsonexport');
 const schedule = require('node-schedule');
-
 require('dotenv').config();
-
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
@@ -13,7 +10,6 @@ const port = 3999
 app.listen(port, () => console.log(`Express server is running on localhost: ${port}`))
 //=============================================================
 let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', 'ms212rdctx12', 'ms212rdctx14', 'ms212rdctx15', 'ms212rdctx16'];
-// let filePath = `//${servers[0]}/routing/UserConfigCalvinTest.txt`;
 let filePath = `//${servers[0]}/routing/UserConfig.txt`;
 let fs = require('fs');
 let fse = require('fs-extra');
@@ -48,7 +44,6 @@ function connectToGasboyDB() {
   })
 }
 connectToGasboyDB();
-
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
   // console.log('Updating User Configs');
@@ -99,8 +94,6 @@ app.post('/routesNotFlowing', (req, res) => {
     result: 'Route Not Found',
     path: '',
   };
-  let dlroutes = [];
-  let ulroutes = [];
 
   function sendRoutes(path, file) {
     res.json(found)
@@ -608,7 +601,6 @@ function gs1Process(req, res) {
               /// modify this based on export
               else {
                 let today = new Date();
-                // let date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
                 let date = `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`
                 fs.writeFile(`//ms212rdfsc/ern-support/GS1/${date}-GS1Export.csv`, CSVstring, (err, result) => {
                   if (err) console.log(err);
@@ -634,10 +626,12 @@ app.get('/processGS1', (req, res) => {
 })
 
 let rule = new schedule.RecurrenceRule();
+rule.hour = 12;
+rule.minute = 0;
 rule.second = 0;
 
 let gs1job = schedule.scheduleJob(rule, () => {
   console.log('Running scheduled GS1 Job');
-  console.log('FIRING', gs1Process());
+  gs1Process();
 })
 //=============================================================
