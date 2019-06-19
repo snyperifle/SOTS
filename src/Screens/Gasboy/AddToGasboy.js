@@ -448,7 +448,7 @@ class AddToGasboy extends React.Component {
               style={{ marginBottom: 5 }}
             >
               <FormControl>
-                {this.state.selectedOpCo ? null : <InputLabel >Select Device Type</InputLabel>}
+                <InputLabel >Select Device Type</InputLabel>
                 <Select
                   style={{ width: 250 }}
                   value={this.state.selectedDeviceType || "No Device Type Selected"}

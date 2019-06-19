@@ -37,13 +37,8 @@ let gs1config = {
   driver: process.env.GS1_DRIVER,
   server: process.env.GS1_SERVER,
 }
-function connectToGasboyDB() {
-  sql.connect(gbconfig, (err) => {
-    if (err) console.log(err);
-    else console.log('Connected to Gasboy DB');
-  })
-}
-connectToGasboyDB();
+let gbsql = new sql.ConnectionPool(gbconfig)
+let gs1sql = new sql.ConnectionPool(gs1config)
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
   // console.log('Updating User Configs');
@@ -229,223 +224,234 @@ app.post('/gasboyEquipment', (req, res) => {
     if (item === req.body.data.queue[0]) return result
     else return result += ` OR EquipmentIdentifier = '${item}'`
   }, `'${req.body.data.queue[0]}'`)
-  let db = new sql.Request();
   let excelData = [];
-  console.log('Fetching data from GB DB');
-  db.query(
-    "select Equipment.EquipmentIdentifier, Equipment.Description, EquipmentExtended.ConstructionYear, Equipment.Manufacturer, Equipment.ModelNumber, Equipment.SerialNumber " +
-    "from ((Equipment INNER JOIN EquipmentExtended on Equipment.EquipmentID = EquipmentExtended.EquipmentID) " +
-    "INNER JOIN Company on Equipment.SiteCodeID = Company.SiteCodeID) where Company.Name = '" +
-    req.body.data.selectedOpCoNumber + "' and (Equipment.EquipmentIdentifier = " +
-    query + ")"
-  )
-    .then((result) => {
-      result.recordset.forEach((item) => {
-        if (item.EquipmentIdentifier.substring(0, 1) === '1') {
-          let temp = {
-            '// Action': 'R',
-            'Record_type-Mean': 'Mean',
-            Name: (item.EquipmentIdentifier + " " + item.Description).substring(0, 31),
-            Status: '2',
-            Type: '3',
-            Hardware_type: '6',
-            'Auth-type': '1',
-            Employee_type: '1',
-            Vehicle_no: item.EquipmentIdentifier,
-            String: req.body.data.opcoData.stationCode + item.EquipmentIdentifier,
-            Fleet_name: req.body.data.opcoData.fleetName,
-            Department_name: req.body.data.opcoData.stationCode + " Tractors/IFTA",
-            Rule_name: 'Diesel',
-            Driver_id_type: '0',
-            Price_list_name: '',
-            Model_name: item.ModelNumber,
-            Pump_name: '',
-            Year: item.ConstructionYear,
-            Capacity: '150',
-            Consumption: '7',
-            Odometer: '0',
-            Cust_id: item.SerialNumber,
-            Address: '',
-            'Account-type': '0',
-            Available_amount: '0',
-            Use_pin_code: '0',
-            Pin_code: '0',
-            Auth_pin_from: '2',
-            Nr_pin_retries: '0',
-            Block_if_pin_retries_fail: '0',
-            OrPT_prompt_for_plate: '0',
-            OrPT_prompt_for_odometer: '1',
-            Do_odometer_reasonability_check: '0',
-            Max_odometer_delta_allowed: '0',
-            Nr_odometer_retries: '0',
-            Engine_hours: '0',
-            Original_engine_hours: '0',
-            Target_engine_hours: '0',
-            'Two-stage_list': '',
-            OrPT_prompt_for_engine_hours: '0',
-            Address2: '',
-            City: '',
-            State: '',
-            Zip: '',
-            Phone: '',
-            UserData1: '',
-            UserData2: '',
-            UserData3: '',
-            UserData4: '',
-            UserData5: '',
-            Start_odometer: '0',
-            EH_consumption: '0.75',
-            Allow_ID_replacement: '2',
-            Number_of_strings: '3',
-            String2: '',
-            String3: '',
-            String4: '',
-            String5: '',
-            Plate_check_type: '1',
-            Nr_plate_retries: '0',
-            Block_if_plate_retries_fail: '0'
-          }
-          if (req.body.data.selectedOpCoNumber === '049') temp.Department_name = req.body.data.opcoData.stationCode + " Tractors_IFTA"
-          excelData.push(temp);
-        }
-        else if (item.EquipmentIdentifier.substring(0, 1) === '2') {
-          let temp = {
-            '// Action': 'R',
-            'Record_type-Mean': 'Mean',
-            Name: (item.EquipmentIdentifier + " " + item.Description).substring(0, 31),
-            Status: '2',
-            Type: '3',
-            Hardware_type: '6',
-            'Auth-type': '1',
-            Employee_type: '1',
-            Vehicle_no: item.EquipmentIdentifier,
-            String: req.body.data.opcoData.stationCode + item.EquipmentIdentifier,
-            Fleet_name: req.body.data.opcoData.fleetName,
-            Department_name: req.body.data.opcoData.stationCode + " Trailers/Off-Road",
-            Rule_name: 'No Restriction',
-            Driver_id_type: '0',
-            Price_list_name: '',
-            Model_name: item.ModelNumber,
-            Pump_name: '',
-            Year: item.ConstructionYear,
-            Capacity: '50',
-            Consumption: '0',
-            Odometer: '0',
-            Cust_id: item.SerialNumber,
-            Address: '',
-            'Account-type': '0',
-            Available_amount: '0',
-            Use_pin_code: '0',
-            Pin_code: '0',
-            Auth_pin_from: '2',
-            Nr_pin_retries: '0',
-            Block_if_pin_retries_fail: '0',
-            OrPT_prompt_for_plate: '0',
-            OrPT_prompt_for_odometer: '0',
-            Do_odometer_reasonability_check: '0',
-            Max_odometer_delta_allowed: '0',
-            Nr_odometer_retries: '0',
-            Engine_hours: '0',
-            Original_engine_hours: '0',
-            Target_engine_hours: '0',
-            'Two-stage_list': '',
-            OrPT_prompt_for_engine_hours: '1',
-            Address2: '',
-            City: '',
-            State: '',
-            Zip: '',
-            Phone: '',
-            UserData1: '',
-            UserData2: '',
-            UserData3: '',
-            UserData4: '',
-            UserData5: '',
-            Start_odometer: '0',
-            EH_consumption: '0.75',
-            Allow_ID_replacement: '1',
-            Number_of_strings: '2',
-            String2: '',
-            String3: '',
-            String4: '',
-            String5: '',
-            Plate_check_type: '1',
-            Nr_plate_retries: '0',
-            Block_if_plate_retries_fail: '0'
-          }
-          if (req.body.data.selectedOpCoNumber === '049') temp.Department_name = req.body.data.opcoData.stationCode + " Trailers_Off-Road"
-          excelData.push(temp);
-        }
-        else if (item.EquipmentIdentifier.substring(0, 1) === '3') {
-          var reeferObj = {
-            '// Action': 'R',
-            'Record_type-Mean': 'Mean',
-            Name: (item.EquipmentIdentifier + " " + item.Description).substring(0, 31),
-            Status: '2',
-            Type: '3',
-            Hardware_type: '6',
-            'Auth-type': '1',
-            Employee_type: '1',
-            Vehicle_no: item.EquipmentIdentifier,
-            String: req.body.data.opcoData.stationCode + item.EquipmentIdentifier,
-            Fleet_name: req.body.data.opcoData.fleetName,
-            Department_name: req.body.data.opcoData.stationCode + " Others",
-            Rule_name: 'Diesel',
-            Driver_id_type: '0',
-            Price_list_name: '',
-            Model_name: item.ModelNumber,
-            Pump_name: '',
-            Year: item.ConstructionYear,
-            Capacity: '150',
-            Consumption: '11',
-            Odometer: '0',
-            Cust_id: item.SerialNumber,
-            Address: '',
-            'Account-type': '0',
-            Available_amount: '0',
-            Use_pin_code: '0',
-            Pin_code: '0',
-            Auth_pin_from: '2',
-            Nr_pin_retries: '0',
-            Block_if_pin_retries_fail: '0',
-            OrPT_prompt_for_plate: '0',
-            OrPT_prompt_for_odometer: '1',
-            Do_odometer_reasonability_check: '0',
-            Max_odometer_delta_allowed: '0',
-            Nr_odometer_retries: '0',
-            Engine_hours: '0',
-            Original_engine_hours: '0',
-            Target_engine_hours: '0',
-            'Two-stage_list': '',
-            OrPT_prompt_for_engine_hours: '0',
-            Address2: '',
-            City: '',
-            State: '',
-            Zip: '',
-            Phone: '',
-            UserData1: '',
-            UserData2: '',
-            UserData3: '',
-            UserData4: '',
-            UserData5: '',
-            Start_odometer: '0',
-            EH_consumption: '0.75',
-            Allow_ID_replacement: '1',
-            Number_of_strings: '2',
-            String2: '',
-            String3: '',
-            String4: '',
-            String5: '',
-            Plate_check_type: '1',
-            Nr_plate_retries: '0',
-            Block_if_plate_retries_fail: '0'
-          }
-          excelData.push(reeferObj);
-        }
-      })
-      res.send(excelData);
+  gbsql.connect()
+    .then((pool) => {
+      console.log('/////////////////////////');
+      console.log('Connected to GB DB');
+      console.log('Fetching data from GB DB');
+      pool.query(
+        "select Equipment.EquipmentIdentifier, Equipment.Description, EquipmentExtended.ConstructionYear, Equipment.Manufacturer, Equipment.ModelNumber, Equipment.SerialNumber " +
+        "from ((Equipment INNER JOIN EquipmentExtended on Equipment.EquipmentID = EquipmentExtended.EquipmentID) " +
+        "INNER JOIN Company on Equipment.SiteCodeID = Company.SiteCodeID) where Company.Name = '" +
+        req.body.data.selectedOpCoNumber + "' and (Equipment.EquipmentIdentifier = " +
+        query + ")"
+      )
+        .then((result) => {
+          gbsql.close().then(() => console.log('GB Connection closed'))
+          result.recordset.forEach((item) => {
+            if (item.EquipmentIdentifier.substring(0, 1) === '1') {
+              let temp = {
+                '// Action': 'R',
+                'Record_type-Mean': 'Mean',
+                Name: (item.EquipmentIdentifier + " " + item.Description).substring(0, 31),
+                Status: '2',
+                Type: '3',
+                Hardware_type: '6',
+                'Auth-type': '1',
+                Employee_type: '1',
+                Vehicle_no: item.EquipmentIdentifier,
+                String: req.body.data.opcoData.stationCode + item.EquipmentIdentifier,
+                Fleet_name: req.body.data.opcoData.fleetName,
+                Department_name: req.body.data.opcoData.stationCode + " Tractors/IFTA",
+                Rule_name: 'Diesel',
+                Driver_id_type: '0',
+                Price_list_name: '',
+                Model_name: item.ModelNumber,
+                Pump_name: '',
+                Year: item.ConstructionYear,
+                Capacity: '150',
+                Consumption: '7',
+                Odometer: '0',
+                Cust_id: item.SerialNumber,
+                Address: '',
+                'Account-type': '0',
+                Available_amount: '0',
+                Use_pin_code: '0',
+                Pin_code: '0',
+                Auth_pin_from: '2',
+                Nr_pin_retries: '0',
+                Block_if_pin_retries_fail: '0',
+                OrPT_prompt_for_plate: '0',
+                OrPT_prompt_for_odometer: '1',
+                Do_odometer_reasonability_check: '0',
+                Max_odometer_delta_allowed: '0',
+                Nr_odometer_retries: '0',
+                Engine_hours: '0',
+                Original_engine_hours: '0',
+                Target_engine_hours: '0',
+                'Two-stage_list': '',
+                OrPT_prompt_for_engine_hours: '0',
+                Address2: '',
+                City: '',
+                State: '',
+                Zip: '',
+                Phone: '',
+                UserData1: '',
+                UserData2: '',
+                UserData3: '',
+                UserData4: '',
+                UserData5: '',
+                Start_odometer: '0',
+                EH_consumption: '0.75',
+                Allow_ID_replacement: '2',
+                Number_of_strings: '3',
+                String2: '',
+                String3: '',
+                String4: '',
+                String5: '',
+                Plate_check_type: '1',
+                Nr_plate_retries: '0',
+                Block_if_plate_retries_fail: '0'
+              }
+              if (req.body.data.selectedOpCoNumber === '049') temp.Department_name = req.body.data.opcoData.stationCode + " Tractors_IFTA"
+              excelData.push(temp);
+            }
+            else if (item.EquipmentIdentifier.substring(0, 1) === '2') {
+              let temp = {
+                '// Action': 'R',
+                'Record_type-Mean': 'Mean',
+                Name: (item.EquipmentIdentifier + " " + item.Description).substring(0, 31),
+                Status: '2',
+                Type: '3',
+                Hardware_type: '6',
+                'Auth-type': '1',
+                Employee_type: '1',
+                Vehicle_no: item.EquipmentIdentifier,
+                String: req.body.data.opcoData.stationCode + item.EquipmentIdentifier,
+                Fleet_name: req.body.data.opcoData.fleetName,
+                Department_name: req.body.data.opcoData.stationCode + " Trailers/Off-Road",
+                Rule_name: 'No Restriction',
+                Driver_id_type: '0',
+                Price_list_name: '',
+                Model_name: item.ModelNumber,
+                Pump_name: '',
+                Year: item.ConstructionYear,
+                Capacity: '50',
+                Consumption: '0',
+                Odometer: '0',
+                Cust_id: item.SerialNumber,
+                Address: '',
+                'Account-type': '0',
+                Available_amount: '0',
+                Use_pin_code: '0',
+                Pin_code: '0',
+                Auth_pin_from: '2',
+                Nr_pin_retries: '0',
+                Block_if_pin_retries_fail: '0',
+                OrPT_prompt_for_plate: '0',
+                OrPT_prompt_for_odometer: '0',
+                Do_odometer_reasonability_check: '0',
+                Max_odometer_delta_allowed: '0',
+                Nr_odometer_retries: '0',
+                Engine_hours: '0',
+                Original_engine_hours: '0',
+                Target_engine_hours: '0',
+                'Two-stage_list': '',
+                OrPT_prompt_for_engine_hours: '1',
+                Address2: '',
+                City: '',
+                State: '',
+                Zip: '',
+                Phone: '',
+                UserData1: '',
+                UserData2: '',
+                UserData3: '',
+                UserData4: '',
+                UserData5: '',
+                Start_odometer: '0',
+                EH_consumption: '0.75',
+                Allow_ID_replacement: '1',
+                Number_of_strings: '2',
+                String2: '',
+                String3: '',
+                String4: '',
+                String5: '',
+                Plate_check_type: '1',
+                Nr_plate_retries: '0',
+                Block_if_plate_retries_fail: '0'
+              }
+              if (req.body.data.selectedOpCoNumber === '049') temp.Department_name = req.body.data.opcoData.stationCode + " Trailers_Off-Road"
+              excelData.push(temp);
+            }
+            else if (item.EquipmentIdentifier.substring(0, 1) === '3') {
+              var reeferObj = {
+                '// Action': 'R',
+                'Record_type-Mean': 'Mean',
+                Name: (item.EquipmentIdentifier + " " + item.Description).substring(0, 31),
+                Status: '2',
+                Type: '3',
+                Hardware_type: '6',
+                'Auth-type': '1',
+                Employee_type: '1',
+                Vehicle_no: item.EquipmentIdentifier,
+                String: req.body.data.opcoData.stationCode + item.EquipmentIdentifier,
+                Fleet_name: req.body.data.opcoData.fleetName,
+                Department_name: req.body.data.opcoData.stationCode + " Others",
+                Rule_name: 'Diesel',
+                Driver_id_type: '0',
+                Price_list_name: '',
+                Model_name: item.ModelNumber,
+                Pump_name: '',
+                Year: item.ConstructionYear,
+                Capacity: '150',
+                Consumption: '11',
+                Odometer: '0',
+                Cust_id: item.SerialNumber,
+                Address: '',
+                'Account-type': '0',
+                Available_amount: '0',
+                Use_pin_code: '0',
+                Pin_code: '0',
+                Auth_pin_from: '2',
+                Nr_pin_retries: '0',
+                Block_if_pin_retries_fail: '0',
+                OrPT_prompt_for_plate: '0',
+                OrPT_prompt_for_odometer: '1',
+                Do_odometer_reasonability_check: '0',
+                Max_odometer_delta_allowed: '0',
+                Nr_odometer_retries: '0',
+                Engine_hours: '0',
+                Original_engine_hours: '0',
+                Target_engine_hours: '0',
+                'Two-stage_list': '',
+                OrPT_prompt_for_engine_hours: '0',
+                Address2: '',
+                City: '',
+                State: '',
+                Zip: '',
+                Phone: '',
+                UserData1: '',
+                UserData2: '',
+                UserData3: '',
+                UserData4: '',
+                UserData5: '',
+                Start_odometer: '0',
+                EH_consumption: '0.75',
+                Allow_ID_replacement: '1',
+                Number_of_strings: '2',
+                String2: '',
+                String3: '',
+                String4: '',
+                String5: '',
+                Plate_check_type: '1',
+                Nr_plate_retries: '0',
+                Block_if_plate_retries_fail: '0'
+              }
+              excelData.push(reeferObj);
+            }
+          })
+          res.send(excelData);
+        })
+        .catch((error) => {
+          gbsql.close().then(() => console.log('GB Connection closed'))
+          console.log(`GB Query Error::: ${error.code}`);
+          res.send(excelData);
+        })
     })
-    .catch((error) => {
-      console.log(error);
+    .catch((err) => {
+      console.log('/////////////////////////');
+      console.log('GB Connection Error:::', err.code);
       res.send(excelData);
     })
 })
@@ -534,8 +540,6 @@ app.post('/routesToTelogis', (req, res) => {
 })
 //=============================================================
 function gs1Process(req, res) {
-  const gs1sql = require('mssql');
-
   let gs1Query =
     "select " +
     "driverpro.DeliveredGS1Barcode.GS1Barcode, " +
@@ -657,16 +661,14 @@ function gs1Process(req, res) {
   }
   let CSVstring = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2,\r\n'
 
-  console.log('Disconnecting from all database connections');
-
-  // sql.close();
-  gs1sql.connect(gs1config)
-    .then(() => {
+  gs1sql.connect()
+    .then((pool) => {
+      console.log('/////////////////////////');
       console.log('Connected to GS1 DB');
-      let db = new gs1sql.Request();
       console.log('Fetching Data from GS1 DB');
-      db.query(gs1Query)
+      pool.query(gs1Query)
         .then((result) => {
+          gs1sql.close().then(() => console.log('GS1 Connection closed'));
           result.recordset.forEach((item) => {
             if (item['GS1Barcode'].substring(16, 18) === '11' || item['GS1Barcode'].substring(16, 18) === '13' || item['GS1Barcode'].substring(16, 18) === '15' || item['GS1Barcode'].substring(16, 18) === '17') {
               let date = new Date(item['Shipped Date'])
@@ -692,31 +694,26 @@ function gs1Process(req, res) {
                 .concat(`\r\n`)
             }
           })
-          console.log('Disconnecting from all database connections')
-          gs1sql.close()
-            .then(() => {
-              connectToGasboyDB();
-              if (res) res.send({ CSVstring: CSVstring })
-              /// modify this based on export
-              else {
-                let today = new Date();
-                let date = `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`
-                fs.writeFile(`//ms212rdfsc/ern-support/GS1/${date}-GS1Export.csv`, CSVstring, (err, result) => {
-                  if (err) console.log(err);
-                })
-              }
-              /// ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          if (res) res.send({ CSVstring: CSVstring })
+          /// modify this based on export
+          else {
+            let today = new Date();
+            let date = `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`
+            fs.writeFile(`//ms212rdfsc/ern-support/GS1/${date}-GS1Export.csv`, CSVstring, (err, result) => {
+              if (err) console.log(err);
             })
+          }
+          /// ^^^^^^^^^^^^^^^^^^^^^^^^^^^
         })
         .catch((err) => {
+          gs1sql.close().then(() => console.log('GS1 Connection Closed'))
           console.log('GS1 Query Error::', err.code)
           if (res) res.send({ CSVstring: CSVstring })
-          gs1sql.close().then(() => connectToGasboyDB())
         })
     })
     .catch((err => {
+      console.log('/////////////////////////');
       console.log('GS1 Connection Error::', err.code);
-      gs1sql.close().then(() => connectToGasboyDB())
     }))
 }
 //=============================================================
