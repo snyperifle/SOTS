@@ -14,7 +14,6 @@ class MirrorProfile extends React.Component {
     this.state = {
       loading: false,
       fromProfile: '',
-      fromProfileExists: false,
       copiedFiles: [],
     };
     this.fromProfileChecker = this.fromProfileChecker.bind(this);
@@ -22,16 +21,9 @@ class MirrorProfile extends React.Component {
   }
   //=============================================================
   fromProfileChecker(input) {
-    if (this.props.file.filter((item) => item.split(' ')[0] === input).length === 1) {
-      this.setState({
-        fromProfileExists: true,
-        fromProfile: input
-      })
-    } else {
-      this.setState({
-        fromProfileExists: false,
-      })
-    }
+    this.setState({
+      fromProfile: input
+    })
   }
   mirrorProfile() {
     this.setState({
@@ -65,7 +57,7 @@ class MirrorProfile extends React.Component {
         <Row>
           <Col>
             {
-              this.props.userId === '' || this.props.userOpCo === null ?
+              this.props.userId === '' ?
                 <h2 style={{ color: 'red' }}>Please enter the Caller ID</h2>
                 :
                 <Form>
@@ -87,7 +79,7 @@ class MirrorProfile extends React.Component {
                 : null
             }
             {
-              this.props.userId.length > 0 && this.state.fromProfile.length > 0 && this.state.fromProfileExists === true ?
+              this.props.userId.length > 0 && this.state.fromProfile.length === 8 ?
                 <Button
                   variant="contained"
                   color="secondary"

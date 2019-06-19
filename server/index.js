@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const sql = require('mssql');
 const jsonexport = require('jsonexport');
+const schedule = require('node-schedule');
 
 require('dotenv').config();
 
@@ -25,6 +26,29 @@ app.get('/getFiles', (req, res) => {
     res.send(JSON.stringify(data))
   })
 })
+//=============================================================
+let gbconfig = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PW,
+  server: process.env.DB_HOST,
+  database: process.env.DB_NAME
+};
+let gs1config = {
+  user: process.env.GS1_USER,
+  password: process.env.GS1_PW,
+  domain: process.env.GS1_DOMAIN,
+  database: process.env.GS1_DB,
+  driver: process.env.GS1_DRIVER,
+  server: process.env.GS1_SERVER,
+}
+function connectToGasboyDB() {
+  sql.connect(gbconfig, (err) => {
+    if (err) console.log(err);
+    else console.log('Connected to Gasboy DB');
+  })
+}
+connectToGasboyDB();
+
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
   // console.log('Updating User Configs');
@@ -204,22 +228,9 @@ app.post('/mirrorProfile', (req, res) => {
   }, 5000)
 })
 //=============================================================
-let gbconfig = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PW,
-  server: process.env.DB_HOST,
-  database: process.env.DB_NAME
-};
 app.get('/connectToGBDB', (req, res) => {
-  console.log('Disconnecting from all database connections');
-  sql.close();
-  sql.connect(gbconfig, (err) => {
-    if (err) console.log(err);
-    console.log('Connected to Gasboy DB');
-    res.send('Connected to Gasboy Database');
-  });
 })
-
+//=============================================================
 app.post('/gasboyEquipment', (req, res) => {
   let query = req.body.data.queue.reduce((result, item) => {
     if (item === req.body.data.queue[0]) return result
@@ -442,7 +453,7 @@ app.post('/gasboyEquipment', (req, res) => {
       }
     })
 })
-
+//=============================================================
 app.post('/gasboyUser', (req, res) => {
   res.send(
     req.body.data.queue.map((item) => {
@@ -513,89 +524,24 @@ app.post('/gasboyUser', (req, res) => {
   )
 })
 //=============================================================
-app.post('/createNewOpCo', (req, res) => {
-
-  console.log('Num', req.body.data.OpCoNum);
-  console.log('Name', req.body.data.OpCoName);;
-
-  // let item = 'ms212rdctx16'
-
-  // for (let i = 1; i <= 5; i++) {
-  //   fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}`, (err, exist) => {
-  //     if (err) throw err;
-  //     if (exist) console.log(`${req.body.data.OpCoNum}-${i} created`);
-  //   })
-  //   let folders = ['CUSTDL', 'RTRDL', 'RTRUL'];
-  //   folders.forEach((folder) => {
-  //     fs.mkdirSync(`//${item}/routing/${req.body.data.OpCoNum}-${i}/${folder}`, (err, exist) => {
-  //       if (err) throw err;
-  //       if (exist) console.log(`${folder} created`);
-  //     })
-  //   })
-  //   //=============================================================
-  //   let config =
-  //     'IW,"  ' +
-  //     // '429DOERLE FOOD SERVICE, LLC      '
-  //     `${req.body.data.OpCoNum}${req.body.data.OpCoName}`.padEnd(33, ' ')
-  //     + `AS${req.body.data.OpCoNum}A    "\r\n` +
-  //     'FV,"ROADNET        RDNY5 Y200010007"\r\n'
-
-  //   fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/CONFIG.tmp`, config, (err, res) => {
-  //     if (err) throw err;
-  //   })
-  //   //=============================================================
-  //   let lockout = ''
-  //   fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/LOCKOUT.tmp`, lockout, (err, res) => {
-  //     if (err) throw err;
-  //   })
-  //   //=============================================================
-  //   let optmenu =
-  //     ''.padStart(270, ' ') +
-  //     `Delivery Day Upload ÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN15PG.exe`.padEnd(105, ' ') +
-  //     `ÿÿNormal              MANÌí2rLå@Custmr Profit Reportÿÿ\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\OPRN16PG.EXE`.padEnd(126, ' ') +
-  //     `ÿÿNormal              MANW)QN­ëä@`
-  //   fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/OPTMENU.DTA`, optmenu, (err, res) => {
-  //     if (err) throw err;
-  //   })
-  //   //=============================================================
-  //   let rtrsetup =
-  //     `AS429A   *NONE 0${i}\\\\Ms212rdfsc\\rd_transfer\\NON-SUS\\${req.body.data.OpCoNum}\\Test-9429\\TRANSFER                         ` +
-  //     `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\CUSTDL                                             ` +
-  //     `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\RTRDL                                              ` +
-  //     `\\\\${item}\\routing\\${req.body.data.OpCoNum}-${i}\\RTRUL                                              ` +
-  //     `SCDBFP10  *NONE     IBMDA400  537524510513523514539593505555597530523520523524532523555555   ` +
-  //     `ÿÿÿÿÿÿ  …ëQ¸°Lå@[°…±Lå@Ï… å@”Iªµå@1u¹½Mä@ò‹%?.ä@          `
-
-  //   fs.writeFile(`//${item}/routing/${req.body.data.OpCoNum}-${i}/RTRSETUP.DTA`, rtrsetup, (err, res) => {
-  //     if (err) throw err;
-  //   })
-  // }
-
-  //Delivery Day Upload ÿÿ\\isibld\RD_Transfer\ern-sus\335\OPRN15PG.exe                                   
-
-
-
-
-  // fs.writeFile(`//${item}/routing/UserConfig.txt`, req.body.data, (err, res) => {
-  //     if (err) throw err;
-  //   });
-
+app.post('/routesToTelogis', (req, res) => {
+  let path = `//isibld/RD_Transfer/OBC/Routes/Archive`;
+  fs.readdir(path, (err, files) => {
+    if (err) console.log(err);
+    if (files) {
+      res.send(files.filter((item) => {
+        return item.substring(0, 8) === req.body.data
+      })
+      )
+    }
+  })
 })
 //=============================================================
-let gs1config = {
-  user: process.env.GS1_USER,
-  password: process.env.GS1_PW,
-  domain: process.env.GS1_DOMAIN,
-  database: process.env.GS1_DB,
-  driver: process.env.GS1_DRIVER,
-  server: process.env.GS1_SERVER,
-}
-app.get('/processGS1', (req, res) => {
-  console.log('Disconnecting from all database connections');
-  sql.close();
+function gs1Process(req, res) {
   let gs1Query =
     "select " +
     "driverpro.DeliveredGS1Barcode.GS1Barcode, " +
+    "driverpro.DeliveredGS1Barcode.DCID, " +
     "driverpro.DeliveredGS1Barcode.ScheduledDate as 'Shipped Date', " +
     "driverpro.DeliveryItem.ItemID as 'Product Serial Number', " +
     "driverpro.DeliveryItem.ItemUOM as 'Product Quantity Units', " +
@@ -612,64 +558,86 @@ app.get('/processGS1', (req, res) => {
     "and driverpro.DeliveredGS1Barcode.ItemID = driverpro.DeliveryItem.ItemID) " +
     "where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
 
-  sql.connect(gs1config, (err) => {
-    if (err) throw err;
-    console.log('Connected to GS1 DB');
-    let db = new sql.Request();
-    db.query(gs1Query, (err, result) => {
-      if (err) throw err;
-      if (result) {
-        let CSVstring = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2,\r\n'
-        result.recordset.forEach((item) => {
-          if (
-            item['GS1Barcode'].substring(16, 18) === '11' ||
-            item['GS1Barcode'].substring(16, 18) === '13' ||
-            item['GS1Barcode'].substring(16, 18) === '15' ||
-            item['GS1Barcode'].substring(16, 18) === '17'
-          ) {
-            let date = new Date(item['Shipped Date'])
-            CSVstring = CSVstring.concat(
-              `${date.getMonth()}/${date.getDate()}/${date.getFullYear()},` + //Date - REQUIRED
-              `${item['GS1Barcode'].substring(0, 2)},` +                      //SSCC - REQUIRED
-              ',' +                                                           //GLN  - REQUIRED
-              ',' +                                                           //blank
-              ',' +                                                           //Destination GLN - REQUIRED
-              ',' +                                                           //blank
-              `${item['GS1Barcode'].substring(2, 16)},` +                     //GTIN
-              `${item['GS1Barcode'].substring(26, 36) || ''},` +              //Product Lot
-              `${item['Product Serial Number']},` +                           //Product Serial Number
-              `${item['Product Quantity Units']},` +                          //Product Quantity Units
-              `${item['Product Quantity Amount']},` +                         //Product Quantity Amount
-              `${item['PO Number']},` +                                       //poNumber
-              `${item['GS1Barcode'].substring(16, 18) === '13' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
-              `${item['GS1Barcode'].substring(16, 18) === '17' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
-              ',' +                                                           //blank
-              `${item['GS1Barcode'].substring(16, 18) === '11' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
-              `${item['GS1Barcode'].substring(16, 18) === '15' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
-              ',' +                                                           //poNumber 2 - if Applicable
-              '\r\n'
-            )
-          }
+  let CSVstring = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2,\r\n'
+  console.log('Disconnecting from all database connections');
+  sql.close();
+  sql.connect(gs1config)
+    .then(() => {
+      console.log('Connected to GS1 DB');
+      let db = new sql.Request();
+      console.log('Fetching Data from GS1 DB');
+      db.query(gs1Query)
+        .then((result) => {
+          result.recordset.forEach((item) => {
+            // console.log(`HEY ${item['DCID']}`)
+            if (
+              item['GS1Barcode'].substring(16, 18) === '11' ||
+              item['GS1Barcode'].substring(16, 18) === '13' ||
+              item['GS1Barcode'].substring(16, 18) === '15' ||
+              item['GS1Barcode'].substring(16, 18) === '17'
+            ) {
+              let date = new Date(item['Shipped Date'])
+              CSVstring = CSVstring.concat(
+                `${date.getMonth()}/${date.getDate()}/${date.getFullYear()},` + //Date - REQUIRED
+                `${item['GS1Barcode'].substring(0, 2)},` +                      //SSCC - REQUIRED
+                ',' +                                                           //GLN  - REQUIRED
+                ',' +                                                           //blank
+                ',' +                                                           //Destination GLN - REQUIRED
+                ',' +                                                           //blank
+                `${item['GS1Barcode'].substring(2, 16)},` +                     //GTIN
+                `${item['GS1Barcode'].substring(26, 36) || ''},` +              //Product Lot
+                `${item['Product Serial Number']},` +                           //Product Serial Number
+                `${item['Product Quantity Units']},` +                          //Product Quantity Units
+                `${item['Product Quantity Amount']},` +                         //Product Quantity Amount
+                `${item['PO Number']},` +                                       //poNumber
+                `${item['GS1Barcode'].substring(16, 18) === '13' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
+                `${item['GS1Barcode'].substring(16, 18) === '17' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
+                ',' +                                                           //blank
+                `${item['GS1Barcode'].substring(16, 18) === '11' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
+                `${item['GS1Barcode'].substring(16, 18) === '15' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
+                ',' +                                                           //poNumber 2 - if Applicable
+                '\r\n'
+              )
+            }
+          })
+          console.log('Disconnecting from all database connections')
+          sql.close()
+            .then(() => {
+              connectToGasboyDB();
+              if (res) res.send({ CSVstring: CSVstring })
+              /// modify this based on export
+              else {
+                let today = new Date();
+                // let date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
+                let date = `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`
+                fs.writeFile(`//ms212rdfsc/ern-support/GS1/${date}-GS1Export.csv`, CSVstring, (err, result) => {
+                  if (err) console.log(err);
+                })
+              }
+              /// ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            })
         })
-        res.send({
-          CSVstring: CSVstring,
+        .catch((err) => {
+          console.log('GS1 Query Error::', err.code)
+          if (res) res.send({ CSVstring: CSVstring })
+          sql.close().then(() => connectToGasboyDB())
         })
-      }
-      console.log('Disconnecting from all database connections');
-      sql.close();
     })
-  });
+    .catch((err => {
+      console.log('GS1 Connection Error::', err.code);
+      sql.close().then(() => connectToGasboyDB())
+    }))
+}
+//=============================================================
+app.get('/processGS1', (req, res) => {
+  gs1Process(req, res)
 })
 
-app.post('/routesToTelogis', (req, res) => {
-  let path = `//isibld/RD_Transfer/OBC/Routes/Archive`;
-  fs.readdir(path, (err, files) => {
-    if (err) console.log(err);
-    if (files) {
-      res.send(files.filter((item) => {
-        return item.substring(0, 8) === req.body.data
-      })
-      )
-    }
-  })
+let rule = new schedule.RecurrenceRule();
+rule.second = 0;
+
+let gs1job = schedule.scheduleJob(rule, () => {
+  console.log('Running scheduled GS1 Job');
+  console.log('FIRING', gs1Process());
 })
+//=============================================================

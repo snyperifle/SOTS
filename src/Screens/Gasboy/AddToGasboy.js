@@ -13,7 +13,7 @@ class AddToGasboy extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentHour: '',
+      gasboyDatabaseStatus: true,
       OpCoData: {
         "029": {
           stationCode: '1050',
@@ -352,15 +352,12 @@ class AddToGasboy extends React.Component {
       })
     }
     this.connectoToGBDB();
-    let today = new Date();
-    console.log(`Time: ${today.getHours()}`);
-    this.setState({ currentHour: today.getHours() })
   }
 
   connectoToGBDB() {
     axios.get('/connectToGBDB', {})
       .then((response) => {
-        console.log(response.data);
+        this.setState({ gasboyDatabaseStatus: response.data })
       })
       .catch((error) => {
         console.log(error);
@@ -405,7 +402,7 @@ class AddToGasboy extends React.Component {
   }
   //=============================================================
   render() {
-    return this.state.currentHour >= 14 && this.state.currentHour < 17 ?
+    return this.state.gasboyDatabaseStatus === false ?
       <Container className="MainPage">
         <Row>
           <Col>
@@ -555,7 +552,6 @@ class AddToGasboy extends React.Component {
           </Col>
         </Row>
       </Container>
-
   }
 }
 export default AddToGasboy;
