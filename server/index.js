@@ -534,6 +534,8 @@ app.post('/routesToTelogis', (req, res) => {
 })
 //=============================================================
 function gs1Process(req, res) {
+  const gs1sql = require('mssql');
+
   let gs1Query =
     "select " +
     "driverpro.DeliveredGS1Barcode.GS1Barcode, " +
@@ -657,11 +659,11 @@ function gs1Process(req, res) {
 
   console.log('Disconnecting from all database connections');
 
-  sql.close();
-  sql.connect(gs1config)
+  // sql.close();
+  gs1sql.connect(gs1config)
     .then(() => {
       console.log('Connected to GS1 DB');
-      let db = new sql.Request();
+      let db = new gs1sql.Request();
       console.log('Fetching Data from GS1 DB');
       db.query(gs1Query)
         .then((result) => {
@@ -691,7 +693,7 @@ function gs1Process(req, res) {
             }
           })
           console.log('Disconnecting from all database connections')
-          sql.close()
+          gs1sql.close()
             .then(() => {
               connectToGasboyDB();
               if (res) res.send({ CSVstring: CSVstring })
@@ -709,12 +711,12 @@ function gs1Process(req, res) {
         .catch((err) => {
           console.log('GS1 Query Error::', err.code)
           if (res) res.send({ CSVstring: CSVstring })
-          sql.close().then(() => connectToGasboyDB())
+          gs1sql.close().then(() => connectToGasboyDB())
         })
     })
     .catch((err => {
       console.log('GS1 Connection Error::', err.code);
-      sql.close().then(() => connectToGasboyDB())
+      gs1sql.close().then(() => connectToGasboyDB())
     }))
 }
 //=============================================================
