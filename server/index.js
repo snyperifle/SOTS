@@ -565,46 +565,26 @@ function gs1Process(req, res) {
           result.recordset.forEach((item) => {
             if (item['GS1Barcode'].substring(16, 18) === '11' || item['GS1Barcode'].substring(16, 18) === '13' || item['GS1Barcode'].substring(16, 18) === '15' || item['GS1Barcode'].substring(16, 18) === '17') {
               let date = new Date(item['Shipped Date'])
-              // CSVstring = CSVstring.concat(
-              //   `${date.getMonth()}/${date.getDate()}/${date.getFullYear()},` + //Date - REQUIRED
-              //   `${item['GS1Barcode'].substring(0, 2)},` +                      //SSCC - REQUIRED
-              //   ',' +                                                           //GLN  - REQUIRED
-              //   ',' +                                                           //blank
-              //   ',' +                                                           //Destination GLN - REQUIRED
-              //   ',' +                                                           //blank
-              //   `${item['GS1Barcode'].substring(2, 16)},` +                     //GTIN
-              //   `${item['GS1Barcode'].substring(26, 36) || ''},` +              //Product Lot
-              //   `${item['Product Serial Number']},` +                           //Product Serial Number
-              //   `${item['Product Quantity Units']},` +                          //Product Quantity Units
-              //   `${item['Product Quantity Amount']},` +                         //Product Quantity Amount
-              //   `${item['PO Number']},` +                                       //poNumber
-              //   `${item['GS1Barcode'].substring(16, 18) === '13' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
-              //   `${item['GS1Barcode'].substring(16, 18) === '17' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
-              //   ',' +                                                           //blank
-              //   `${item['GS1Barcode'].substring(16, 18) === '11' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
-              //   `${item['GS1Barcode'].substring(16, 18) === '15' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},` +
-              //   ',' +                                                           //poNumber 2 - if Applicable
-              //   '\r\n'
-              // )
               CSVstring = CSVstring
-                .concat(`${date.getMonth()}/${date.getDate()}/${date.getFullYear()},`)
-                .concat(`${item['GS1Barcode'].substring(0, 2)},`)
-                .concat(`,`)
-                .concat(`,`)
-                .concat(`,`)
-                .concat(`,`)
-                .concat(`${item['GS1Barcode'].substring(2, 16)},`)
-                .concat(`${item['GS1Barcode'].substring(26, 36) || ''},`)
-                .concat(`${item['Product Serial Number']},`)
-                .concat(`${item['Product Quantity Units']},`)
-                .concat(`${item['Product Quantity Amount']},`)
-                .concat(`${item['PO Number']},`)
-                // .concat(`${item['GS1Barcode'].substring(16, 18) === '13' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},`)
-                // .concat(`${item['GS1Barcode'].substring(16, 18) === '17' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},`)
-                .concat(`,`)
-                // .concat(`${item['GS1Barcode'].substring(16, 18) === '11' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},`)
-                // .concat(`${item['GS1Barcode'].substring(16, 18) === '15' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)}` : ''},`)
-                .concat(`,\r\n`)
+                .concat(`${date.getMonth()}/${date.getDate()}/${date.getFullYear()},`)  //Required - Date
+                .concat(`${item['GS1Barcode'].substring(0, 2)},`)                       //Required - SSCC
+                .concat(`,`)                                                            //Required - GLN (from)
+                .concat(`,`)                                                            //Optional - GLN Extension (from)
+                .concat(`,`)                                                            //Required - GLN (to)
+                .concat(`,`)                                                            //Optional - GLN Extension (to)
+                .concat(`${item['GS1Barcode'].substring(2, 16)},`)                      //Required - GTIN
+                .concat(`${item['GS1Barcode'].substring(26, 36) || ''},`)               //Required - Product Lot
+                .concat(`${item['Product Serial Number']},`)                            //If Applicable - Product Serial Number
+                .concat(`${item['Product Quantity Units']},`)                           //Required - Product Quantity Units
+                .concat(`${item['Product Quantity Amount']},`)                          //Required - Product Quantity Amount
+                .concat(`${item['PO Number']},`)                                        //Required - PO Number
+                .concat(item['GS1Barcode'].substring(16, 18) === '13' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //packDate
+                .concat(item['GS1Barcode'].substring(16, 18) === '17' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //useThruDate
+                .concat(`,`)                                                                                                                                                                                //expirationDate
+                .concat(item['GS1Barcode'].substring(16, 18) === '11' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //productionDate
+                .concat(item['GS1Barcode'].substring(16, 18) === '15' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //bestBeforeDate
+                .concat(`,`)                                                            //If Applicable - poNumber2
+                .concat(`\r\n`)
             }
           })
           console.log('Disconnecting from all database connections')

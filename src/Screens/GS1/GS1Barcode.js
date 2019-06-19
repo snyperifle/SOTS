@@ -10,12 +10,16 @@ class GS1Barcode extends React.Component {
     super(props);
     this.state = {
       downloadData: '',
+      date: '',
     };
     this.processGS1 = this.processGS1.bind(this);
   }
 
   componentDidMount() {
-    // this.processGS1();
+    let today = new Date();
+    this.setState({
+      date: `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`
+    })
   }
 
   processGS1() {
@@ -57,7 +61,7 @@ class GS1Barcode extends React.Component {
               this.state.downloadData.length > 0 ?
                 <CSVLink
                   data={this.state.downloadData}
-                  filename={`GS1BarcodeData.csv`}
+                  filename={`${this.state.date}-GS1Export.csv`}
                   style={{
                     color: 'green',
                     margin: 20
