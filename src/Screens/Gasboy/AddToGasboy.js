@@ -357,7 +357,12 @@ class AddToGasboy extends React.Component {
   connectoToGBDB() {
     axios.get('/connectToGBDB', {})
       .then((response) => {
-        this.setState({ gasboyDatabaseStatus: response.data })
+        console.log(response.data);
+        if (response.data === 'ELOGIN') {
+          this.setState({
+            gasboyDatabaseStatus: false
+          })
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -374,6 +379,7 @@ class AddToGasboy extends React.Component {
     })
       .then((response) => {
         console.log(response.data);
+        if(response.data.length === 0) alert('Unit does not exist in Gasboy')
         this.setState({
           downloadData: response.data
         })
@@ -406,7 +412,7 @@ class AddToGasboy extends React.Component {
       <Container className="MainPage">
         <Row>
           <Col>
-            <h2 className='title'>Sorry, Gasboy DB is busy</h2>
+            <h2 className='title'>Sorry, Gasboy DB is down for maintenance</h2>
             <h5>Please try again later</h5>
           </Col>
         </Row>

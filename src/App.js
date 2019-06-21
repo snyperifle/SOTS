@@ -30,9 +30,9 @@ import AddToGasboy from './Screens/Gasboy/AddToGasboy';
 import TelogisInfo from './Screens/Telogis/TelogisInfo';
 import RoutesToTelogis from './Screens/Telogis/RoutesToTelogis';
 
-import AddNewOpCo from './Screens/Development/AddNewOpCo';
-
 import GS1Barcode from './Screens/GS1/GS1Barcode';
+
+import MigrationExport from './Screens/Development/MigrationExport';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -142,7 +142,6 @@ class App extends React.Component {
     this.AddToGasboy = this.AddToGasboy.bind(this);
     this.TelogisInfo = this.TelogisInfo.bind(this);
     this.RoutesToTelogis = this.RoutesToTelogis.bind(this);
-    this.AddNewOpCo = this.AddNewOpCo.bind(this);
     this.GS1Barcode = this.GS1Barcode.bind(this);
     //=============================================================
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
@@ -272,13 +271,6 @@ class App extends React.Component {
     )
   }
   //=============================================================
-  AddNewOpCo() {
-    return (
-      <AddNewOpCo
-
-      />
-    )
-  }
   RoutesToTelogis() {
     return (
       <RoutesToTelogis
@@ -295,7 +287,15 @@ class App extends React.Component {
       />
     )
   }
+//=============================================================
+MigrationExport(){
+  return(
+    <MigrationExport
 
+    />
+  )
+}
+  //=============================================================
   render() {
     return (
       <Router>
@@ -478,6 +478,13 @@ class App extends React.Component {
                     <Link to="/gs1Barcode">Manual Process</Link>
                   </li>
                 </ul>
+                <Divider variant="middle" />
+                <h5>Development</h5>
+                <ul>
+                  <li onClick={() => this.setState({ drawer:false, page: true})}>
+                    <Link to="/migrationExport">Routing Solution</Link>
+                  </li>
+                </ul>
               </div>
             </nav>
             : null}
@@ -497,8 +504,8 @@ class App extends React.Component {
               <Route path="/addToGasboy" component={this.AddToGasboy} />
               <Route path="/telogisInfo" component={this.TelogisInfo} />
               <Route path="/routesToTelogis" component={this.RoutesToTelogis} />
-              <Route path="/addNewOpCo" component={this.AddNewOpCo} />
               <Route path="/gs1Barcode" component={this.GS1Barcode} />
+              <Route path="/migrationExport" component={this.MigrationExport} />
             </div>
             :
             <Container>

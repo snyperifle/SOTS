@@ -37,8 +37,26 @@ let gs1config = {
   driver: process.env.GS1_DRIVER,
   server: process.env.GS1_SERVER,
 }
-let gbsql = new sql.ConnectionPool(gbconfig)
-let gs1sql = new sql.ConnectionPool(gs1config)
+let exconfig = {
+  user: process.env.EX_USER,
+  password: process.env.EX_PW,
+  database: process.env.EX_NAME,
+  server: process.env.EX_HOST
+}
+let gbsql = new sql.ConnectionPool(gbconfig);
+let gs1sql = new sql.ConnectionPool(gs1config);
+let exsql = new sql.ConnectionPool(exconfig);
+
+let today;
+let time;
+
+function currentTime() {
+  let date = new Date();
+  today = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`
+  time = `${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${('0' + date.getSeconds()).slice(-2)}`
+
+  console.log(`///////////////////////// ${time}`);
+}
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
   // console.log('Updating User Configs');
@@ -217,9 +235,22 @@ app.post('/mirrorProfile', (req, res) => {
 })
 //=============================================================
 app.get('/connectToGBDB', (req, res) => {
+  currentTime();
+
+  console.log('Pinging Gasboy Database');
+  gbsql.connect()
+    .then(() => {
+      console.log('Ping Successful');
+      gbsql.close()
+    })
+    .catch((error) => {
+      console.log(`Ping Unsuccessful: ${error}`);
+      res.send(error.code);
+    })
 })
 //=============================================================
 app.post('/gasboyEquipment', (req, res) => {
+  currentTime();
   let query = req.body.data.queue.reduce((result, item) => {
     if (item === req.body.data.queue[0]) return result
     else return result += ` OR EquipmentIdentifier = '${item}'`
@@ -227,9 +258,10 @@ app.post('/gasboyEquipment', (req, res) => {
   let excelData = [];
   gbsql.connect()
     .then((pool) => {
-      console.log('/////////////////////////');
-      console.log('Connected to GB DB');
-      console.log('Fetching data from GB DB');
+      console.log('Connected to Gasboy Database');
+      req.body.data.queue.forEach((item) => {
+        console.log(`Fetching Data for ${item} - OpCo ${req.body.data.selectedOpCoNumber}`);
+      })
       pool.query(
         "select Equipment.EquipmentIdentifier, Equipment.Description, EquipmentExtended.ConstructionYear, Equipment.Manufacturer, Equipment.ModelNumber, Equipment.SerialNumber " +
         "from ((Equipment INNER JOIN EquipmentExtended on Equipment.EquipmentID = EquipmentExtended.EquipmentID) " +
@@ -238,7 +270,7 @@ app.post('/gasboyEquipment', (req, res) => {
         query + ")"
       )
         .then((result) => {
-          gbsql.close().then(() => console.log('GB Connection closed'))
+          gbsql.close().then(() => console.log('Gasboy Database Connection closed'))
           result.recordset.forEach((item) => {
             if (item.EquipmentIdentifier.substring(0, 1) === '1') {
               let temp = {
@@ -444,19 +476,21 @@ app.post('/gasboyEquipment', (req, res) => {
           res.send(excelData);
         })
         .catch((error) => {
-          gbsql.close().then(() => console.log('GB Connection closed'))
+          gbsql.close().then(() => console.log('Gasboy Database Connection closed'))
           console.log(`GB Query Error::: ${error.code}`);
           res.send(excelData);
         })
     })
     .catch((err) => {
-      console.log('/////////////////////////');
-      console.log('GB Connection Error:::', err.code);
-      res.send(excelData);
+      console.log('GB Connection Error:::', err);
+      res.send(err.code);
     })
 })
 //=============================================================
 app.post('/gasboyUser', (req, res) => {
+  currentTime();
+  console.log('Generating Gasboy User');
+
   res.send(
     req.body.data.queue.map((item) => {
       return {
@@ -527,6 +561,8 @@ app.post('/gasboyUser', (req, res) => {
 })
 //=============================================================
 app.post('/routesToTelogis', (req, res) => {
+  currentTime();
+  console.log('Pulling routes for Telogis');
   let path = `//isibld/RD_Transfer/OBC/Routes/Archive`;
   fs.readdir(path, (err, files) => {
     if (err) console.log(err);
@@ -663,12 +699,11 @@ function gs1Process(req, res) {
 
   gs1sql.connect()
     .then((pool) => {
-      console.log('/////////////////////////');
-      console.log('Connected to GS1 DB');
-      console.log('Fetching Data from GS1 DB');
+      console.log('Connected to GS1 Database');
+      console.log('Fetching Data from GS1 Database');
       pool.query(gs1Query)
         .then((result) => {
-          gs1sql.close().then(() => console.log('GS1 Connection closed'));
+          gs1sql.close().then(() => console.log('GS1 Database Connection closed'));
           result.recordset.forEach((item) => {
             if (item['GS1Barcode'].substring(16, 18) === '11' || item['GS1Barcode'].substring(16, 18) === '13' || item['GS1Barcode'].substring(16, 18) === '15' || item['GS1Barcode'].substring(16, 18) === '17') {
               let date = new Date(item['Shipped Date'])
@@ -697,9 +732,7 @@ function gs1Process(req, res) {
           if (res) res.send({ CSVstring: CSVstring })
           /// modify this based on export
           else {
-            let today = new Date();
-            let date = `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`
-            fs.writeFile(`//ms212rdfsc/ern-support/GS1/${date}-GS1Export.csv`, CSVstring, (err, result) => {
+            fs.writeFile(`//ms212rdfsc/ern-support/GS1/${today}-GS1Export.csv`, CSVstring, (err, result) => {
               if (err) console.log(err);
             })
           }
@@ -707,27 +740,137 @@ function gs1Process(req, res) {
         })
         .catch((err) => {
           gs1sql.close().then(() => console.log('GS1 Connection Closed'))
-          console.log('GS1 Query Error::', err.code)
+          console.log('GS1 Query Error::', err)
           if (res) res.send({ CSVstring: CSVstring })
         })
     })
     .catch((err => {
       console.log('/////////////////////////');
-      console.log('GS1 Connection Error::', err.code);
+      console.log('GS1 Connection Error::', err);
     }))
 }
 //=============================================================
 app.get('/processGS1', (req, res) => {
+  currentTime();
+
   gs1Process(req, res)
 })
 
-let rule = new schedule.RecurrenceRule();
-rule.hour = 12;
-rule.minute = 0;
-rule.second = 0;
+let gs1Rule = new schedule.RecurrenceRule();
+gs1Rule.hour = 12;
+gs1Rule.minute = 0;
+gs1Rule.second = 0;
 
-let gs1job = schedule.scheduleJob(rule, () => {
+let gs1job = schedule.scheduleJob(gs1Rule, () => {
+  currentTime();
   console.log('Running scheduled GS1 Job');
   gs1Process();
 })
 //=============================================================
+
+function routingSolution(req, res) {
+  currentTime();
+  let exQuery =
+    `SELECT "RS_SESSION"."REGION_ID", "RS_SESSION"."SESSION_DATE", "RS_SESSION"."DESCRIPTION", "RS_STOP"."LOCATION_ID",` +
+    `"RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE1", "RS_ROUTE"."ROUTE_ID", "RS_ROUTE"."DESCRIPTION" AS 'ROUTE_DESCRIPTION', "RS_ROUTE"."LOCATION_ID_ORIGIN",` +
+    `"RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE2", "RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE3", "RS_ROUTE_EQUIPMENT"."EQUIPMENT_TYPE_ID",` +
+    `"RS_STOP"."SEQUENCE_NUMBER", "RS_STOP"."DISTANCE", "RS_ROUTE"."DISTANCE", "TS_LOCATION"."ADDR_LINE1", "TS_LOCATION"."ADDR_LINE2",` +
+    `"TS_LOCATION"."XADDR_LINE1", "TS_LOCATION"."REGION1", "TS_LOCATION"."REGION2", "TS_LOCATION"."REGION3", "TS_LOCATION"."POSTAL_CODE",` +
+    `"TS_LOCATION"."COUNTRY", "RS_ROUTE"."TRAVEL_TIME", "RS_ROUTE"."SERVICE_TIME", "RS_ORDER"."ORDER_NUMBER", "RS_ORDER"."SELECTOR",` +
+    `"RS_ORDER"."ORDER_TYPE", "RS_ORDER"."SIZE1", "RS_ORDER"."SIZE2", "RS_ORDER"."SIZE3", "RS_ORDER"."SIZE1_CAT1", "RS_ORDER"."SIZE2_CAT1",` +
+    `"RS_ORDER"."SIZE3_CAT1", "RS_ORDER"."SIZE1_CAT2", "RS_ORDER"."SIZE2_CAT2", "RS_ORDER"."SIZE3_CAT2", "RS_ORDER"."SIZE1_CAT3",` +
+    `"RS_ORDER"."SIZE2_CAT3", "RS_ORDER"."SIZE3_CAT3", "RS_ROUTE"."START_TIME", "RS_ROUTE"."PREROUTE_TIME", "RS_ROUTE"."POSTROUTE_TIME", "RS_ROUTE"."START_TIME",` +
+    `"RS_ROUTE"."DRIVER1_ID", "RS_ROUTE"."DRIVER2_ID", "RS_STOP"."LOCATION_TYPE", "RS_STOP"."STOP_TYPE", "RS_ROUTE"."LOCATION_ID_DESTINATION", "TS_LOCATION"."SERVICE_TIME_TYPE_ID", "TS_EQUIPMENT_TYPE"."SIZE1", "TS_EQUIPMENT_TYPE"."SIZE2", "TS_EQUIPMENT_TYPE"."SIZE3", "TS_LOCATION"."DESCRIPTION", "TS_LOCATION"."LONGITUDE", "TS_LOCATION"."LATITUDE", "TS_REGION"."USER_FIELD1", "RS_ROUTE_SUMMARY_VIEW"."STOP_SUM", "RS_STOP"."TRAVEL_TIME"` +
+    `FROM   {oj (("UPSLT"."TSDBA"."TS_LOCATION" "TS_LOCATION"` +
+    `INNER JOIN (((("UPSLT"."TSDBA"."TS_REGION" "TS_REGION"` +
+    `INNER JOIN "UPSLT"."TSDBA"."RS_SESSION" "RS_SESSION" ON "TS_REGION"."REGION_ID"="RS_SESSION"."REGION_ID")` +
+    `LEFT OUTER JOIN (("UPSLT"."TSDBA"."TS_EQUIPMENT_TYPE" "TS_EQUIPMENT_TYPE"` +
+    `INNER JOIN "UPSLT"."TSDBA"."RS_ROUTE_EQUIPMENT" "RS_ROUTE_EQUIPMENT"` +
+    `ON ("TS_EQUIPMENT_TYPE"."EQUIPMENT_TYPE_ID"="RS_ROUTE_EQUIPMENT"."EQUIPMENT_TYPE_ID")` +
+    `AND ("TS_EQUIPMENT_TYPE"."REGION_ID"="RS_ROUTE_EQUIPMENT"."EQUIPMENT_OWNER_ID"))` +
+    `INNER JOIN "UPSLT"."TSDBA"."RS_ROUTE" "RS_ROUTE" ON ("RS_ROUTE_EQUIPMENT"."ROUTE_PKEY"="RS_ROUTE"."PKEY")` +
+    `AND ("RS_ROUTE_EQUIPMENT"."RN_SESSION_PKEY"="RS_ROUTE"."RN_SESSION_PKEY")) ON "RS_SESSION"."PKEY"="RS_ROUTE"."RN_SESSION_PKEY")` +
+    `LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_STOP" "RS_STOP" ON ("RS_ROUTE"."RN_SESSION_PKEY"="RS_STOP"."RN_SESSION_PKEY")` +
+    `AND ("RS_ROUTE"."PKEY"="RS_STOP"."ROUTE_PKEY")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_ROUTE_SUMMARY_VIEW" "RS_ROUTE_SUMMARY_VIEW"` +
+    `ON ("RS_ROUTE"."RN_SESSION_PKEY"="RS_ROUTE_SUMMARY_VIEW"."RN_SESSION_PKEY") AND ("RS_ROUTE"."PKEY"="RS_ROUTE_SUMMARY_VIEW"."PKEY"))` +
+    `ON (("TS_LOCATION"."REGION_ID"="RS_STOP"."LOCATION_REGION_ID") AND ("TS_LOCATION"."TYPE"="RS_STOP"."LOCATION_TYPE")) AND ("TS_LOCATION"."ID"="RS_STOP"."LOCATION_ID")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_STOP_SUMMARY_VIEW" "RS_STOP_SUMMARY_VIEW" ON (("RS_STOP"."PKEY"="RS_STOP_SUMMARY_VIEW"."PKEY") AND ("RS_STOP"."RN_SESSION_PKEY"="RS_STOP_SUMMARY_VIEW"."RN_SESSION_PKEY")) AND ("RS_STOP"."ROUTE_PKEY"="RS_STOP_SUMMARY_VIEW"."ROUTE_PKEY")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_ORDER" "RS_ORDER" ON ("RS_STOP"."RN_SESSION_PKEY"="RS_ORDER"."RN_SESSION_PKEY") AND ("RS_STOP"."PKEY"="RS_ORDER"."STOP_PKEY")}` +
+    `WHERE  ("RS_SESSION"."DESCRIPTION" LIKE 'Delivery' OR "RS_SESSION"."DESCRIPTION" LIKE 'DELIVERY'` +
+    `OR "RS_SESSION"."DESCRIPTION" LIKE 'Integrator Imported' OR "RS_SESSION"."DESCRIPTION" LIKE 'INTEGRATOR IMPORTED')` +
+    `AND "RS_STOP"."SEQUENCE_NUMBER"<>-1 AND ("RS_SESSION"."SESSION_DATE">={ts '${today} 00:00:00'}` +
+    `AND "RS_SESSION"."SESSION_DATE"<{ts '${today} 00:00:01'}) AND "RS_SESSION"."REGION_ID"='078'` +
+    `ORDER BY "RS_SESSION"."SESSION_DATE", "RS_ROUTE"."ROUTE_ID", "RS_STOP"."SEQUENCE_NUMBER"`
+  let CSVstring = '';
+  exsql.connect()
+    .then((pool) => {
+      console.log('Successfully Connected to EX DB');
+      console.log('Fetching data for Routing Solution');
+      pool.query(exQuery)
+        .then((result) => {
+          exsql.close();
+
+          result.recordset.forEach((item) => {
+            let timeObj = new Date(item['START_TIME'][0]);
+            let startTime = `${('0' + timeObj.getUTCHours()).slice(-2)}:${('0' + timeObj.getMinutes()).slice(-2)}:${('0' + timeObj.getSeconds()).slice(-2)}`
+            let startDate = `${(timeObj.getFullYear())}-${('0' + (timeObj.getMonth() + 1)).slice(-2)}-${('0' + timeObj.getDate()).slice(-2)}`
+
+            CSVstring = CSVstring
+              .concat(`${item['LOCATION_ID']}`.padEnd(10))                      //1
+              .concat(`${item['ORDER_NUMBER']}`.padEnd(10))                     //2
+              .concat(`${item['SIZE1'][0]}`.padEnd(10))                         //3
+              .concat(`${item['SIZE1_CAT1']}`.padEnd(10))                       //4
+              .concat(`${item['SIZE1_CAT2']}`.padEnd(10))                       //5
+              .concat(`${item['SIZE1_CAT3']}`.padEnd(10))                       //6
+              .concat(`${item['SIZE2'][0]}`.padEnd(10))                         //7
+              .concat(`${item['SIZE2_CAT1']}`.padEnd(10))                       //8
+              .concat(`${item['SIZE2_CAT2']}`.padEnd(10))                       //9
+              .concat(`${item['SIZE2_CAT3']}`.padEnd(10))                       //10
+              .concat(`${item['SIZE3'][0]}`.padEnd(10))                         //11
+              .concat(`${item['SIZE3_CAT1']}`.padEnd(10))                       //12
+              .concat(`${item['SIZE3_CAT2']}`.padEnd(10))                       //13
+              .concat(`${item['SIZE3_CAT3']}`.padEnd(10))                       //14
+              .concat(`${item['ROUTE_ID']}`.padEnd(5))                          //15
+              .concat(`${item['DRIVER1_ID']}`.padEnd(15))                       //16
+              .concat(`${item['DRIVER2_ID']}`.padEnd(15))                       //17
+              .concat(`${item['EQUIPMENT_TYPE_ID']}`.padEnd(5))                 //18
+              .concat(`${item['ROUTE_DESCRIPTION']}`.padEnd(30))                //19
+              .concat(`${item['LOCATION_ID_ORIGIN']}`.padEnd(10))               //20
+              .concat(`${item['LOCATION_ID_DESTINATION']}`.padEnd(10))          //21
+              .concat(` ${item['PREROUTE_TIME']}`.padEnd(10))                   //22
+              .concat(` ${item['POSTROUTE_TIME']}`.padEnd(10))                  //23
+              .concat(`${item['SEQUENCE_NUMBER']}`.padEnd(5))                   //24
+              .concat(`${item['ORDER_TYPE']}`.padEnd(5))                        //25
+              .concat(startDate.padEnd(15))                                     //26
+              .concat(startTime.padEnd(15))                                     //27
+              // .concat(`${item['SESSION_DATE']}`.padEnd(40))
+
+              .concat(`\r\n`)
+          })
+          if (res) {
+            res.send({ CSVstring: CSVstring })
+          }
+          else {
+            fs.writeFile(`//ms212rdfsc/ern-support/078RoutingSolution/${today} - 078RoutedSolution.csv`, CSVstring, (err, result) => {
+              if (err) console.log(err);
+            })
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    })
+    .catch((err) => { console.log(err); })
+}
+
+app.get('/routingSolution', (req, res) => {
+  routingSolution(req, res);
+});
+
+let rsRule = new schedule.RecurrenceRule();
+rsRule.hour = 9;
+rsRule.minute = 0;
+rsRule.second = 0;
+
+let rsjob = schedule.scheduleJob(rsRule, () => {
+  console.log('Running scheduled RS Job');
+  routingSolution();
+})
