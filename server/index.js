@@ -584,6 +584,8 @@ app.post('/routesToTelogis', (req, res) => {
 //=============================================================
 function gs1Process(req, res) {
 
+  let queryDate = req ? req.body.data.date : today;
+
   let gs1Query =
     "select " +
     "driverpro.DeliveredGS1Barcode.GS1Barcode, " +
@@ -602,7 +604,7 @@ function gs1Process(req, res) {
     "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.DeliveryItem.RouteID " +
     "and driverpro.DeliveredGS1Barcode.StopSequenceNumber = driverpro.DeliveryItem.StopSequenceNumber " +
     "and driverpro.DeliveredGS1Barcode.ItemID = driverpro.DeliveryItem.ItemID) " +
-    `and driverpro.DeliveredGS1Barcode.ScheduledDate = {ts '${req.body.data.date} 00:00:00'}` + 
+    `and driverpro.DeliveredGS1Barcode.ScheduledDate = {ts '${queryDate} 00:00:00'}` + 
     "where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
 
   let fromGLN = {
