@@ -55,7 +55,7 @@ function currentTime() {
   let date = new Date();
   today = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`
   time = `${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${('0' + date.getSeconds()).slice(-2)}`
-
+  console.log(`Today: ${today}`);
   // sessionDate = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + (date.getDate() + 1)).slice(-2)}`
   sessionDate = `2019-07-01`
   // console.log('test---', sessionDate);
@@ -583,6 +583,7 @@ app.post('/routesToTelogis', (req, res) => {
 })
 //=============================================================
 function gs1Process(req, res) {
+
   let gs1Query =
     "select " +
     "driverpro.DeliveredGS1Barcode.GS1Barcode, " +
@@ -601,10 +602,8 @@ function gs1Process(req, res) {
     "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.DeliveryItem.RouteID " +
     "and driverpro.DeliveredGS1Barcode.StopSequenceNumber = driverpro.DeliveryItem.StopSequenceNumber " +
     "and driverpro.DeliveredGS1Barcode.ItemID = driverpro.DeliveryItem.ItemID) " +
-    "and driverpro.DeliveredGS1Barcode.ScheduledDate = {ts '2019-06-29 00:00:00'}" +
+    `and driverpro.DeliveredGS1Barcode.ScheduledDate = {ts '${req.body.data.date} 00:00:00'}` + 
     "where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
-
-  // {ts '${sessionDate} 00:00:00'}
 
   let fromGLN = {
     '331': '0074865xxxxxx',
@@ -760,14 +759,14 @@ function gs1Process(req, res) {
     }))
 }
 //=============================================================
-app.get('/processGS1', (req, res) => {
+app.post('/processGS1', (req, res) => {
   currentTime();
 
   gs1Process(req, res)
 })
 
 let gs1Rule = new schedule.RecurrenceRule();
-gs1Rule.hour = 12;
+gs1Rule.hour = 17;
 gs1Rule.minute = 0;
 gs1Rule.second = 0;
 

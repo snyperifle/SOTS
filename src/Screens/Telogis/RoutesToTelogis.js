@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Container, Row, Col } from 'react-bootstrap';
 import '../../App.css';
 import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css"
+import "react-datepicker/dist/react-datepicker.css";
 import { PulseLoader } from 'react-spinners';
 //=============================================================
 class RoutesToTelogis extends React.Component {
