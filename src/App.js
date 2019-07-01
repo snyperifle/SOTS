@@ -287,14 +287,14 @@ class App extends React.Component {
       />
     )
   }
-//=============================================================
-MigrationExport(){
-  return(
-    <MigrationExport
+  //=============================================================
+  MigrationExport() {
+    return (
+      <MigrationExport
 
-    />
-  )
-}
+      />
+    )
+  }
   //=============================================================
   render() {
     return (
@@ -448,7 +448,8 @@ MigrationExport(){
                     <Link to="/removeFromRoutingInterface">Remove User from Routing Interface</Link>
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/replaceRIConfig">Replace RI Config File</Link>
+                    {/* <Link to="/replaceRIConfig">Replace RI Config File</Link> */}
+                    <h6 style={{ color: 'grey' }}>Replace RI Config File</h6>
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link>
@@ -481,7 +482,7 @@ MigrationExport(){
                 <Divider variant="middle" />
                 <h5>Development</h5>
                 <ul>
-                  <li onClick={() => this.setState({ drawer:false, page: true})}>
+                  <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/migrationExport">Routing Solution</Link>
                   </li>
                 </ul>

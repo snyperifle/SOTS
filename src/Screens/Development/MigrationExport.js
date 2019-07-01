@@ -20,7 +20,7 @@ class MigrationExport extends React.Component {
   componentDidMount() {
     let today = new Date();
     this.setState({
-      date: `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`
+      date: `${today.getMonth() + 1}-${today.getDate() + 1}-${today.getFullYear()}`
     })
   }
   processExport() {

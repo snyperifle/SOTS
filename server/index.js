@@ -49,14 +49,20 @@ let exsql = new sql.ConnectionPool(exconfig);
 
 let today;
 let time;
+let sessionDate;
 
 function currentTime() {
   let date = new Date();
   today = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`
   time = `${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${('0' + date.getSeconds()).slice(-2)}`
 
+  // sessionDate = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + (date.getDate() + 1)).slice(-2)}`
+  sessionDate = `2019-07-01`
+  // console.log('test---', sessionDate);
+
   console.log(`///////////////////////// ${time}`);
 }
+
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
   // console.log('Updating User Configs');
@@ -72,7 +78,7 @@ app.post('/replaceRIConfig', (req, res) => {
   let filesReplaced = [];
   servers.forEach((server) => {
     let path = `//ms212rdctx06/ROUTING/XXX-${req.body.data.OpCo.substring(4)}`
-    fs.readdir(path, (err, res) => {
+    fs.readdir(path, 'ascii', (err, res) => {
       if (err) console.log(err);;
       if (res) {
         res.forEach((file) => {
@@ -84,7 +90,8 @@ app.post('/replaceRIConfig', (req, res) => {
                 .split('YYYYY').join(`${req.body.data.OpCo}`)
                 .split('ZZZZZ').join(`${req.body.data.name[0].OpCoName}`.padEnd(30, ' '))
                 .split('SERVER').join(`${server}`)
-              fs.writeFile(`//${server}/ROUTING/${req.body.data.OpCo}/${file}`, data, (err, res) => {
+              // fs.writeFile(`//${server}/ROUTING/${req.body.data.OpCo}/${file}`, data, (err, res) => {
+              fs.writeFile(`//ms212rdfsc/ERN-support/ConfigTest/${req.body.data.OpCo}/${file}`, data, 'ascii', (err, res) => {
                 if (err) console.log(err);
               })
             }
@@ -594,7 +601,10 @@ function gs1Process(req, res) {
     "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.DeliveryItem.RouteID " +
     "and driverpro.DeliveredGS1Barcode.StopSequenceNumber = driverpro.DeliveryItem.StopSequenceNumber " +
     "and driverpro.DeliveredGS1Barcode.ItemID = driverpro.DeliveryItem.ItemID) " +
+    "and driverpro.DeliveredGS1Barcode.ScheduledDate = {ts '2019-06-29 00:00:00'}" +
     "where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
+
+  // {ts '${sessionDate} 00:00:00'}
 
   let fromGLN = {
     '331': '0074865xxxxxx',
@@ -708,11 +718,11 @@ function gs1Process(req, res) {
             if (item['GS1Barcode'].substring(16, 18) === '11' || item['GS1Barcode'].substring(16, 18) === '13' || item['GS1Barcode'].substring(16, 18) === '15' || item['GS1Barcode'].substring(16, 18) === '17') {
               let date = new Date(item['Shipped Date'])
               CSVstring = CSVstring
-                .concat(`${date.getMonth()}/${date.getDate()}/${date.getFullYear()},`)  //Required - Date
+                .concat(`${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()},`)  //Required - Date
                 .concat(`${item['GS1Barcode'].substring(0, 2)},`)                       //Required - SSCC
                 .concat(`${fromGLN[item['DCID']]},`)                                                            //Required - GLN (from)
                 .concat(`,`)                                                            //Optional - GLN Extension (from)
-                .concat(`,`)                                                            //Required - GLN (to)
+                .concat(`${item['GS1Barcode'].substring(3, 16)},`)                      //Required - GLN (to)
                 .concat(`,`)                                                            //Optional - GLN Extension (to)
                 .concat(`${item['GS1Barcode'].substring(2, 16)},`)                      //Required - GTIN
                 .concat(`${item['GS1Barcode'].substring(26, 36) || ''},`)               //Required - Product Lot
@@ -770,6 +780,7 @@ let gs1job = schedule.scheduleJob(gs1Rule, () => {
 
 function routingSolution(req, res) {
   currentTime();
+
   let exQuery =
     `SELECT "RS_SESSION"."REGION_ID", "RS_SESSION"."SESSION_DATE", "RS_SESSION"."DESCRIPTION", "RS_STOP"."LOCATION_ID",` +
     `"RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE1", "RS_ROUTE"."ROUTE_ID", "RS_ROUTE"."DESCRIPTION" AS 'ROUTE_DESCRIPTION', "RS_ROUTE"."LOCATION_ID_ORIGIN",` +
@@ -796,26 +807,27 @@ function routingSolution(req, res) {
     `ON (("TS_LOCATION"."REGION_ID"="RS_STOP"."LOCATION_REGION_ID") AND ("TS_LOCATION"."TYPE"="RS_STOP"."LOCATION_TYPE")) AND ("TS_LOCATION"."ID"="RS_STOP"."LOCATION_ID")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_STOP_SUMMARY_VIEW" "RS_STOP_SUMMARY_VIEW" ON (("RS_STOP"."PKEY"="RS_STOP_SUMMARY_VIEW"."PKEY") AND ("RS_STOP"."RN_SESSION_PKEY"="RS_STOP_SUMMARY_VIEW"."RN_SESSION_PKEY")) AND ("RS_STOP"."ROUTE_PKEY"="RS_STOP_SUMMARY_VIEW"."ROUTE_PKEY")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_ORDER" "RS_ORDER" ON ("RS_STOP"."RN_SESSION_PKEY"="RS_ORDER"."RN_SESSION_PKEY") AND ("RS_STOP"."PKEY"="RS_ORDER"."STOP_PKEY")}` +
     `WHERE  ("RS_SESSION"."DESCRIPTION" LIKE 'Delivery' OR "RS_SESSION"."DESCRIPTION" LIKE 'DELIVERY'` +
     `OR "RS_SESSION"."DESCRIPTION" LIKE 'Integrator Imported' OR "RS_SESSION"."DESCRIPTION" LIKE 'INTEGRATOR IMPORTED')` +
-    `AND "RS_STOP"."SEQUENCE_NUMBER"<>-1 AND ("RS_SESSION"."SESSION_DATE">={ts '${today} 00:00:00'}` +
-    `AND "RS_SESSION"."SESSION_DATE"<{ts '${today} 00:00:01'}) AND "RS_SESSION"."REGION_ID"='078'` +
+    `AND "RS_STOP"."SEQUENCE_NUMBER"<>-1 AND ("RS_SESSION"."SESSION_DATE">={ts '${sessionDate} 00:00:00'}` +
+    `AND "RS_SESSION"."SESSION_DATE"<{ts '${sessionDate} 00:00:01'}) AND "RS_SESSION"."REGION_ID"='078'` +
     `ORDER BY "RS_SESSION"."SESSION_DATE", "RS_ROUTE"."ROUTE_ID", "RS_STOP"."SEQUENCE_NUMBER"`
   let CSVstring = '';
   exsql.connect()
     .then((pool) => {
-      console.log('Successfully Connected to EX DB');
+      console.log('Successfully Connected to RS DB');
       console.log('Fetching data for Routing Solution');
       pool.query(exQuery)
         .then((result) => {
+          console.log('RS Database Connection closed');
           exsql.close();
 
           result.recordset.forEach((item) => {
             let timeObj = new Date(item['START_TIME'][0]);
-            let startTime = `${('0' + timeObj.getUTCHours()).slice(-2)}:${('0' + timeObj.getMinutes()).slice(-2)}:${('0' + timeObj.getSeconds()).slice(-2)}`
+            let startTime = `${('0' + timeObj.getHours()).slice(-2)}:${('0' + timeObj.getMinutes()).slice(-2)}`
             let startDate = `${(timeObj.getFullYear())}-${('0' + (timeObj.getMonth() + 1)).slice(-2)}-${('0' + timeObj.getDate()).slice(-2)}`
 
             CSVstring = CSVstring
               .concat(`${item['LOCATION_ID']}`.padEnd(10))                      //1
-              .concat(`${item['ORDER_NUMBER']}`.padEnd(10))                     //2
+              .concat(`${item['ORDER_NUMBER']}`.padEnd(15))                     //2
               .concat(`${item['SIZE1'][0]}`.padEnd(10))                         //3
               .concat(`${item['SIZE1_CAT1']}`.padEnd(10))                       //4
               .concat(`${item['SIZE1_CAT2']}`.padEnd(10))                       //5
@@ -828,22 +840,21 @@ function routingSolution(req, res) {
               .concat(`${item['SIZE3_CAT1']}`.padEnd(10))                       //12
               .concat(`${item['SIZE3_CAT2']}`.padEnd(10))                       //13
               .concat(`${item['SIZE3_CAT3']}`.padEnd(10))                       //14
-              .concat(`${item['ROUTE_ID']}`.padEnd(5))                          //15
+              .concat(`${item['ROUTE_ID']}`.padEnd(15))                         //15
               .concat(`${item['DRIVER1_ID']}`.padEnd(15))                       //16
               .concat(`${item['DRIVER2_ID']}`.padEnd(15))                       //17
               .concat(`${item['EQUIPMENT_TYPE_ID']}`.padEnd(5))                 //18
               .concat(`${item['ROUTE_DESCRIPTION']}`.padEnd(30))                //19
               .concat(`${item['LOCATION_ID_ORIGIN']}`.padEnd(10))               //20
               .concat(`${item['LOCATION_ID_DESTINATION']}`.padEnd(10))          //21
-              .concat(` ${item['PREROUTE_TIME']}`.padEnd(10))                   //22
-              .concat(` ${item['POSTROUTE_TIME']}`.padEnd(10))                  //23
-              .concat(`${item['SEQUENCE_NUMBER']}`.padEnd(5))                   //24
-              .concat(`${item['ORDER_TYPE']}`.padEnd(5))                        //25
-              .concat(startDate.padEnd(15))                                     //26
-              .concat(startTime.padEnd(15))                                     //27
-              // .concat(`${item['SESSION_DATE']}`.padEnd(40))
-
+              .concat(`${item['SEQUENCE_NUMBER']}`.padEnd(5))                   //22
+              .concat(`${item['ORDER_TYPE']}`.padEnd(5))                        //23
+              .concat(startDate.padEnd(15))                                     //24
+              .concat(startTime.padEnd(15))                                     //25
               .concat(`\r\n`)
+
+            // .concat(` ${item['PREROUTE_TIME']}`.padEnd(10))                   //22
+            // .concat(` ${item['POSTROUTE_TIME']}`.padEnd(10))                  //23
           })
           if (res) {
             res.send({ CSVstring: CSVstring })
@@ -866,7 +877,7 @@ app.get('/routingSolution', (req, res) => {
 });
 
 let rsRule = new schedule.RecurrenceRule();
-rsRule.hour = 9;
+rsRule.hour = 22;
 rsRule.minute = 0;
 rsRule.second = 0;
 

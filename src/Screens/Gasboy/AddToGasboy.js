@@ -327,7 +327,7 @@ class AddToGasboy extends React.Component {
       },
       deviceType: [
         { type: "Tractor / Trailer" },
-        { type: "Driver / Employee" }
+        { type: "Driver / Employee" },
       ],
       selectedOpCo: '',
       queryString: '',
@@ -370,6 +370,9 @@ class AddToGasboy extends React.Component {
   }
 
   generateEquipmentExcelFile() {
+    this.setState({
+      downloadData: []
+    })
     axios.post('/gasboyEquipment', {
       data: {
         selectedOpCoNumber: this.state.selectedOpCo.num,
@@ -379,7 +382,7 @@ class AddToGasboy extends React.Component {
     })
       .then((response) => {
         console.log(response.data);
-        if(response.data.length === 0) alert('Unit does not exist in Gasboy')
+        if (response.data.length === 0) alert('Unit does not exist in Gasboy')
         this.setState({
           downloadData: response.data
         })
