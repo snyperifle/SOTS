@@ -476,7 +476,7 @@ class App extends React.Component {
                 <h5>GS1 Barcode</h5>
                 <ul>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/gs1Barcode">Manual Process</Link>
+                    <Link to="/gs1Barcode">GS1 Report</Link>
                   </li>
                 </ul>
                 <Divider variant="middle" />

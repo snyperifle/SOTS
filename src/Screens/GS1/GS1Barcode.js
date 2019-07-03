@@ -5,7 +5,9 @@ import Button from '@material-ui/core/Button';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { CSVLink } from "react-csv";
+import FileDrop from 'react-file-drop';
 import { Container, Row, Col } from 'react-bootstrap';
+import './GS1Barcode.css';
 //=============================================================
 class GS1Barcode extends React.Component {
   constructor(props) {
@@ -14,11 +16,13 @@ class GS1Barcode extends React.Component {
       downloadData: '',
       date: '',
       pickerDate: new Date(),
+      WeeklyGLN: '',
     };
     this.processGS1 = this.processGS1.bind(this);
     this.changeDate = this.changeDate.bind(this);
+    this.updateMasterGLN = this.updateMasterGLN.bind(this);
   }
-
+  //=============================================================
   componentDidMount() {
     let date = new Date();
     let today = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
@@ -58,7 +62,20 @@ class GS1Barcode extends React.Component {
         console.log(error);
       })
   }
+  //=============================================================
+  updateMasterGLN() {
 
+    axios.post('/updateMasterGLN',
+      {
+        data: this.state.WeeklyGLN
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  }
   //=============================================================
   render() {
     return (
@@ -76,31 +93,67 @@ class GS1Barcode extends React.Component {
               onSelect={this.changeDate}
             />
           </Col>
+          <Col>
+            <h4>Update GLN Master list</h4>
+          </Col>
         </Row>
         <Row>
-          <Button
-            variant="contained"
-            color="primary"
-            style={{ margin: 15 }}
-            onClick={() => {
-              this.processGS1();
+          <Col>
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ marginTop: 15 }}
+              onClick={() => {
+                this.processGS1();
+              }}
+            >Generate</Button>
+            {
+              this.state.downloadData.length > 0 ?
+                <CSVLink
+                  data={this.state.downloadData}
+                  filename={`${this.state.date} - GS1Export.csv`}
+                  style={{
+                    color: 'green',
+                    margin: 15,
+                  }}
+                >Download File</CSVLink>
+                : null
+            }
+          </Col>
+          <Col
+            style={{
+              border: 'solid black',
+              borderWidth: 1,
+              width: 200,
+              height: 100,
             }}
-          >Generate</Button>
-          {
-            this.state.downloadData.length > 0 ?
-              <CSVLink
-                data={this.state.downloadData}
-                filename={`${this.state.date} - GS1Export.csv`}
-                style={{
-                  color: 'green',
-                  margin: 20
-                }}
-              >Download File</CSVLink>
-              : null
-          }
+          >
+            <FileDrop
+              onDrop={(file) => {
+                this.setState({
+                  WeeklyGLN: file
+                })
+              }}
+            >
+              Drop Weekly Store GLN's file here
+            </FileDrop>
+            {
+              this.state.WeeklyGLN ?
+                <Button
+                  variant="contained"
+                  color="primary"
+                  style={{ marginTop: 15 }}
+                  onClick={() => {
+                    this.updateMasterGLN();
+                  }}
+                >Update</Button>
+                :
+                null
+            }
+          </Col>
         </Row>
-      </Container>
-    )
+      </Container >
+    );
   }
 }
 export default GS1Barcode;

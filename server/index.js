@@ -56,8 +56,8 @@ function currentTime() {
   today = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`
   time = `${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${('0' + date.getSeconds()).slice(-2)}`
   console.log(`Today: ${today}`);
-  // sessionDate = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + (date.getDate() + 1)).slice(-2)}`
-  sessionDate = `2019-07-01`
+  sessionDate = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + (date.getDate() + 1)).slice(-2)}`
+  // sessionDate = `2019-07-01`
   // console.log('test---', sessionDate);
 
   console.log(`///////////////////////// ${time}`);
@@ -584,7 +584,7 @@ app.post('/routesToTelogis', (req, res) => {
 //=============================================================
 function gs1Process(req, res) {
 
-  let queryDate = req ? req.body.data.date : today;
+  let queryDate = (req ? req.body.data.date : today);
 
   let gs1Query =
     "select " +
@@ -604,7 +604,7 @@ function gs1Process(req, res) {
     "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.DeliveryItem.RouteID " +
     "and driverpro.DeliveredGS1Barcode.StopSequenceNumber = driverpro.DeliveryItem.StopSequenceNumber " +
     "and driverpro.DeliveredGS1Barcode.ItemID = driverpro.DeliveryItem.ItemID) " +
-    `and driverpro.DeliveredGS1Barcode.ScheduledDate = {ts '${queryDate} 00:00:00'}` + 
+    `and driverpro.DeliveredGS1Barcode.ScheduledDate = {ts '${queryDate} 00:00:00'}` +
     "where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
 
   let fromGLN = {
@@ -706,7 +706,7 @@ function gs1Process(req, res) {
     '5450': '0074865xxxxxx',
     '9995': '0074865xxxxxx',
   }
-  let CSVstring = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2,\r\n'
+  let CSVstring = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2\r\n'
 
   gs1sql.connect()
     .then((pool) => {
@@ -720,8 +720,9 @@ function gs1Process(req, res) {
               let date = new Date(item['Shipped Date'])
               CSVstring = CSVstring
                 .concat(`${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()},`)  //Required - Date
-                .concat(`${item['GS1Barcode'].substring(0, 2)},`)                       //Required - SSCC
-                .concat(`${fromGLN[item['DCID']]},`)                                                            //Required - GLN (from)
+                // .concat(`${item['GS1Barcode'].substring(0, 2)},`)                       //Required - SSCC
+                .concat(`,`)                                                            //Required - SSCC
+                .concat(`${fromGLN[item['DCID']]},`)                                    //Required - GLN (from)
                 .concat(`,`)                                                            //Optional - GLN Extension (from)
                 .concat(`${item['GS1Barcode'].substring(3, 16)},`)                      //Required - GLN (to)
                 .concat(`,`)                                                            //Optional - GLN Extension (to)
@@ -733,17 +734,17 @@ function gs1Process(req, res) {
                 .concat(`${item['PO Number']},`)                                        //Required - PO Number
                 .concat(item['GS1Barcode'].substring(16, 18) === '13' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //packDate
                 .concat(item['GS1Barcode'].substring(16, 18) === '17' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //useThruDate
-                .concat(`,`)                                                                                                                                                                                //expirationDate
                 .concat(item['GS1Barcode'].substring(16, 18) === '11' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //productionDate
+                .concat(`,`)                                                            //expirationDate
                 .concat(item['GS1Barcode'].substring(16, 18) === '15' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //bestBeforeDate
-                .concat(`,`)                                                            //If Applicable - poNumber2
+                // .concat(`,`)                                                         //If Applicable - poNumber2
                 .concat(`\r\n`)
             }
           })
           if (res) res.send({ CSVstring: CSVstring })
           /// modify this based on export
           else {
-            fs.writeFile(`//ms212rdfsc/ern-support/GS1/${today}-GS1Export.csv`, CSVstring, (err, result) => {
+            fs.writeFile(`//ms212rdfsc/ern-support/GS1/Exports/${today}-GS1Export.csv`, CSVstring, (err, result) => {
               if (err) console.log(err);
             })
           }
@@ -878,8 +879,8 @@ app.get('/routingSolution', (req, res) => {
 });
 
 let rsRule = new schedule.RecurrenceRule();
-rsRule.hour = 22;
-rsRule.minute = 0;
+rsRule.hour = 20;
+rsRule.minute = 45;
 rsRule.second = 0;
 
 let rsjob = schedule.scheduleJob(rsRule, () => {
