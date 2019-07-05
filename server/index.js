@@ -13,6 +13,7 @@ let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', '
 let filePath = `//${servers[0]}/routing/UserConfig.txt`;
 let fs = require('fs');
 let fse = require('fs-extra');
+let XLSX = require('xlsx');
 //=============================================================
 app.get('/getFiles', (req, res) => {
   // console.log('Getting OpCo Info');
@@ -779,7 +780,16 @@ let gs1job = schedule.scheduleJob(gs1Rule, () => {
   gs1Process();
 })
 //=============================================================
-
+app.post('/updateMasterGLN', (req, res) => {
+  // console.log(`DATA: ${req.body.data}`);
+  const workbook = XLSX.readFile('//ms212rdfsc/ern-support/GS1/Master/Weekly Store GLNs - Sysco Corporate.xlsx')
+  const sheet_name_list = workbook.SheetNames;
+  XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]).forEach((item) => {
+    console.log(`${item['Store']}:${item['Store GLN']}`);
+    // console.log(item);
+  })
+})
+//=============================================================
 function routingSolution(req, res) {
   currentTime();
 

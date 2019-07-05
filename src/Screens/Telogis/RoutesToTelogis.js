@@ -27,7 +27,7 @@ class RoutesToTelogis extends React.Component {
     setTimeout(() => {
       this.fetchExportFilesToTelogis(this.state.date);
     }, 1000);
-    console.log(this.props.allOpCo);
+    // console.log(this.props.allOpCo);
   }
   //=============================================================
   changeDate(date) {
@@ -36,7 +36,7 @@ class RoutesToTelogis extends React.Component {
     let day = date.getDate();
     this.setState({
       pickerDate: date,
-      date: `${year}${month.toString().length === 1 ? `0${month}` : month}${day}`
+      date: `${year}${month.toString().length === 1 ? `0${month}` : month}${day.toString().length === 1 ? `0${day}`: day}`
     })
     setTimeout(() => {
       this.fetchExportFilesToTelogis(this.state.date);
@@ -44,6 +44,7 @@ class RoutesToTelogis extends React.Component {
   }
 
   fetchExportFilesToTelogis(date) {
+    console.log(this.state.date)
     this.setState({
       loading: true,
       routeList: [],

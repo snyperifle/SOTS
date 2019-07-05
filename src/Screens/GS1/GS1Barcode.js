@@ -6,6 +6,8 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { CSVLink } from "react-csv";
 import FileDrop from 'react-file-drop';
+// import * as XLSX from 'xlsx';
+import readXlsxFile from 'read-excel-file';
 import { Container, Row, Col } from 'react-bootstrap';
 import './GS1Barcode.css';
 //=============================================================
@@ -17,6 +19,7 @@ class GS1Barcode extends React.Component {
       date: '',
       pickerDate: new Date(),
       WeeklyGLN: '',
+      fileName: '',
     };
     this.processGS1 = this.processGS1.bind(this);
     this.changeDate = this.changeDate.bind(this);
@@ -64,6 +67,12 @@ class GS1Barcode extends React.Component {
   }
   //=============================================================
   updateMasterGLN() {
+    // console.log(this.state.WeeklyGLN[0]);
+    // const input = document.getElementById('fileItem')
+
+    // readXlsxFile(input.files[0]).then((row) => {
+    //   console.log(row);
+    // })
 
     axios.post('/updateMasterGLN',
       {
@@ -131,11 +140,16 @@ class GS1Barcode extends React.Component {
             <FileDrop
               onDrop={(file) => {
                 this.setState({
-                  WeeklyGLN: file
+                  WeeklyGLN: file,
+                  fileName: file['0']['name']
                 })
               }}
             >
-              Drop Weekly Store GLN's file here
+              {
+                this.state.fileName ?
+                  this.state.fileName
+                  : "Drop Weekly Store GLN's file here"
+              }
             </FileDrop>
             {
               this.state.WeeklyGLN ?

@@ -31,7 +31,9 @@
     "react-router-dom": "^5.0.0",
     "react-scripts": "3.0.0",
     "react-spinners": "^0.5.4",
-    "tedious": "^6.1.2"
+    "read-excel-file": "^4.0.1",
+    "tedious": "^6.1.2",
+    "xlsx": "^0.14.3"
   },
   "proxy": "http://localhost:3999",
   "scripts": {
