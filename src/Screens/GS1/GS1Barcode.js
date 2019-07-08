@@ -6,8 +6,9 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { CSVLink } from "react-csv";
 import FileDrop from 'react-file-drop';
-// import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx';
 import readXlsxFile from 'read-excel-file';
+import { PulseLoader } from 'react-spinners';
 import { Container, Row, Col } from 'react-bootstrap';
 import './GS1Barcode.css';
 //=============================================================
@@ -20,6 +21,8 @@ class GS1Barcode extends React.Component {
       pickerDate: new Date(),
       WeeklyGLN: '',
       fileName: '',
+      loading: false,
+      response: '',
     };
     this.processGS1 = this.processGS1.bind(this);
     this.changeDate = this.changeDate.bind(this);
@@ -67,23 +70,37 @@ class GS1Barcode extends React.Component {
   }
   //=============================================================
   updateMasterGLN() {
-    // console.log(this.state.WeeklyGLN[0]);
-    // const input = document.getElementById('fileItem')
+    this.setState({ loading: true })
+    let reader = new FileReader();
+    reader.onload = () => {
+      let workbook = XLSX.read(new Uint8Array(reader.result), { type: 'array' })
+      let firstSheet = workbook.SheetNames[0];
+      let worksheet = workbook.Sheets[firstSheet];
+      let jsonSheet = XLSX.utils.sheet_to_json(worksheet);
+      let data = '';
+      jsonSheet.forEach((item) => {
+        data = data.concat(`${item['Store']}:${item['Store GLN']}\r\n`)
+      })
+      axios.post('/updateMasterGLN',
+        {
+          data: data
+        })
+        .then((response) => {
+          console.log(response.data);
+          this.setState({
+            loading: false,
+            response: response.data,
+          })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    }
+    reader.onabort = () => console.log('File reading was aborted');
+    reader.onerror = () => console.log('File reading has failed');
+    reader.readAsArrayBuffer(this.state.WeeklyGLN[0]);
 
-    // readXlsxFile(input.files[0]).then((row) => {
-    //   console.log(row);
-    // })
 
-    axios.post('/updateMasterGLN',
-      {
-        data: this.state.WeeklyGLN
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
   }
   //=============================================================
   render() {
@@ -138,10 +155,10 @@ class GS1Barcode extends React.Component {
             }}
           >
             <FileDrop
-              onDrop={(file) => {
+              onDrop={(file, event) => {
                 this.setState({
+                  fileName: file['0']['name'],
                   WeeklyGLN: file,
-                  fileName: file['0']['name']
                 })
               }}
             >
@@ -151,19 +168,35 @@ class GS1Barcode extends React.Component {
                   : "Drop Weekly Store GLN's file here"
               }
             </FileDrop>
-            {
-              this.state.WeeklyGLN ?
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ marginTop: 15 }}
-                  onClick={() => {
-                    this.updateMasterGLN();
-                  }}
-                >Update</Button>
-                :
-                null
-            }
+            <Row>
+              {
+                this.state.WeeklyGLN ?
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    style={{ marginTop: 15 }}
+                    onClick={() => {
+                      this.updateMasterGLN();
+                    }}
+                  >Update</Button>
+                  :
+                  null
+              }
+              {
+                this.state.loading === true ?
+                  <PulseLoader
+                    style={{ margin: 20 }}
+                  />
+                  : null
+              }
+              {
+                this.state.response ?
+                  <h5
+                    style={{ margin: 20 }}
+                  >{this.state.response}</h5>
+                  : null
+              }
+            </Row>
           </Col>
         </Row>
       </Container >

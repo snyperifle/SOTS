@@ -584,6 +584,15 @@ app.post('/routesToTelogis', (req, res) => {
 })
 //=============================================================
 function gs1Process(req, res) {
+  
+  let destinationGLNs = {};
+  fs.readFile('//ms212rdfsc/ERN-support/GS1/Master/destinationGLN.csv', 'utf8', (err, data) => {
+    if(err) console.log(err);
+    // console.log(data);
+    data.split('\r\n').forEach((item) => {
+      destinationGLNs[`${item.split(':')[0]}`] = `${item.split(':')[1]}`
+    })
+  })
 
   let queryDate = (req ? req.body.data.date : today);
 
@@ -595,16 +604,29 @@ function gs1Process(req, res) {
     "driverpro.DeliveryItem.ItemID as 'Product Serial Number', " +
     "driverpro.DeliveryItem.ItemUOM as 'Product Quantity Units', " +
     "driverpro.DeliveryItem.DeliveredQuantity as 'Product Quantity Amount', " +
-    "driverpro.Invoice.InvoiceNumber as 'PO Number' " +
+    "driverpro.Invoice.InvoiceNumber as 'PO Number', " +
+    "driverpro.Stop.Stopname " +
+
     "from driverpro.DeliveredGS1Barcode " +
+
     "inner join driverpro.Invoice " +
     "on (driverpro.DeliveredGS1Barcode.DCID = driverpro.Invoice.DCID " +
-    "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.Invoice.RouteID ) " +
+    "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.Invoice.RouteID " +
+    "and driverpro.DeliveredGS1Barcode.ScheduledDate = driverpro.Invoice.ScheduledDate) "+
+
     "inner join driverpro.DeliveryItem " +
     "on (driverpro.DeliveredGS1Barcode.DCID = driverpro.DeliveryItem.DCID " +
     "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.DeliveryItem.RouteID " +
+    "and driverpro.DeliveredGS1Barcode.ScheduledDate = driverpro.DeliveryItem.ScheduledDate " +
     "and driverpro.DeliveredGS1Barcode.StopSequenceNumber = driverpro.DeliveryItem.StopSequenceNumber " +
     "and driverpro.DeliveredGS1Barcode.ItemID = driverpro.DeliveryItem.ItemID) " +
+
+    "inner join driverpro.Stop " + 
+    "on (driverpro.DeliveredGS1Barcode.DCID = driverpro.Stop.DCID " +
+    "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.Stop.RouteID " +
+    "and driverpro.DeliveredGS1Barcode.ScheduledDate = driverpro.Stop.ScheduledDate " +
+    "and driverpro.DeliveredGS1Barcode.StopSequenceNumber = driverpro.Stop.StopSequenceNumber) " +
+
     `and driverpro.DeliveredGS1Barcode.ScheduledDate = {ts '${queryDate} 00:00:00'}` +
     "where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
 
@@ -719,6 +741,7 @@ function gs1Process(req, res) {
           result.recordset.forEach((item) => {
             if (item['GS1Barcode'].substring(16, 18) === '11' || item['GS1Barcode'].substring(16, 18) === '13' || item['GS1Barcode'].substring(16, 18) === '15' || item['GS1Barcode'].substring(16, 18) === '17') {
               let date = new Date(item['Shipped Date'])
+              // console.log(item['Stopname']);
               CSVstring = CSVstring
                 .concat(`${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()},`)  //Required - Date
                 // .concat(`${item['GS1Barcode'].substring(0, 2)},`)                       //Required - SSCC
@@ -781,12 +804,14 @@ let gs1job = schedule.scheduleJob(gs1Rule, () => {
 })
 //=============================================================
 app.post('/updateMasterGLN', (req, res) => {
-  // console.log(`DATA: ${req.body.data}`);
-  const workbook = XLSX.readFile('//ms212rdfsc/ern-support/GS1/Master/Weekly Store GLNs - Sysco Corporate.xlsx')
-  const sheet_name_list = workbook.SheetNames;
-  XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]).forEach((item) => {
-    console.log(`${item['Store']}:${item['Store GLN']}`);
-    // console.log(item);
+  // console.log('DATA:', req.body.data);
+  fs.writeFile('//ms212rdfsc/ERN-support/GS1/Master/destinationGLN.csv',req.body.data, (err) => {
+    if(err) {
+      console.log(err);
+      res.send(err);
+    }
+    console.log('Destination GLNs updated');
+    res.send('Destination GLNs updated');
   })
 })
 //=============================================================
@@ -881,7 +906,11 @@ function routingSolution(req, res) {
           console.log(err);
         })
     })
-    .catch((err) => { console.log(err); })
+    .catch((err) => { 
+      console.log(err); 
+      exsql.close();
+      console.log('RS Database Connection closed');
+    })
 }
 
 app.get('/routingSolution', (req, res) => {
