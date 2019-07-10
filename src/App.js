@@ -448,8 +448,8 @@ class App extends React.Component {
                     <Link to="/removeFromRoutingInterface">Remove User from Routing Interface</Link>
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    {/* <Link to="/replaceRIConfig">Replace RI Config File</Link> */}
-                    <h6 style={{ color: 'grey' }}>Replace RI Config File</h6>
+                    <Link to="/replaceRIConfig">Replace RI Config File</Link>
+                    {/* <h6 style={{ color: 'grey' }}>Replace RI Config File</h6> */}
                   </li>
                   <li onClick={() => this.setState({ drawer: false, page: true })}>
                     <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link>

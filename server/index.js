@@ -14,11 +14,12 @@ let filePath = `//${servers[0]}/routing/UserConfig.txt`;
 let fs = require('fs');
 let fse = require('fs-extra');
 let XLSX = require('xlsx');
+let replace = require('replace-in-file');
 //=============================================================
 app.get('/getFiles', (req, res) => {
   // console.log('Getting OpCo Info');
   fs.readFile(filePath, 'utf8', (err, data) => {
-    if (err) throw err;
+    if (err) console.log(err)
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(data))
   })
@@ -70,43 +71,42 @@ app.post('/updateUserConfigs', (req, res) => {
   servers.forEach((item) => {
     // fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, (err, res) => {
     fs.writeFile(`//${item}/routing/UserConfig.txt`, req.body.data, (err, res) => {
-      if (err) throw err;
+      if (err) console.log(err)
     });
   })
   res.send(`User Configs updated!`);
 })
 app.post('/replaceRIConfig', (req, res) => {
   let filesReplaced = [];
+  let files = ['CONFIG.TMP', 'LOCKOUT.TMP', 'OPTMENU.DTA', 'RTRSETUP.DTA'];
   servers.forEach((server) => {
-    let path = `//ms212rdctx06/ROUTING/XXX-${req.body.data.OpCo.substring(4)}`
-    fs.readdir(path, 'ascii', (err, res) => {
-      if (err) console.log(err);;
-      if (res) {
-        res.forEach((file) => {
-          filesReplaced.push(`${server} - ${file}`);
-          fs.readFile(`${path}/${file}`, 'utf8', (err, data) => {
-            if (err) console.log(err);
-            if (data) {
-              data = data.split('XXX').join(`${req.body.data.OpCo.substring(0, 3)}`)
-                .split('YYYYY').join(`${req.body.data.OpCo}`)
-                .split('ZZZZZ').join(`${req.body.data.name[0].OpCoName}`.padEnd(30, ' '))
-                .split('SERVER').join(`${server}`)
-              // fs.writeFile(`//${server}/ROUTING/${req.body.data.OpCo}/${file}`, data, (err, res) => {
-              fs.writeFile(`//ms212rdfsc/ERN-support/ConfigTest/${req.body.data.OpCo}/${file}`, data, 'ascii', (err, res) => {
-                if (err) console.log(err);
-              })
+    files.forEach((file) => {
+      let source = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${req.body.data.OpCo}/${file}`
+      let target = `//${server}/routing/${req.body.data.OpCo}/${file}`
+      fse.copy(source, target)
+        .then(() => {
+          if (file === 'OPTMENU.DTA') {
+            let options = {
+              encoding: 'binary',
+              files: `//${server}/routing/${req.body.data.OpCo}/OPTMENU.DTA`,
+              from: [/ms212rdctx03/g, /ms212rdctx04/g, /ms212rdctx05/g, /ms212rdctx06/g, /ms212rdctx07/g, /ms212rdctx08/g, /ms212rdctx11/g, /ms212rdctx12/g, /ms212rdctx13/g, /ms212rdctx14/g, /ms212rdctx15/g, /ms212rdctx16/g],
+              to: `${server}`,
+              disableGlobs: true,
             }
-          })
+            replace(options)
+              .then(() => { console.log(`Modified ${server} - ${file}`) })
+              .catch((error) => { console.log(error); })
+          }
+          filesReplaced.push(`${server} - ${file}`);
         })
-      }
-    })
-    fs.writeFile(`//${server}/ROUTING/${req.body.data.OpCo}/LOCKOUT.TMP`, '', (err, res) => {
-      if (err) console.log(err);
+        .catch((error) => {
+          console.log(error);
+        })
     })
   })
   setTimeout(() => {
     res.send(filesReplaced)
-  }, 2000)
+  }, 10000)
 })
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
@@ -114,9 +114,11 @@ app.post('/routesNotFlowing', (req, res) => {
     sendable: true,
     result: 'Route Not Found',
     path: '',
+    time: '',
   };
 
   function sendRoutes(path, file) {
+    console.log('Sending...');
     res.json(found)
   }
 
@@ -125,18 +127,22 @@ app.post('/routesNotFlowing', (req, res) => {
   servers.forEach((item) => {
     let path = `//${item}/routing/${req.body.data.userOpCo}/RTRDL`;
     fs.readdir(path, (err, res) => {
-      if (err) throw err;
+      if (err) console.log(err)
       res.forEach((item2) => {
         fs.readFile(`${path}/${item2}`, 'utf8', (err, data) => {
-          if (err) throw err
+          if (err) console.log(err)
           let content = data.split('\n')
           content.forEach((item3) => {
             if (item3.slice(16, 20) === req.body.data.route && found.sendable === true) {
               console.log('Download found');
-              found.sendable = false
-              found.result = 'Route Found'
-              found.path = `${path}/${item2}`
-              sendRoutes();
+              fs.stat(`${path}/${item2}`, (err, stats) => {
+                console.log(stats)
+                found.date = stats.mtime
+                found.sendable = false
+                found.result = 'Route Found'
+                found.path = `${path}/${item2}`
+                sendRoutes();
+              })
             };
           })
         })
@@ -146,18 +152,22 @@ app.post('/routesNotFlowing', (req, res) => {
   servers.forEach((item) => {
     let path = `//${item}/routing/${req.body.data.userOpCo}/RTRUL`;
     fs.readdir(path, (err, res) => {
-      if (err) throw err;
+      if (err) console.log(err)
       res.forEach((item2) => {
         fs.readFile(`${path}/${item2}`, 'utf8', (err, data) => {
-          if (err) throw err
+          if (err) console.log(err)
           let content = data.split('\n')
           content.forEach((item3) => {
             if (item3.slice(20, 24) === req.body.data.route && found.sendable === true) {
               console.log('Upload found');
-              found.sendable = false
-              found.result = 'Route Found'
-              found.path = `${path}/${item2}`
-              sendRoutes();
+              fs.stat(`${path}/${item2}`, (err, stats) => {
+                console.log(stats)
+                found.date = stats.mtime
+                found.sendable = false
+                found.result = 'Route Found'
+                found.path = `${path}/${item2}`
+                sendRoutes();
+              })
             };
           })
         })
@@ -181,11 +191,11 @@ app.post('/restoreColumns', (req, res) => {
   let destinationFolder = '//ms212rdfsc/rdclient$/'
 
   fse.pathExists(`${backupFolder}${req.body.data}`, (err, exists) => {
-    if (err) throw err;
+    if (err) console.log(err)
     if (exists) {
       files.forEach((item) => {
         fse.pathExists(`${backupFolder}${req.body.data}/${item}`, (err, exists) => {
-          if (err) throw err;
+          if (err) console.log(err)
           if (exists) {
             fse.copy(`${backupFolder}${req.body.data}/${item}`, `${destinationFolder}${req.body.data}/${item}`)
               .then(() => {
@@ -215,11 +225,11 @@ app.post('/mirrorProfile', (req, res) => {
   let destinationFolder = '//ms212rdfsc/rdclient$/'
 
   fse.pathExists(`${backupFolder}${req.body.data.fromProfile}`, (err, exists) => {
-    if (err) throw err;
+    if (err) console.log(err)
     if (exists) {
       files.forEach((item) => {
         fse.pathExists(`${backupFolder}${req.body.data.fromProfile}/${item}`, (err, exists) => {
-          if (err) throw err;
+          if (err) console.log(err)
           if (exists) {
             fse.copy(`${backupFolder}${req.body.data.fromProfile}/${item}`, `${destinationFolder}${req.body.data.toProfile}/${item}`)
               .then(() => {
@@ -584,10 +594,10 @@ app.post('/routesToTelogis', (req, res) => {
 })
 //=============================================================
 function gs1Process(req, res) {
-  
+
   let destinationGLNs = {};
   fs.readFile('//ms212rdfsc/ERN-support/GS1/Master/destinationGLN.csv', 'utf8', (err, data) => {
-    if(err) console.log(err);
+    if (err) console.log(err);
     // console.log(data);
     data.split('\r\n').forEach((item) => {
       destinationGLNs[`${item.split(':')[0]}`] = `${item.split(':')[1]}`
@@ -612,7 +622,7 @@ function gs1Process(req, res) {
     "inner join driverpro.Invoice " +
     "on (driverpro.DeliveredGS1Barcode.DCID = driverpro.Invoice.DCID " +
     "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.Invoice.RouteID " +
-    "and driverpro.DeliveredGS1Barcode.ScheduledDate = driverpro.Invoice.ScheduledDate) "+
+    "and driverpro.DeliveredGS1Barcode.ScheduledDate = driverpro.Invoice.ScheduledDate) " +
 
     "inner join driverpro.DeliveryItem " +
     "on (driverpro.DeliveredGS1Barcode.DCID = driverpro.DeliveryItem.DCID " +
@@ -621,7 +631,7 @@ function gs1Process(req, res) {
     "and driverpro.DeliveredGS1Barcode.StopSequenceNumber = driverpro.DeliveryItem.StopSequenceNumber " +
     "and driverpro.DeliveredGS1Barcode.ItemID = driverpro.DeliveryItem.ItemID) " +
 
-    "inner join driverpro.Stop " + 
+    "inner join driverpro.Stop " +
     "on (driverpro.DeliveredGS1Barcode.DCID = driverpro.Stop.DCID " +
     "and driverpro.DeliveredGS1Barcode.RouteID = driverpro.Stop.RouteID " +
     "and driverpro.DeliveredGS1Barcode.ScheduledDate = driverpro.Stop.ScheduledDate " +
@@ -805,8 +815,8 @@ let gs1job = schedule.scheduleJob(gs1Rule, () => {
 //=============================================================
 app.post('/updateMasterGLN', (req, res) => {
   // console.log('DATA:', req.body.data);
-  fs.writeFile('//ms212rdfsc/ERN-support/GS1/Master/destinationGLN.csv',req.body.data, (err) => {
-    if(err) {
+  fs.writeFile('//ms212rdfsc/ERN-support/GS1/Master/destinationGLN.csv', req.body.data, (err) => {
+    if (err) {
       console.log(err);
       res.send(err);
     }
@@ -906,8 +916,8 @@ function routingSolution(req, res) {
           console.log(err);
         })
     })
-    .catch((err) => { 
-      console.log(err); 
+    .catch((err) => {
+      console.log(err);
       exsql.close();
       console.log('RS Database Connection closed');
     })

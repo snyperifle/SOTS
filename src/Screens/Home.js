@@ -15,7 +15,7 @@ class Home extends React.Component {
             { name: 'Geoffrey Bray', number: '281-615-6013' },
             { name: 'Roy Mammen', number: '' },
             { name: 'Ranuka Subramanian', number: '720-442-2495' },
-            { name: 'Calvin Chui', number: '832-524-2831' },
+            { name: 'Calvin Chui', number: '832-524-2731' },
             { name: 'Jose Suyambu', number: '832-696-4412' },
           ]
         },

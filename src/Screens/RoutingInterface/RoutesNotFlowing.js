@@ -17,6 +17,8 @@ class RoutesNotFlowing extends React.Component {
       route: '',
       message: '',
       path: '',
+      enabled: true,
+      date: '',
     };
     this.getRoutes = this.getRoutes.bind(this);
   }
@@ -26,6 +28,8 @@ class RoutesNotFlowing extends React.Component {
       loading: true,
       message: '',
       path: '',
+      date: '',
+      enabled: false,
     })
     axios.post('/routesNotFlowing', {
       data: {
@@ -36,10 +40,17 @@ class RoutesNotFlowing extends React.Component {
       this.setState({
         message: res.data.result,
         path: res.data.path,
-        loading: false
+        date: res.data.date,
+        loading: false,
+        enabled: true,
       })
     })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err)
+        this.setState({
+          enabled: true
+        })
+      })
   }
   //=============================================================
   render() {
@@ -68,7 +79,7 @@ class RoutesNotFlowing extends React.Component {
                 }}
               ></FormControl>
             </Form>
-            {this.props.userOpCo ?
+            {this.props.userOpCo && this.state.enabled ?
               <Button
                 variant="contained"
                 color="primary"
@@ -76,6 +87,9 @@ class RoutesNotFlowing extends React.Component {
                   this.getRoutes()
                 }}
               >Search for route {this.state.route} in {this.props.userOpCo}</Button>
+              :
+              this.state.enabled === false ? 
+              <h4>Please hold</h4>
               :
               <h4
                 style={{ color: 'red' }}
@@ -87,6 +101,7 @@ class RoutesNotFlowing extends React.Component {
               <div style={{ margin: 20 }}>
                 <h5>{this.state.message}</h5>
                 <h5>{this.state.path}</h5>
+                <h5>Last modified: {this.state.date.slice(0,10)}</h5>
               </div>
               : null
             }
