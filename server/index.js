@@ -57,8 +57,8 @@ function currentTime() {
   let date = new Date();
   today = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`
   time = `${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${('0' + date.getSeconds()).slice(-2)}`
-  console.log(`Today: ${today}`);
   sessionDate = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + (date.getDate() + 1)).slice(-2)}`
+  // console.log(`Today: ${today}`);
   // sessionDate = `2019-07-01`
   // console.log('test---', sessionDate);
 
@@ -106,7 +106,7 @@ app.post('/replaceRIConfig', (req, res) => {
   })
   setTimeout(() => {
     res.send(filesReplaced)
-  }, 10000)
+  }, 15000)
 })
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
@@ -595,14 +595,7 @@ app.post('/routesToTelogis', (req, res) => {
 //=============================================================
 function gs1Process(req, res) {
 
-  let destinationGLNs = {};
-  fs.readFile('//ms212rdfsc/ERN-support/GS1/Master/destinationGLN.csv', 'utf8', (err, data) => {
-    if (err) console.log(err);
-    // console.log(data);
-    data.split('\r\n').forEach((item) => {
-      destinationGLNs[`${item.split(':')[0]}`] = `${item.split(':')[1]}`
-    })
-  })
+
 
   let queryDate = (req ? req.body.data.date : today);
 
@@ -639,6 +632,8 @@ function gs1Process(req, res) {
 
     `and driverpro.DeliveredGS1Barcode.ScheduledDate = {ts '${queryDate} 00:00:00'}` +
     "where driverpro.DeliveredGS1Barcode.GS1Barcode is not null"
+
+  let CSVstring = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2\r\n'
 
   let fromGLN = {
     '331': '0074865xxxxxx',
@@ -739,7 +734,12 @@ function gs1Process(req, res) {
     '5450': '0074865xxxxxx',
     '9995': '0074865xxxxxx',
   }
-  let CSVstring = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2\r\n'
+
+  let destinationGLNs = {};
+  let data = fs.readFileSync('//ms212rdfsc/ERN-support/GS1/Master/destinationGLN.csv', 'utf8')
+  data.split('\r\n').forEach((item) => {
+    destinationGLNs[`${item.split(':')[0]}`] = `${item.split(':')[1]}`
+  })
 
   gs1sql.connect()
     .then((pool) => {
@@ -751,28 +751,31 @@ function gs1Process(req, res) {
           result.recordset.forEach((item) => {
             if (item['GS1Barcode'].substring(16, 18) === '11' || item['GS1Barcode'].substring(16, 18) === '13' || item['GS1Barcode'].substring(16, 18) === '15' || item['GS1Barcode'].substring(16, 18) === '17') {
               let date = new Date(item['Shipped Date'])
-              // console.log(item['Stopname']);
-              CSVstring = CSVstring
-                .concat(`${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()},`)  //Required - Date
-                // .concat(`${item['GS1Barcode'].substring(0, 2)},`)                       //Required - SSCC
-                .concat(`,`)                                                            //Required - SSCC
-                .concat(`${fromGLN[item['DCID']]},`)                                    //Required - GLN (from)
-                .concat(`,`)                                                            //Optional - GLN Extension (from)
-                .concat(`${item['GS1Barcode'].substring(3, 16)},`)                      //Required - GLN (to)
-                .concat(`,`)                                                            //Optional - GLN Extension (to)
-                .concat(`${item['GS1Barcode'].substring(2, 16)},`)                      //Required - GTIN
-                .concat(`${item['GS1Barcode'].substring(26, 36) || ''},`)               //Required - Product Lot
-                .concat(`${item['Product Serial Number']},`)                            //If Applicable - Product Serial Number
-                .concat(`${item['Product Quantity Units']},`)                           //Required - Product Quantity Units
-                .concat(`${item['Product Quantity Amount']},`)                          //Required - Product Quantity Amount
-                .concat(`${item['PO Number']},`)                                        //Required - PO Number
-                .concat(item['GS1Barcode'].substring(16, 18) === '13' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //packDate
-                .concat(item['GS1Barcode'].substring(16, 18) === '17' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //useThruDate
-                .concat(item['GS1Barcode'].substring(16, 18) === '11' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //productionDate
-                .concat(`,`)                                                            //expirationDate
-                .concat(item['GS1Barcode'].substring(16, 18) === '15' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //bestBeforeDate
-                // .concat(`,`)                                                         //If Applicable - poNumber2
-                .concat(`\r\n`)
+              if (item['Stopname'].includes("SUBWAY")) {
+                let stopnameSplit = item['Stopname'].split(' ');
+                let stopStoreNum = stopnameSplit[stopnameSplit.length - 1].replace(/\D/g, '');
+                CSVstring = CSVstring
+                  .concat(`${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()},`)  //Required - Date
+                  .concat(`,`)                                                                    //Required - SSCC
+                  .concat(`${fromGLN[item['DCID']]},`)                                            //Required - GLN (from)
+                  .concat(`,`)                                                                    //Optional - GLN Extension (from)
+                  .concat(`${destinationGLNs[`${stopStoreNum}-0`]},`)                             //Required - GLN (to)
+                  .concat(`,`)                                                                    //Optional - GLN Extension (to)
+                  .concat(`${item['GS1Barcode'].substring(2, 16)},`)                              //Required - GTIN
+                  .concat(`${item['GS1Barcode'].substring(26, 36) || ''},`)                       //Required - Product Lot
+                  .concat(`${item['Product Serial Number']},`)                                    //If Applicable - Product Serial Number
+                  .concat(`${item['Product Quantity Units']},`)                                   //Required - Product Quantity Units
+                  .concat(`${item['Product Quantity Amount']},`)                                  //Required - Product Quantity Amount
+                  .concat(`${item['PO Number']},`)                                                //Required - PO Number
+                  .concat(item['GS1Barcode'].substring(16, 18) === '13' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //packDate
+                  .concat(item['GS1Barcode'].substring(16, 18) === '17' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //useThruDate
+                  .concat(item['GS1Barcode'].substring(16, 18) === '11' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //productionDate
+                  .concat(`,`)                                                                    //expirationDate
+                  .concat(item['GS1Barcode'].substring(16, 18) === '15' ? `${item['GS1Barcode'].substring(20, 22)}/${item['GS1Barcode'].substring(22, 24)}/20${item['GS1Barcode'].substring(18, 20)},` : ',') //bestBeforeDate
+                  .concat(``)                                                                     //If Applicable - poNumber2
+                  .concat(`\r\n`)
+                // .concat(`${item['GS1Barcode'].substring(0, 2)},`)                              //Required - SSCC
+              }
             }
           })
           if (res) res.send({ CSVstring: CSVstring })
