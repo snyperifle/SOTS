@@ -110,12 +110,14 @@ app.post('/replaceRIConfig', (req, res) => {
 })
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
+  currentTime();
   let found = {
     sendable: true,
     result: 'Route Not Found',
     path: '',
-    time: '',
+    time: today,
   };
+  console.log('TODAY IS:', today);
 
   function sendRoutes(path, file) {
     console.log('Sending...');
@@ -136,12 +138,13 @@ app.post('/routesNotFlowing', (req, res) => {
             if (item3.slice(16, 20) === req.body.data.route && found.sendable === true) {
               console.log('Download found');
               fs.stat(`${path}/${item2}`, (err, stats) => {
-                console.log(stats)
-                found.date = stats.mtime
-                found.sendable = false
-                found.result = 'Route Found'
-                found.path = `${path}/${item2}`
-                sendRoutes();
+                // console.log(stats)
+                if (stats.mtime.toJSON().slice(0, 10) === today) {
+                  found.date = stats.mtime;
+                  found.sendable = false
+                  found.result = 'Route Found'
+                  found.path = `${path}/${item2}`
+                }
               })
             };
           })
@@ -161,12 +164,14 @@ app.post('/routesNotFlowing', (req, res) => {
             if (item3.slice(20, 24) === req.body.data.route && found.sendable === true) {
               console.log('Upload found');
               fs.stat(`${path}/${item2}`, (err, stats) => {
-                console.log(stats)
-                found.date = stats.mtime
-                found.sendable = false
-                found.result = 'Route Found'
-                found.path = `${path}/${item2}`
-                sendRoutes();
+                // console.log( stats.mtime.toJSON().slice(0,10) + today );
+                if (stats.mtime.toJSON().slice(0, 10) === today) {
+                  console.log(stats.mtime);
+                  found.date = stats.mtime
+                  found.sendable = false
+                  found.result = 'Route Found'
+                  found.path = `${path}/${item2}`
+                }
               })
             };
           })
@@ -176,9 +181,9 @@ app.post('/routesNotFlowing', (req, res) => {
   })
 
   setTimeout(() => {
-    if (found.sendable === true) {
-      sendRoutes();
-    }
+    // if (found.sendable === true) {
+    sendRoutes();
+    // }
   }, 5000)
 
 })
@@ -759,7 +764,7 @@ function gs1Process(req, res) {
                   .concat(`,`)                                                                    //Required - SSCC
                   .concat(`${fromGLN[item['DCID']]},`)                                            //Required - GLN (from)
                   .concat(`,`)                                                                    //Optional - GLN Extension (from)
-                  .concat(`${destinationGLNs[`${stopStoreNum}-0`]},`)                             //Required - GLN (to)
+                  .concat(`${destinationGLNs[stopStoreNum + '-0']},`)                             //Required - GLN (to)
                   .concat(`,`)                                                                    //Optional - GLN Extension (to)
                   .concat(`${item['GS1Barcode'].substring(2, 16)},`)                              //Required - GTIN
                   .concat(`${item['GS1Barcode'].substring(26, 36) || ''},`)                       //Required - Product Lot

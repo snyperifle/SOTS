@@ -40,7 +40,7 @@ class RoutesNotFlowing extends React.Component {
       this.setState({
         message: res.data.result,
         path: res.data.path,
-        date: res.data.date,
+        date: res.data.date ? res.data.date : '0000000000',
         loading: false,
         enabled: true,
       })
@@ -88,12 +88,12 @@ class RoutesNotFlowing extends React.Component {
                 }}
               >Search for route {this.state.route} in {this.props.userOpCo}</Button>
               :
-              this.state.enabled === false ? 
-              <h4>Please hold</h4>
-              :
-              <h4
-                style={{ color: 'red' }}
-              >Please enter the Caller ID</h4>
+              this.state.enabled === false ?
+                <h4>Please hold</h4>
+                :
+                <h4
+                  style={{ color: 'red' }}
+                >Please enter the Caller ID</h4>
             }
           </Col>
           <Col>
@@ -101,7 +101,7 @@ class RoutesNotFlowing extends React.Component {
               <div style={{ margin: 20 }}>
                 <h5>{this.state.message}</h5>
                 <h5>{this.state.path}</h5>
-                <h5>Last modified: {this.state.date.slice(0,10)}</h5>
+                <h5>Last modified: {this.state.date.slice(0, 10)}</h5>
               </div>
               : null
             }
