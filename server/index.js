@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const express = require('express');
 const bodyParser = require('body-parser');
 const sql = require('mssql');
@@ -13,7 +14,6 @@ let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', '
 let filePath = `//${servers[0]}/routing/UserConfig.txt`;
 let fs = require('fs');
 let fse = require('fs-extra');
-let XLSX = require('xlsx');
 let replace = require('replace-in-file');
 //=============================================================
 app.get('/getFiles', (req, res) => {
@@ -77,36 +77,131 @@ app.post('/updateUserConfigs', (req, res) => {
   res.send(`User Configs updated!`);
 })
 app.post('/replaceRIConfig', (req, res) => {
-  let filesReplaced = [];
-  let files = ['CONFIG.TMP', 'LOCKOUT.TMP', 'OPTMENU.DTA', 'RTRSETUP.DTA'];
-  servers.forEach((server) => {
-    files.forEach((file) => {
-      let source = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${req.body.data.OpCo}/${file}`
-      let target = `//${server}/routing/${req.body.data.OpCo}/${file}`
-      fse.copy(source, target)
-        .then(() => {
-          if (file === 'OPTMENU.DTA') {
-            let options = {
-              encoding: 'binary',
-              files: `//${server}/routing/${req.body.data.OpCo}/OPTMENU.DTA`,
-              from: [/ms212rdctx03/g, /ms212rdctx04/g, /ms212rdctx05/g, /ms212rdctx06/g, /ms212rdctx07/g, /ms212rdctx08/g, /ms212rdctx11/g, /ms212rdctx12/g, /ms212rdctx13/g, /ms212rdctx14/g, /ms212rdctx15/g, /ms212rdctx16/g],
-              to: `${server}`,
-              disableGlobs: true,
+  // let filesReplaced = [];
+  // let files = ['CONFIG.TMP', 'LOCKOUT.TMP', 'OPTMENU.DTA', 'RTRSETUP.DTA'];
+  // servers.forEach((server) => {
+  //   files.forEach((file) => {
+  //     let source = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${req.body.data.OpCo}/${file}`
+  //     let target = `//${server}/routing/${req.body.data.OpCo}/${file}`
+  //     fse.copy(source, target)
+  //       .then(() => {
+  //         if (file === 'RTRSETUP.DTA') {
+  //           let options = {
+  //             encoding: 'binary',
+  //             files: `//${server}/routing/${req.body.data.OpCo}/RTRSETUP.DTA`,
+  //             from: [/ms212rdctx03/g, /ms212rdctx04/g, /ms212rdctx05/g, /ms212rdctx06/g, /ms212rdctx07/g, /ms212rdctx08/g, /ms212rdctx11/g, /ms212rdctx12/g, /ms212rdctx13/g, /ms212rdctx14/g, /ms212rdctx15/g, /ms212rdctx16/g],
+  //             to: `${server}`,
+  //             disableGlobs: true,
+  //           }
+  //           replace(options)
+  //             .then(() => { console.log(`Modified ${server} - ${file}`) })
+  //             .catch((error) => { console.log(error); })
+  //         }
+  //         filesReplaced.push(`${server} - ${file}`);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       })
+  //   })
+  // })
+  // setTimeout(() => {
+  //   res.send(filesReplaced)
+  // }, 15000)
+  ////
+  let files = [
+    'CONFIG.TMP',
+    'LOCKOUT.TMP',
+    'OPTMENU.DTA',
+    'RTRSETUP.DTA'
+  ];
+  let master = 'newMaster'
+  let servers = [
+    // 'ms212rdctx06', 
+    // 'ms212rdctx07',
+    // 'ms212rdctx08', 
+    // 'ms212rdctx11',
+    // 'ms212rdctx12', 
+    // 'ms212rdctx14', 
+    // 'ms212rdctx15', 
+    // 'ms212rdctx16'
+  ];
+  let awsServers = ['ms238rdctxo1',
+    'ms238rdctxo2', 'ms238rdctxo3', 'ms238rdctxo4', 'ms238rdctxo5', 'ms238rdctxo6'
+  ];
+  let OpCos = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "022", "023", "024", "025", "026", "027", "029", "031", "032", "035", "036", "037", "038", "039", "040", "043", "045", "046", "047", "048", "049", "050", "051", "052", "054", "055", "056", "057", "058", "059", "060", "061", "064", "066", "067", "068", "073", "075", "076", "078", "101", "102", "137", "163", "164", "194", "195", "288", "293", "306", "320", "332", "335", "429"]
+  let ignores = ['010-4', '010-5', '012-5', '015-5', '164-5', '306-5', '429-1', '429-2', '429-3', '429-4', '429-5']
+  let folders = ['CUSTDL', 'RTRDL', 'RTRUL']
+  let missingFiles = {}
+
+  // fs.mkdirSync(`//ms212rdfsc/ERN-support/AWSRI/${master}`)
+
+  awsServers.forEach((server) => {
+    // servers.forEach((server) => {
+    // fs.mkdirSync(`//ms212rdfsc/ERN-support/AWSRI/${master}/${server}`)
+    // console.log(`Created ${server}`);
+    OpCos.forEach((OpCo) => {
+      for (let i = 1; i <= 5; i++) {
+        // fs.mkdirSync(`//ms212rdfsc/ERN-support/AWSRI/${master}/${server}/${OpCo}-${i}`)
+        // console.log(`Created ${server}/${OpCo}-${i}`);
+
+        // folders.forEach((folder) => {
+        //   fs.mkdir(`//ms212rdfsc/ERN-support/AWSRI/${master}/${server}/${OpCo}-${i}/${folder}`, (err) => {
+        //     if (err) console.log(err);
+        //   })
+        //   console.log(`Created ${server}/${OpCo}-${i}/${folder}`);
+        // })
+
+        // files.forEach((file) => {
+        //   let source = `//${server}/ROUTING/${OpCo}-${i}/${file}`
+        //   let target = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${OpCo}-${i}/${file}`
+        //   fse.copy(source, target, (err) => {
+        //     if (err) {
+        //       console.log(`Could not find ${file} in ${OpCo}-${i} in ${server}`);
+        //     }
+        //     else {
+        //       console.log(`Copied ${file} from ${OpCo}-${i} in ${server} to master`);
+        //     }
+        //   })
+
+        files.forEach((file) => {
+          let source = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${OpCo}-${i}/${file}`
+          let target = `//ms212rdfsc/ERN-support/AWSRI/${master}/${server}/${OpCo}-${i}/${file}`
+          fse.copy(source, target, (err) => {
+            if (err) {
+              if (!ignores.includes(`${OpCo}-${i}`)) {
+                console.log(`Could not find ${file} in ${OpCo}-${i} in master`);
+                if (!(`${OpCo}-${i}` in missingFiles)) {
+                  missingFiles[`${OpCo}-${i}`] = `${file}`
+                  let jsonData = JSON.stringify(missingFiles)
+                  jsonData = jsonData.slice(1, jsonData.length - 1).split(',').join('\r\n')
+                  fs.writeFile('//ms212rdfsc/ERN-support/AWSRI/Missing Files.csv', jsonData, 'utf8', (err) => {
+                    if (err) console.log(err);
+                  })
+                }
+              }
             }
-            replace(options)
-              .then(() => { console.log(`Modified ${server} - ${file}`) })
-              .catch((error) => { console.log(error); })
-          }
-          filesReplaced.push(`${server} - ${file}`);
+            else {
+              if (file === 'RTRSETUP.DTA') {
+                let options = {
+                  encoding: 'binary',
+                  files: `//ms212rdfsc/ERN-support/${master}/${server}/${OpCo}-${i}/RTRSETUP.DTA`,
+                  from: [/ms212rdctx03/g, /ms212rdctx04/g, /ms212rdctx05/g, /ms212rdctx06/g, /ms212rdctx07/g, /ms212rdctx08/g, /ms212rdctx11/g, /ms212rdctx12/g, /ms212rdctx13/g, /ms212rdctx14/g, /ms212rdctx15/g, /ms212rdctx16/g],
+                  to: `${server}`,
+                  disableGlobs: true,
+                }
+                replace(options)
+                  .then(() => { console.log(`Replaced server details ${server}/${OpCo}-${i}/${file}`); })
+                  .catch((error) => { console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`) })
+              }
+              console.log(`Copied ${file} into ${OpCo}-${i} in ${server} `);
+            }
+          })
+
         })
-        .catch((error) => {
-          console.log(error);
-        })
+      }
     })
   })
-  setTimeout(() => {
-    res.send(filesReplaced)
-  }, 15000)
+  ////
 })
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
@@ -760,7 +855,7 @@ function gs1Process(req, res) {
                 let stopnameSplit = item['Stopname'].split(' ');
                 let stopStoreNum = stopnameSplit[stopnameSplit.length - 1].replace(/\D/g, '');
                 CSVstring = CSVstring
-                  .concat(`${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()},`)  //Required - Date
+                  .concat(`${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate() + 1).slice(-2)}/${date.getFullYear()},`)  //Required - Date
                   .concat(`,`)                                                                    //Required - SSCC
                   .concat(`${fromGLN[item['DCID']]},`)                                            //Required - GLN (from)
                   .concat(`,`)                                                                    //Optional - GLN Extension (from)
