@@ -8,6 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { CSVLink } from "react-csv";
 import { Container, Row, Col } from 'react-bootstrap';
+import '../../App.css';
 //=============================================================
 class AddToGasboy extends React.Component {
   constructor(props) {

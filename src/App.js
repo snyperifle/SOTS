@@ -2,17 +2,11 @@ import React from 'react';
 import axios from 'axios';
 //=============================================================
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
-import AddIcon from '@material-ui/icons/Add';
-import ListIcon from '@material-ui/icons/List';
-import Divider from '@material-ui/core/Divider'
 import './App.css';
-import { Container, Row, Col } from 'react-bootstrap';
-import { css } from '@emotion/core';
-import { ClipLoader } from 'react-spinners';
+import { scaleRotate as Menu } from 'react-burger-menu';
 //=============================================================
 import Home from './Screens/Home'
 
@@ -299,237 +293,128 @@ class App extends React.Component {
   render() {
     return (
       <Router>
-        <div className="App">
-          {/* //============================================================= */}
-          <Navbar
-            variant="light"
-            expand="lg"
-            style={{
-              color: 'white',
-              backgroundColor: "#e9ecef",
-              justifyContent: 'space-between',
-            }}
-          >
-            <Navbar.Brand
+        <div className="App" id="outer-container">
+          <Menu pageWrapId={"page-wrap"} outerContainerId={"outer-container"}>
+            <h5>Roadnet</h5>
+            <Link to="/addToRoadnet">Add New User</Link>
+            <Link to='/restoreColumns'>Restore User Columns</Link>
+            <Link to='/mirrorProfile'>Mirror User Profile</Link>
+            <h5>Routing Interface</h5>
+            <Link to="/addToRoutingInterface">Add New User</Link>
+            <Link to="/removeFromRoutingInterface">Remove User</Link>
+            <Link to="/replaceRIConfig">Replace RI Config File</Link>
+            <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link>
+            <h5>GasBoy</h5>
+            <Link to="/addToGasboy">Add to Gasboy</Link>
+            <h5>Telogis</h5>
+            <Link to="/telogisInfo">Telogis Information</Link>
+            <Link to="/routesToTelogis">Routes not Flowing to Telogis</Link>
+            <h5>GS1 Barcode</h5>
+            <Link to="/gs1Barcode">GS1 Report</Link>
+            <h5>Development</h5>
+            <Link to="/migrationExport">Routing Solution</Link>
+          </Menu>
+          <div id="page-wrap">
+            <Navbar
+              variant="light"
+              expand="lg"
+              style={{
+                color: 'white',
+                backgroundColor: "#e9ecef",
+                justifyContent: 'space-between',
+              }}
             >
-              <img
-                src="https://www.sysco.com/dam/jcr:2ed25439-a58a-41d2-8306-dcf3761c7d95/Sysco-Logo-Color1.png"
-                height="60"
-                alt="Logo"
-              />
-              <ListIcon
+              <Navbar.Brand
                 style={{
-                  marginLeft: 10,
-                  height: 50
+                  paddingLeft: 70,
+                  paddingTop: 10
                 }}
-                onClick={() => {
-                  this.setState({
-                    drawer: true,
-                    page: false
-                  })
-                }}
-              />
-            </Navbar.Brand>
-            <Navbar.Brand
-              href="/"
-            >
-              <h3
-                style={{
-                  color: "#2F8FD9",
-                  alignSelf: 'center'
-                }}
-              >Sysco Outbound Transportation Support Dashboard
-              </h3>
-            </Navbar.Brand>
-            <Form inline>
-              {this.state.userId.length > 0 ?
-                <div
-                  style={{ marginRight: 10 }}
-                >
-                  <h5
-                    style={{ color: '#2F8FD9' }}
-                  >
-                    {this.state.userOpCo ?
-                      `OpCo: ${this.state.userOpCo.split('-')[0]} ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].name}`
-                      : null}
-                  </h5>
-                  <h5
-                    style={{ color: '#2F8FD9' }}
-                  >
-                    {this.state.userOpCo ?
-                      `${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].timezone}`
-                      : null}
-                  </h5>
-                </div>
-                : null}
-              <FormControl
-                type='text'
-                placeholder="Caller User ID*"
-                onChange={(text) => {
-                  if (text.target.value.length === 8) {
-                    this.setState({
-                      userId: text.target.value
-                    })
-                    let temp = this.state.file.filter((item) => {
-                      return item.includes(text.target.value);
-                    })
-                    temp.length > 0 ? temp = temp[0].split(' ')[1] : temp = null
-                    this.setState({
-                      userOpCo: temp
-                    })
-                  } else {
-                    this.setState({
-                      userOpCo: null
-                    })
-                  }
-                }}
-              />
-              <CopyToClipboard
-                text={this.state.userId}
-                style={{ marginLeft: 10 }}
               >
-                <AddIcon
-                  style={{
-                    backgroundColor: 'black',
-                    color: 'red'
-                  }}
-                  onClick={() => alert("User copied to clipboard")}
+                <img
+                  src="https://www.sysco.com/dam/jcr:2ed25439-a58a-41d2-8306-dcf3761c7d95/Sysco-Logo-Color1.png"
+                  height="50"
+                  alt="Logo"
                 />
-              </CopyToClipboard>
-            </Form>
-          </Navbar>
-          {/* //============================================================= */}
-          {this.state.drawer ?
-            <nav className="side-drawer"
-            >
-              <div style={{
-                margin: 20
-              }}>
-                <div
-                  className="drawer-icon"
+              </Navbar.Brand>
+              <Navbar.Brand
+                href="/"
+              >
+                <h3
                   style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
+                    color: "#2F8FD9",
+                    alignSelf: 'center'
                   }}
-                >
-                  <div>
-                  </div>
-                  <ListIcon
-                    onClick={() => {
-                      this.setState({
-                        drawer: false,
-                        page: true
-                      })
+                >Sysco Outbound Transportation Support Dashboard
+              </h3>
+              </Navbar.Brand>
+              <Form inline>
+                {this.state.userId.length > 0 ?
+                  <div
+                    style={{
+                      marginRight: 10
                     }}
-                  />
-                </div>
-                <h5>Roadnet</h5>
-                <ul>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/addToRoadnet">Add User to Roadnet</Link>
-                  </li>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to='/restoreColumns'>Restore User Columns</Link>
-                    {/* <h6 style={{ color: 'grey' }}>Restore User Columns</h6> */}
-                  </li>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    {/* <h6 style={{ color: 'grey' }}>Mirror User Profile</h6> */}
-                    <Link to='/mirrorProfile'>Mirror User Profile</Link>
-                  </li>
-                </ul>
-                <Divider variant="middle" />
-                <h5>Routing Interface</h5>
-                <ul>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/addToRoutingInterface">Add User to Roadnet Interface</Link>
-                  </li>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/removeFromRoutingInterface">Remove User from Routing Interface</Link>
-                  </li>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/replaceRIConfig">Replace RI Config File</Link>
-                    {/* <h6 style={{ color: 'grey' }}>Replace RI Config File</h6> */}
-                  </li>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link>
-                  </li>
-                </ul>
-                <Divider variant="middle" />
-                <h5>GasBoy</h5>
-                <ul>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/addToGasboy">Add to Gasboy</Link>
-                  </li>
-                </ul>
-                <Divider variant="middle" />
-                <h5>Telogis</h5>
-                <ul>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/telogisInfo">Telogis Information</Link>
-                  </li>
-                  <li onClick={() => { this.setState({ drawer: false, page: true }) }}>
-                    <Link to="/routesToTelogis">Routes not Flowing to Telogis</Link>
-                  </li>
-                </ul>
-                <Divider variant="middle" />
-                <h5>GS1 Barcode</h5>
-                <ul>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/gs1Barcode">GS1 Report</Link>
-                  </li>
-                </ul>
-                <Divider variant="middle" />
-                <h5>Development</h5>
-                <ul>
-                  <li onClick={() => this.setState({ drawer: false, page: true })}>
-                    <Link to="/migrationExport">Routing Solution</Link>
-                  </li>
-                </ul>
-              </div>
-            </nav>
-            : null}
-          {/* //============================================================= */}
-          {this.state.page === true ?
-            <div
-              style={{ margin: 20 }}
-            >
-              <Route exact path="/" component={this.Home} />
-              <Route path="/addToRoadnet" component={this.AddToRoadnet} />
-              <Route path="/restoreColumns" component={this.RestoreColumns} />
-              <Route path="/mirrorProfile" component={this.MirrorProfile} />
-              <Route path="/addToRoutingInterface" component={this.AddToRoutingInterface} />
-              <Route path="/removeFromRoutingInterface" component={this.RemoveFromRoutingInterface} />
-              <Route path="/replaceRIConfig" component={this.ReplaceRIConfig} />
-              <Route path="/routesNotFlowing" component={this.RoutesNotFlowing} />
-              <Route path="/addToGasboy" component={this.AddToGasboy} />
-              <Route path="/telogisInfo" component={this.TelogisInfo} />
-              <Route path="/routesToTelogis" component={this.RoutesToTelogis} />
-              <Route path="/gs1Barcode" component={this.GS1Barcode} />
-              <Route path="/migrationExport" component={this.MigrationExport} />
-            </div>
-            :
-            <Container>
-              <Row style={{ margin: 150 }}>
-                <Col
-                  style={{
-                    textAlign: 'center'
-                  }}
-                >
-                  <ClipLoader
-                    css={
-                      css`display:block; margin:0 auto; border-color:black;`
+                  >
+                    <h5
+                      style={{
+                        color: '#2F8FD9',
+                        fontSize: 14
+                      }}
+                    >
+                      {this.state.userOpCo ?
+                        `OpCo: ${this.state.userOpCo.split('-')[0]} ${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].name}`
+                        : null}
+                    </h5>
+                    <h5
+                      style={{
+                        color: '#4F8FD9',
+                        fontSize: 14
+                      }}
+                    >
+                      {this.state.userOpCo ?
+                        `${this.state.allOpCo.filter((item) => item.num === this.state.userOpCo.split('-')[0])[0].timezone}`
+                        : null}
+                    </h5>
+                  </div>
+                  : null}
+                <FormControl
+                  type='text'
+                  placeholder="Caller User ID*"
+                  onChange={(text) => {
+                    if (text.target.value.length === 8) {
+                      this.setState({
+                        userId: text.target.value
+                      })
+                      let temp = this.state.file.filter((item) => {
+                        return item.includes(text.target.value);
+                      })
+                      temp.length > 0 ? temp = temp[0].split(' ')[1] : temp = null
+                      this.setState({
+                        userOpCo: temp
+                      })
+                    } else {
+                      this.setState({
+                        userOpCo: null
+                      })
                     }
-                    size={100}
-                    sizeUnit={"px"}
-                    color={'blue'}
-                    loading={this.state.loading}
-                  />
-                </Col>
-              </Row>
-            </Container>
-          }
-        </div>
+                  }}
+                />
+              </Form>
+            </Navbar>
+            <Route exact path="/" component={this.Home} />
+            <Route path="/addToRoadnet" component={this.AddToRoadnet} />
+            <Route path="/restoreColumns" component={this.RestoreColumns} />
+            <Route path="/mirrorProfile" component={this.MirrorProfile} />
+            <Route path="/addToRoutingInterface" component={this.AddToRoutingInterface} />
+            <Route path="/removeFromRoutingInterface" component={this.RemoveFromRoutingInterface} />
+            <Route path="/replaceRIConfig" component={this.ReplaceRIConfig} />
+            <Route path="/routesNotFlowing" component={this.RoutesNotFlowing} />
+            <Route path="/addToGasboy" component={this.AddToGasboy} />
+            <Route path="/telogisInfo" component={this.TelogisInfo} />
+            <Route path="/routesToTelogis" component={this.RoutesToTelogis} />
+            <Route path="/gs1Barcode" component={this.GS1Barcode} />
+            <Route path="/migrationExport" component={this.MigrationExport} />
+          </div>
+        </div >
       </Router >
     )
   }
