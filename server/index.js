@@ -17,11 +17,22 @@ let replace = require('replace-in-file');
 // require('./src/BarcodeParser.js')
 const gs1js = require('gs1js');
 //=============================================================
-let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', 'ms212rdctx12', 'ms212rdctx14', 'ms212rdctx15', 'ms212rdctx16'];
-let filePath = `//${servers[0]}/routing/UserConfig.txt`;
+let servers =
+  [
+    'ms212rdctx06',
+    'ms212rdctx07',
+    'ms212rdctx08',
+    'ms212rdctx11',
+    'ms212rdctx12',
+    'ms212rdctx14',
+    'ms212rdctx15',
+    'ms212rdctx16'
+  ];
+
 //=============================================================
 app.get('/getFiles', (req, res) => {
   // console.log('Getting OpCo Info');
+  let filePath = `//${servers[0]}/routing/UserConfig.txt`;
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) console.log(err)
     res.setHeader('Content-Type', 'application/json');
@@ -886,11 +897,11 @@ function gs1Process(req, res) {
                 .concat(`${item['Product Quantity Units']},`)                                   //Required - Product Quantity Units
                 .concat(`${item['Product Quantity Amount']},`)                                  //Required - Product Quantity Amount
                 .concat(`${item['PO Number']},`)                                                //Required - PO Number
-                .concat(`${temp['13'] ? `${temp['13'].slice(2,4)}/${temp['13'].slice(4,6)}/20${temp['13'].slice(0,2)}` : ''},`)  //packDate
-                .concat(`${temp['17'] ? `${temp['17'].slice(2,4)}/${temp['17'].slice(4,6)}/20${temp['17'].slice(0,2)}` : ''},`)  //useThruDate
-                .concat(`${temp['11'] ? `${temp['11'].slice(2,4)}/${temp['11'].slice(4,6)}/20${temp['11'].slice(0,2)}` : ''},`)  //productionDate
+                .concat(`${temp['13'] ? `${temp['13'].slice(2, 4)}/${temp['13'].slice(4, 6)}/20${temp['13'].slice(0, 2)}` : ''},`)  //packDate
+                .concat(`${temp['17'] ? `${temp['17'].slice(2, 4)}/${temp['17'].slice(4, 6)}/20${temp['17'].slice(0, 2)}` : ''},`)  //useThruDate
+                .concat(`${temp['11'] ? `${temp['11'].slice(2, 4)}/${temp['11'].slice(4, 6)}/20${temp['11'].slice(0, 2)}` : ''},`)  //productionDate
                 .concat(`,`)                                                                    //expirationDate
-                .concat(`${temp['15'] ? `${temp['15'].slice(2,4)}/${temp['15'].slice(4,6)}/20${temp['15'].slice(0,2)}` : ''},`)  //bestBeforeDate
+                .concat(`${temp['15'] ? `${temp['15'].slice(2, 4)}/${temp['15'].slice(4, 6)}/20${temp['15'].slice(0, 2)}` : ''},`)  //bestBeforeDate
                 .concat(``)                                                                     //If Applicable - poNumber2
                 .concat(`\r\n`)
             }
