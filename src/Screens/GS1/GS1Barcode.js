@@ -22,10 +22,13 @@ class GS1Barcode extends React.Component {
       fileName: '',
       loading: false,
       response: '',
+      ftpFileName: '',
+      ftpUpload: '',
     };
     this.processGS1 = this.processGS1.bind(this);
     this.changeDate = this.changeDate.bind(this);
     this.updateMasterGLN = this.updateMasterGLN.bind(this);
+    this.uploadFTP = this.uploadFTP.bind(this);
   }
   //=============================================================
   componentDidMount() {
@@ -102,6 +105,38 @@ class GS1Barcode extends React.Component {
     else alert('Wrong File');
   }
   //=============================================================
+  uploadFTP(){
+    let reader = new FileReader();
+    // reader.onload = () => {
+    //   let workbook = XLSX.read(new Uint8Array(reader.result), { type: 'array' });
+    //   let firstSheet = workbook.SheetNames[0];
+    //   let worksheet = workbook.Sheets[firstSheet];
+    //   let jsonSheet = XLSX.utils.sheet_to_json(worksheet);
+      let data = '';
+    //   jsonSheet.forEach((item) => {
+    //     // data = data.concat(`${item['Store']}:${item['Store GLN']}\r\n`)
+    //     console.log(item);
+    //   })
+      axios.post('/uploadFTP',
+        {
+          data: data
+        })
+        .then((response) => {
+          console.log(response.data);
+          this.setState({
+            loading: false,
+            response: response.data,
+          })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    // }
+    // reader.onabort = () => console.log('File reading was aborted');
+    // reader.onerror = () => console.log('File reading has failed');
+    // reader.readAsArrayBuffer(this.state.ftpUpload[0]);
+  }
+  //=============================================================
   render() {
     return (
       <Container>
@@ -136,7 +171,7 @@ class GS1Barcode extends React.Component {
               this.state.downloadData.length > 0 ?
                 <CSVLink
                   data={this.state.downloadData}
-                  filename={`${this.state.date} - GS1Export.csv`}
+                  filename={`${this.state.date}-GS1Export.csv`}
                   style={{
                     color: 'green',
                     margin: 15,
@@ -197,6 +232,55 @@ class GS1Barcode extends React.Component {
               }
             </Row>
           </Col>
+        </Row>
+        <Row>
+          <Col>
+            <h3>FTP Report</h3>
+          </Col>
+          <Col>
+          </Col>
+        </Row>
+        <Row>
+          <Col
+            style={{
+              border: 'solid black',
+              borderWidth: 1,
+              width: 200,
+              height: 100,
+            }}
+          >
+            <FileDrop
+              onDrop={(file, event) => {
+                this.setState({
+                  ftpFileName: file['0']['name'],
+                  ftpUpload: file,
+                })
+              }}
+            >
+              {
+                this.state.ftpFileName ?
+                  this.state.ftpFileName
+                  : "Drop GS1 FTP Report here"
+              }
+            </FileDrop>
+          </Col>
+          <Col>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+          <Button
+              variant="contained"
+              color="primary"
+              style={{ marginTop: 15 }}
+              onClick={() => {
+                this.uploadFTP();
+                console.log('Firing');
+              }}
+            >Export</Button>
+          </Col>
+        <Col>
+        </Col>
         </Row>
       </Container >
     );
