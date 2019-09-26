@@ -13,6 +13,8 @@ app.listen(port, () => console.log(`Express server is running on localhost: ${po
 let fs = require('fs');
 let fse = require('fs-extra');
 let replace = require('replace-in-file');
+let replaceInFiles = require('replace-in-files');
+const XRegExp = require('xregexp');
 // require('gs1-barcode-parser');
 // require('./src/BarcodeParser.js')
 const gs1js = require('gs1js');
@@ -45,18 +47,7 @@ let today;
 let time;
 let sessionDate;
 //=============================================================
-let servers =
-  [
-    'ms212rdctx06',
-    'ms212rdctx07',
-    'ms212rdctx08',
-    'ms212rdctx11',
-    'ms212rdctx12',
-    'ms212rdctx14',
-    'ms212rdctx15',
-    'ms212rdctx16'
-  ];
-
+let servers = ['ms238rdctxo1', 'ms238rdctxo2', 'ms238rdctxo3', 'ms238rdctxo4', 'ms238rdctxo5', 'ms238rdctxo6',];
 //=============================================================
 function currentTime() {
   let date = new Date();
@@ -70,7 +61,6 @@ function currentTime() {
 }
 //=============================================================
 app.get('/getFiles', (req, res) => {
-  // console.log('Getting OpCo Info');
   let filePath = `//${servers[0]}/routing/UserConfig.txt`;
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) console.log(err)
@@ -80,10 +70,8 @@ app.get('/getFiles', (req, res) => {
 })
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
-  // console.log('Updating User Configs');
-  servers.forEach((item) => {
-    // fs.writeFile(`//${item}/routing/UserConfigCalvinTest.txt`, req.body.data, (err, res) => {
-    fs.writeFile(`//${item}/routing/UserConfig.txt`, req.body.data, (err, res) => {
+  servers.forEach((server) => {
+    fs.writeFile(`//${server}/routing/UserConfig.txt`, req.body.data, (err, res) => {
       if (err) console.log(err)
     });
   })
@@ -122,110 +110,7 @@ app.post('/replaceRIConfig', (req, res) => {
   setTimeout(() => {
     res.send(filesReplaced)
   }, 15000)
-  ////
-  // let files = [
-  //   // 'LOCKOUT.TMP',
-  //   // 'CONFIG.TMP',
-  //   // 'OPTMENU.DTA',
-  //   'RTRSETUP.DTA'
-  // ];
-  // let master = 'newMaster'
-  // let servers = [
-  //   // 'ms212rdctx06', 
-  //   // 'ms212rdctx07',
-  //   // 'ms212rdctx08', 
-  //   // 'ms212rdctx11',
-  //   // 'ms212rdctx12', 
-  //   // 'ms212rdctx14', 
-  //   // 'ms212rdctx15', 
-  //   // 'ms212rdctx16'
-  // ];
-  // let awsServers = [
-  //   'ms238rdctxo1',
-  //   'ms238rdctxo2',
-  //   'ms238rdctxo3',
-  //   'ms238rdctxo4',
-  //   'ms238rdctxo5',
-  //   'ms238rdctxo6'
-  // ];
-  // let OpCos = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "022", "023", "024", "025", "026", "027", "029", "031", "032", "035", "036", "037", "038", "039", "040", "043", "045", "046", "047", "048", "049", "050", "051", "052", "054", "055", "056", "057", "058", "059", "060", "061", "064", "066", "067", "068", "073", "075", "076", "078", "101", "102", "137", "163", "164", "194", "195", "288", "293", "306", "320", "332", "335", "429"]
-  // let ignores = ['010-4', '010-5', '012-5', '015-5', '164-5', '306-5', '429-1', '429-2', '429-3', '429-4', '429-5']
-  // let folders = ['CUSTDL', 'RTRDL', 'RTRUL']
-  // let missingFiles = {}
-
-  // // fs.mkdirSync(`//ms212rdfsc/ERN-support/AWSRI/${master}`)
-
-  // awsServers.forEach((server) => {
-  //   // servers.forEach((server) => {
-  //   // fs.mkdirSync(`//ms212rdfsc/ERN-support/AWSRI/${master}/${server}`)
-  //   // console.log(`Created ${server}`);
-  //   OpCos.forEach((OpCo) => {
-  //     for (let i = 1; i <= 5; i++) {
-  //       // fs.mkdirSync(`//ms212rdfsc/ERN-support/AWSRI/${master}/${server}/${OpCo}-${i}`)
-  //       // console.log(`Created ${server}/${OpCo}-${i}`);
-
-  //       // folders.forEach((folder) => {
-  //       //   fs.mkdir(`//ms212rdfsc/ERN-support/AWSRI/${master}/${server}/${OpCo}-${i}/${folder}`, (err) => {
-  //       //     if (err) console.log(err);
-  //       //   })
-  //       //   console.log(`Created ${server}/${OpCo}-${i}/${folder}`);
-  //       // })
-
-  //       // files.forEach((file) => {
-  //       //   let source = `//${server}/ROUTING/${OpCo}-${i}/${file}`
-  //       //   let target = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${OpCo}-${i}/${file}`
-  //       //   fse.copy(source, target, (err) => {
-  //       //     if (err) {
-  //       //       console.log(`Could not find ${file} in ${OpCo}-${i} in ${server}`);
-  //       //     }
-  //       //     else {
-  //       //       console.log(`Copied ${file} from ${OpCo}-${i} in ${server} to master`);
-  //       //     }
-  //       //   })
-
-  //       files.forEach((file) => {
-  //         // console.log(`${OpCo}-${i}/${file}`);
-  //         let source = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${OpCo}-${i}/${file}`
-  //         let target = `//ms212rdfsc/ERN-support/AWSRI/${master}/${server}/${OpCo}-${i}/${file}`
-  //         // fse.copy(source, target, (err) => {
-  //         // if (err) {
-  //         //   if (!ignores.includes(`${OpCo}-${i}`)) {
-  //         //     if (!(`${OpCo}-${i}` in missingFiles)) {
-  //         //       console.log(`Could not find ${file} in ${OpCo}-${i} in master`);
-  //         //       missingFiles[`${OpCo}-${i}`] = `${file}`
-  //         //       let jsonData = JSON.stringify(missingFiles)
-  //         //       jsonData = jsonData.slice(1, jsonData.length - 1).split(',').join('\r\n')
-  //         //       fs.writeFile('//ms212rdfsc/ERN-support/AWSRI/Missing Files.csv', jsonData, 'utf8', (err) => {
-  //         //         if (err) console.log(err);
-  //         //       })
-  //         //     }
-  //         //   }
-  //         // }
-  //         // else {
-  //         if (file === 'RTRSETUP.DTA') {
-  //           let options = {
-  //             encoding: 'binary',
-  //             files: `//ms212rdfsc/ERN-support/AWSRI/${master}/${server}/${OpCo}-${i}/RTRSETUP.DTA`,
-  //             from: [/ms212rdctx03/g, /ms212rdctx04/g, /ms212rdctx05/g, /ms212rdctx06/g, /ms212rdctx07/g, /ms212rdctx08/g, /ms212rdctx11/g, /ms212rdctx12/g, /ms212rdctx13/g, /ms212rdctx14/g, /ms212rdctx15/g, /ms212rdctx16/g],
-  //             to: `${server}`,
-  //             disableGlobs: true,
-  //           }
-  //           replace(options)
-  //             .then(() => { console.log(`Replaced server details ${server}/${OpCo}-${i}/${file}`); })
-  //             .catch((error) => {
-  //               // console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
-  //               console.log(error);
-  //             })
-  //         }
-  //         console.log(`Copied ${file} into ${OpCo}-${i} in ${server} `);
-  //         // }
-  //         // })
-
-  //       })
-  //     }
-  //   })
-  // })
-  ////
+  //=============================================================
 })
 //=============================================================
 app.post('/routesNotFlowing', (req, res) => {
@@ -1049,11 +934,11 @@ let gs1Rule = new schedule.RecurrenceRule();
 gs1Rule.hour = 17;
 gs1Rule.minute = 0;
 gs1Rule.second = 0;
-let gs1job = schedule.scheduleJob(gs1Rule, () => {
-  currentTime();
-  console.log('Running scheduled GS1 Job');
-  gs1Process();
-})
+// let gs1job = schedule.scheduleJob(gs1Rule, () => {
+//   currentTime();
+//   console.log('Running scheduled GS1 Job');
+//   gs1Process();
+// })
 //=============================================================
 let rsRule = new schedule.RecurrenceRule();
 rsRule.hour = 20;
@@ -1062,4 +947,170 @@ rsRule.second = 0;
 let rsjob = schedule.scheduleJob(rsRule, () => {
   console.log('Running scheduled RS Job');
   routingSolution();
+})
+
+app.post('/generateConfigFiles', (req, res) => {
+  let files = [
+    'LOCKOUT.TMP',
+    'CONFIG.TMP',
+    'OPTMENU.DTA',
+    'RTRSETUP.DTA'
+  ];
+  // let newCopyFilePath = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles'
+  let newCopyFilePath = '//ms238rdctxo1/d$/OBTsupport/ORI-Files'
+  let master = 'newMasterFSX'
+  let awsServers = [
+    'ms238rdctxo1',
+    'ms238rdctxo2',
+    'ms238rdctxo3',
+    'ms238rdctxo4',
+    'ms238rdctxo5',
+    'ms238rdctxo6',
+    // 'ms238rdctxo1d'
+  ];
+  let OpCos = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "022", "023", "024", "025", "026", "027", "029", "031", "032", "035", "036", "037", "038", "039", "040", "043", "045", "046", "047", "048", "049", "050", "051", "052", "054", "055", "056", "057", "058", "059", "060", "061", "064", "066", "067", "068", "073", "075", "076", "078", "101", "102", "137", "163", "164", "194", "195", "288", "293", "306", "320", "332", "335", "429"];
+  let folders = ['CUSTDL', 'RTRDL', 'RTRUL'];
+
+  let filesGenerated = [];
+  let missingFiles = [];
+
+  fs.mkdirSync(`${newCopyFilePath}/${master}`)
+
+  awsServers.forEach((server) => {
+    fs.mkdirSync(`${newCopyFilePath}/${master}/${server}`)
+    console.log(`Created ${server}`);
+    OpCos.forEach((OpCo) => {
+      for (let i = 1; i <= 5; i++) {
+        fs.mkdirSync(`${newCopyFilePath}/${master}/${server}/${OpCo}-${i}`)
+        console.log(`Created ${server}/${OpCo}-${i}`);
+        folders.forEach((folder) => {
+          fs.mkdir(`${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/${folder}`, (err) => {
+            if (err) console.log(err);
+          })
+          console.log(`Created ${server}/${OpCo}-${i}/${folder}`);
+        })
+        //=============================================================
+        files.forEach((file) => {
+          let source = `C:/Users/Administrator/Desktop/newMasterFSX/${server}/${OpCo}-${i}/${file}`
+          let target = `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/${file}`
+          fse.copy(source, target, (err) => {
+            if (err) {
+              missingFiles.push(`${file} in ${OpCo}-${i} in ${server}`)
+            }
+            else {
+              if (file === 'RTRSETUP.DTA') {
+                let options = {
+                  encoding: 'binary',
+                  files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/RTRSETUP.DTA`,
+                  from: `obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER             `,
+                  to: `obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER             `,
+                  disableGlobs: true,
+                }
+                replace(options)
+                  .then(() => {
+                    console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
+                  })
+                  .catch((error) => {
+                    console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
+                  })
+              }
+              if (file === 'OPTMENU.DTA') {
+                let options = {
+                  encoding: 'binary',
+                  files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/OPTMENU.DTA`,
+                  from: `obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.exe               `,
+                  to: `obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.exe         `,
+                  disableGlobs: true,
+                }
+                replace(options)
+                  .then(() => {
+                    console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
+                  })
+                  .catch((error) => {
+                    console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
+                  })
+              }
+              filesGenerated.push(`${file} in ${OpCo}-${i} in ${server}`)
+              console.log(`Copied ${file} into ${OpCo}-${i} in ${server}`);
+            }
+          })
+        })
+        //=============================================================
+      }
+    })
+  })
+  ////
+  // setTimeout(() => res.send({ filesGenerated, missingFiles }), 120000)
+})
+
+app.post('/generateTransferConfigFiles', (req, res) => {
+  console.log('Generating Files');
+  let filesGenerated = [];
+  let missingFiles = [];
+  //=============================================================
+  let count = 5;
+  let master = `//na.sysco.net/roadnet/obt-np/rd_data/ERN-SUS/New ERN-SUS${count}`;
+  let folders = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "022", "023", "024", "025", "026", "027", "029", "031", "032", "035", "036", "037", "038", "039", "040", "043", "045", "046", "047", "048", "049", "050", "051", "052", "054", "055", "056", "057", "058", "059", "060", "061", "064", "066", "067", "068", "073", "075", "076", "078", "101", "102", "137", "163", "164", "194", "195", "288", "293", "306", "320", "332", "335", "429", "450"];
+  let files = ["OPTMENU.DTA", "RTRSETUP.DTA"];
+  //=============================================================
+  folders.forEach((folder) => {
+    files.forEach((file) => {
+      let path = `${master}/${folder}/${file}`;
+      if (file === "OPTMENU.DTA") {
+        const options1 = {
+          files: path,
+          encoding: 'binary',
+          from: `isibld\\RD_Transfer\\ern-sus\\${folder}\\OPRN15PG.exe                                  `,
+          to: `na.sysco.net\\roadnet\\obt\\rd_data\\rd_transfer\\ERN-SUS\\${folder}\\OPRN15PG.exe        `,
+        }
+        const options2 = {
+          files: path,
+          encoding: 'binary',
+          from: `isibld\\RD_Transfer\\ern-sus\\${folder}\\OPRN16PG.EXE                                  `,
+          to: `na.sysco.net\\roadnet\\obt\\rd_data\\rd_transfer\\ERN-SUS\\${folder}\\OPRN16PG.exe        `,
+        }
+        replaceInFiles(options1)
+          .then(() => {
+            console.log(`Modified ${folder}/${file}`)
+            filesGenerated = filesGenerated.concat(`${folder}/${file}`);
+
+            replaceInFiles(options2)
+              .then(() => {
+                console.log(`Modified ${folder}/${file}`)
+                filesGenerated = filesGenerated.concat(`${folder}/${file}`);
+              })
+              .catch(error => {
+                console.log(`Error with ${folder}/${file}`)
+                missingFiles = missingFiles.concat(`${folder}/${file}`);
+              });
+
+          })
+          .catch(error => {
+            console.log(`Error with ${folder}/${file}`)
+            missingFiles = missingFiles.concat(`${folder}/${file}`);
+          });
+
+      }
+      if (file === "RTRSETUP.DTA") {
+        const options1 = {
+          files: path,
+          encoding: 'binary',
+          from: `isibld\\RD_Transfer\\ern-sus\\${folder}\\TRANSFER                                       `,
+          to: `na.sysco.net\\roadnet\\obt\\rd_data\\rd_transfer\\ERN-SUS\\${folder}\\TRANSFER             `,
+        }
+        replaceInFiles(options1)
+          .then(() => {
+            console.log(`Modified ${folder}/${file}`)
+            filesGenerated = filesGenerated.concat(`${folder}/${file}`);
+          })
+          .catch(error => {
+            console.log(`Error with ${folder}/${file}`)
+            missingFiles = missingFiles.concat(`${folder}/${file}`);
+          });
+      }
+
+    })
+  })
+
+  setTimeout(() => res.send({ filesGenerated, missingFiles }), 60000)
 })

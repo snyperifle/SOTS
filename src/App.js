@@ -27,6 +27,7 @@ import RoutesToTelogis from './Screens/Telogis/RoutesToTelogis';
 import GS1Barcode from './Screens/GS1/GS1Barcode';
 
 import MigrationExport from './Screens/Development/MigrationExport';
+import GenerateRIConfig from './Screens/Development/GenerateRIConfig';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -137,6 +138,7 @@ class App extends React.Component {
     this.TelogisInfo = this.TelogisInfo.bind(this);
     this.RoutesToTelogis = this.RoutesToTelogis.bind(this);
     this.GS1Barcode = this.GS1Barcode.bind(this);
+    this.GenerateRIConfig = this.GenerateRIConfig.bind(this);
     //=============================================================
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.updateOpCo = this.updateOpCo.bind(this);
@@ -289,6 +291,11 @@ class App extends React.Component {
       />
     )
   }
+  GenerateRIConfig() {
+    return (
+      <GenerateRIConfig />
+    )
+  }
   //=============================================================
   render() {
     return (
@@ -314,6 +321,7 @@ class App extends React.Component {
             <Link to="/gs1Barcode">GS1 Report</Link>
             <h5 id="category">Development</h5>
             <Link to="/migrationExport">Routing Solution</Link>
+            <Link to="/generateRIConfig">Generate RI Config Files</Link>
           </Menu>
           <div id="page-wrap">
             <Navbar
@@ -321,7 +329,7 @@ class App extends React.Component {
               expand="lg"
               style={{
                 color: 'white',
-                backgroundColor: "#e9ecef",
+                backgroundColor: "#FF9900",
                 justifyContent: 'space-between',
               }}
             >
@@ -342,7 +350,7 @@ class App extends React.Component {
               >
                 <h3
                   style={{
-                    color: "#2F8FD9",
+                    color: "#black",
                     alignSelf: 'center'
                   }}
                 >Sysco Outbound Transportation Support Dashboard
@@ -414,6 +422,7 @@ class App extends React.Component {
             <Route path="/routesToTelogis" component={this.RoutesToTelogis} />
             <Route path="/gs1Barcode" component={this.GS1Barcode} />
             <Route path="/migrationExport" component={this.MigrationExport} />
+            <Route path="/generateRIConfig" component={this.GenerateRIConfig} />
           </div>
         </div >
       </Router >

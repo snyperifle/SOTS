@@ -38,7 +38,8 @@
     "replace-in-file": "^4.1.1",
     "replace-in-files": "^1.1.4",
     "tedious": "^6.1.2",
-    "xlsx": "^0.14.3"
+    "xlsx": "^0.14.3",
+    "xregexp": "^4.2.4"
   },
   "proxy": "http://localhost:3999",
   "scripts": {

@@ -90,18 +90,3 @@
   background: rgba(0, 0, 0, 0.3);
   opacity: 1;
 }
-
-.MainColumn {
-  /* display:flex;
-  flex-direction: row;
-  justify-content: space-between */
-}
-
-.MainPage{
-  /* height: 100vh */
-}
-
-.Title{
-  /* display:flex;
-  flex-direction: row; */
-}
