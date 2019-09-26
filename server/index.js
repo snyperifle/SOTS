@@ -17,29 +17,6 @@ let replace = require('replace-in-file');
 // require('./src/BarcodeParser.js')
 const gs1js = require('gs1js');
 //=============================================================
-let servers =
-  [
-    'ms212rdctx06',
-    'ms212rdctx07',
-    'ms212rdctx08',
-    'ms212rdctx11',
-    'ms212rdctx12',
-    'ms212rdctx14',
-    'ms212rdctx15',
-    'ms212rdctx16'
-  ];
-
-//=============================================================
-app.get('/getFiles', (req, res) => {
-  // console.log('Getting OpCo Info');
-  let filePath = `//${servers[0]}/routing/UserConfig.txt`;
-  fs.readFile(filePath, 'utf8', (err, data) => {
-    if (err) console.log(err)
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(data))
-  })
-})
-//=============================================================
 let gbconfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PW,
@@ -67,7 +44,20 @@ let exsql = new sql.ConnectionPool(exconfig);
 let today;
 let time;
 let sessionDate;
+//=============================================================
+let servers =
+  [
+    'ms212rdctx06',
+    'ms212rdctx07',
+    'ms212rdctx08',
+    'ms212rdctx11',
+    'ms212rdctx12',
+    'ms212rdctx14',
+    'ms212rdctx15',
+    'ms212rdctx16'
+  ];
 
+//=============================================================
 function currentTime() {
   let date = new Date();
   today = `${(date.getFullYear())}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`
@@ -76,10 +66,18 @@ function currentTime() {
   // console.log(`Today: ${today}`);
   // sessionDate = `2019-07-01`
   // console.log('test---', sessionDate);
-
   console.log(`///////////////////////// ${time}`);
 }
-
+//=============================================================
+app.get('/getFiles', (req, res) => {
+  // console.log('Getting OpCo Info');
+  let filePath = `//${servers[0]}/routing/UserConfig.txt`;
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) console.log(err)
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(data))
+  })
+})
 //=============================================================
 app.post('/updateUserConfigs', (req, res) => {
   // console.log('Updating User Configs');
@@ -932,17 +930,6 @@ app.post('/processGS1', (req, res) => {
 
   gs1Process(req, res)
 })
-
-let gs1Rule = new schedule.RecurrenceRule();
-gs1Rule.hour = 17;
-gs1Rule.minute = 0;
-gs1Rule.second = 0;
-
-let gs1job = schedule.scheduleJob(gs1Rule, () => {
-  currentTime();
-  console.log('Running scheduled GS1 Job');
-  gs1Process();
-})
 //=============================================================
 app.post('/updateMasterGLN', (req, res) => {
   // console.log('DATA:', req.body.data);
@@ -1057,12 +1044,21 @@ function routingSolution(req, res) {
 app.get('/routingSolution', (req, res) => {
   routingSolution(req, res);
 });
-
+//=============================================================
+let gs1Rule = new schedule.RecurrenceRule();
+gs1Rule.hour = 17;
+gs1Rule.minute = 0;
+gs1Rule.second = 0;
+let gs1job = schedule.scheduleJob(gs1Rule, () => {
+  currentTime();
+  console.log('Running scheduled GS1 Job');
+  gs1Process();
+})
+//=============================================================
 let rsRule = new schedule.RecurrenceRule();
 rsRule.hour = 20;
 rsRule.minute = 45;
 rsRule.second = 0;
-
 let rsjob = schedule.scheduleJob(rsRule, () => {
   console.log('Running scheduled RS Job');
   routingSolution();
