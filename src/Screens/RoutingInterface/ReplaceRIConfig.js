@@ -30,7 +30,7 @@ class ReplaceRIConfig extends React.Component {
       .then((response) => {
         console.log(response.data);
         this.setState({
-          filesReplaced: response.data,
+          filesReplaced: response.data.filesReplaced,
           loading: false,
         })
       })

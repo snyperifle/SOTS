@@ -14,9 +14,6 @@ let fs = require('fs');
 let fse = require('fs-extra');
 let replace = require('replace-in-file');
 let replaceInFiles = require('replace-in-files');
-const XRegExp = require('xregexp');
-// require('gs1-barcode-parser');
-// require('./src/BarcodeParser.js')
 const gs1js = require('gs1js');
 //=============================================================
 let gbconfig = {
@@ -47,7 +44,14 @@ let today;
 let time;
 let sessionDate;
 //=============================================================
-let servers = ['ms238rdctxo1', 'ms238rdctxo2', 'ms238rdctxo3', 'ms238rdctxo4', 'ms238rdctxo5', 'ms238rdctxo6',];
+let servers = [
+  'ms238rdctxo1',
+  'ms238rdctxo2',
+  'ms238rdctxo3',
+  'ms238rdctxo4',
+  // 'ms238rdctxo5', 
+  // 'ms238rdctxo6',
+];
 //=============================================================
 function currentTime() {
   let date = new Date();
@@ -73,10 +77,12 @@ app.post('/updateUserConfigs', (req, res) => {
   servers.forEach((server) => {
     fs.writeFile(`//${server}/routing/UserConfig.txt`, req.body.data, (err, res) => {
       if (err) console.log(err)
+      else console.log(`Updated ${server}`);
     });
   })
   res.send(`User Configs updated!`);
 })
+//=============================================================
 app.post('/replaceRIConfig', (req, res) => {
   currentTime();
   console.log('Replacing RI Config Files');
@@ -84,32 +90,24 @@ app.post('/replaceRIConfig', (req, res) => {
   let files = ['CONFIG.TMP', 'LOCKOUT.TMP', 'OPTMENU.DTA', 'RTRSETUP.DTA'];
   servers.forEach((server) => {
     files.forEach((file) => {
-      let source = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${req.body.data.OpCo}/${file}`
+      console.log(`Replacing ${file} in ${req.body.data.OpCo} in ${server}`);
+      let source = `//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles/MasterFSX/${server}/${req.body.data.OpCo}/${file}`
       let target = `//${server}/routing/${req.body.data.OpCo}/${file}`
       fse.copy(source, target)
         .then(() => {
-          if (file === 'RTRSETUP.DTA') {
-            let options = {
-              encoding: 'binary',
-              files: `//${server}/routing/${req.body.data.OpCo}/RTRSETUP.DTA`,
-              from: [/ms212rdctx03/g, /ms212rdctx04/g, /ms212rdctx05/g, /ms212rdctx06/g, /ms212rdctx07/g, /ms212rdctx08/g, /ms212rdctx11/g, /ms212rdctx12/g, /ms212rdctx13/g, /ms212rdctx14/g, /ms212rdctx15/g, /ms212rdctx16/g],
-              to: `${server}`,
-              disableGlobs: true,
-            }
-            replace(options)
-              .then(() => { console.log(`Modified ${server} - ${file}`) })
-              .catch((error) => { console.log(error); })
+          filesReplaced.push(`${server}/${req.body.data.OpCo}/${file}`);
+          if (server === servers[servers.length - 1] && file === files[files.length - 1]) {
+            res.send({ filesReplaced })
           }
-          filesReplaced.push(`${server} - ${file}`);
         })
         .catch((error) => {
           console.log(error);
+          if (server === servers[servers.length - 1] && file === files[files.length - 1]) {
+            res.send({ filesReplaced })
+          }
         })
     })
   })
-  setTimeout(() => {
-    res.send(filesReplaced)
-  }, 15000)
   //=============================================================
 })
 //=============================================================
@@ -183,82 +181,39 @@ app.post('/routesNotFlowing', (req, res) => {
       })
     })
   })
-
   setTimeout(() => {
-    // if (found.sendable === true) {
     sendRoutes();
-    // }
   }, 5000)
-
 })
 //=============================================================
 app.post('/restoreColumns', (req, res) => {
   console.log(`Restoring Profile for ${req.body.data}`);
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
-  let backupFolder = '//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/'
-  let destinationFolder = '//ms212rdfsc/rdclient$/'
+  let backupFolder = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/rdclient$';
+  let destinationFolder = '//na.sysco.net/roadnet/obt/rd_data/profiles';
 
-  fse.pathExists(`${backupFolder}${req.body.data}`, (err, exists) => {
-    if (err) console.log(err)
-    if (exists) {
-      files.forEach((item) => {
-        fse.pathExists(`${backupFolder}${req.body.data}/${item}`, (err, exists) => {
-          if (err) console.log(err)
-          if (exists) {
-            fse.copy(`${backupFolder}${req.body.data}/${item}`, `${destinationFolder}${req.body.data}/${item}`)
-              .then(() => {
-                console.log(`${item} copied from ${backupFolder} to ${destinationFolder}`)
-                copied.push(item);
-              })
-              .catch((error) => {
-                console.log(error);
-              })
-          } else console.log(`${item} not found in ${backupFolder}${req.body.data.fromProfile}`);
-        })
-      })
-    } else {
-      console.log(`${req.body.data} does not exist in ${backupFolder}`)
-    }
+  files.forEach((file) => {
+    fse.copy(`${backupFolder}/${req.body.data}/${file}`, `${destinationFolder}/${req.body.data}/${file}`)
+      .then(() => { copied.push(file); })
+      .catch((error) => { console.log(error); })
   })
-  setTimeout(() => {
-    res.send(copied);
-  }, 5000)
+  setTimeout(() => { res.send(copied) }, 1000)
 })
 //=============================================================
 app.post('/mirrorProfile', (req, res) => {
   console.log(`Mirroring Profile from ${req.body.data.fromProfile} to ${req.body.data.toProfile}`);
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
-  let backupFolder = '//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/'
-  let destinationFolder = '//ms212rdfsc/rdclient$/'
+  let backupFolder = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/rdclient$';
+  let destinationFolder = '//na.sysco.net/roadnet/obt/rd_data/profiles';
 
-  fse.pathExists(`${backupFolder}${req.body.data.fromProfile}`, (err, exists) => {
-    if (err) console.log(err)
-    if (exists) {
-      files.forEach((item) => {
-        fse.pathExists(`${backupFolder}${req.body.data.fromProfile}/${item}`, (err, exists) => {
-          if (err) console.log(err)
-          if (exists) {
-            fse.copy(`${backupFolder}${req.body.data.fromProfile}/${item}`, `${destinationFolder}${req.body.data.toProfile}/${item}`)
-              .then(() => {
-                console.log(`${item} copied from ${backupFolder} to ${destinationFolder}`);
-                copied.push(item);
-              })
-              .catch((error) => {
-                console.log(error);
-              })
-          } else console.log(`${item} not found in ${backupFolder}${req.body.data.fromProfile}`);
-        })
-      })
-    }
-    else {
-      console.log(`${req.body.data.fromProfile} does not exist in ${backupFolder}`);
-    }
+  files.forEach((item) => {
+    fse.copy(`${backupFolder}/${req.body.data.fromProfile}/${item}`, `${destinationFolder}/${req.body.data.toProfile}/${item}`)
+      .then(() => { copied.push(item); })
+      .catch((error) => { console.log(error); })
   })
-  setTimeout(() => {
-    res.send(copied);
-  }, 5000)
+  setTimeout(() => { res.send(copied); }, 1000)
 })
 //=============================================================
 app.get('/connectToGBDB', (req, res) => {
@@ -590,7 +545,7 @@ app.post('/gasboyUser', (req, res) => {
 app.post('/routesToTelogis', (req, res) => {
   currentTime();
   console.log('Pulling routes for Telogis');
-  let path = `//isibld/RD_Transfer/OBC/Routes/Archive`;
+  let path = `//na.sysco.net/roadnet/obt/rd_data/rd_transfer/OBC/Routes/Archive`;
   fs.readdir(path, (err, files) => {
     if (err) console.log(err);
     if (files) {
@@ -830,7 +785,7 @@ app.post('/updateMasterGLN', (req, res) => {
 //=============================================================
 function routingSolution(req, res) {
   currentTime();
-
+  console.log(sessionDate);
   let exQuery =
     `SELECT "RS_SESSION"."REGION_ID", "RS_SESSION"."SESSION_DATE", "RS_SESSION"."DESCRIPTION", "RS_STOP"."LOCATION_ID",` +
     `"RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE1", "RS_ROUTE"."ROUTE_ID", "RS_ROUTE"."DESCRIPTION" AS 'ROUTE_DESCRIPTION', "RS_ROUTE"."LOCATION_ID_ORIGIN",` +
@@ -948,7 +903,7 @@ let rsjob = schedule.scheduleJob(rsRule, () => {
   console.log('Running scheduled RS Job');
   routingSolution();
 })
-
+//=============================================================
 app.post('/generateConfigFiles', (req, res) => {
   let files = [
     'LOCKOUT.TMP',
@@ -957,8 +912,8 @@ app.post('/generateConfigFiles', (req, res) => {
     'RTRSETUP.DTA'
   ];
   // let newCopyFilePath = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles'
-  let newCopyFilePath = '//ms238rdctxo1/d$/OBTsupport/ORI-Files'
-  let master = 'newMasterFSX'
+  let newCopyFilePath = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles/'
+  let master = 'MasterFSX - 450'
   let awsServers = [
     'ms238rdctxo1',
     'ms238rdctxo2',
@@ -968,7 +923,11 @@ app.post('/generateConfigFiles', (req, res) => {
     'ms238rdctxo6',
     // 'ms238rdctxo1d'
   ];
-  let OpCos = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "022", "023", "024", "025", "026", "027", "029", "031", "032", "035", "036", "037", "038", "039", "040", "043", "045", "046", "047", "048", "049", "050", "051", "052", "054", "055", "056", "057", "058", "059", "060", "061", "064", "066", "067", "068", "073", "075", "076", "078", "101", "102", "137", "163", "164", "194", "195", "288", "293", "306", "320", "332", "335", "429"];
+  let OpCos = [
+    // "001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "022", "023", "024", "025", "026", "027", "029", "031", "032", "035", "036", "037", "038", "039", "040", "043", "045", "046", "047", "048", "049", "050", "051", "052", "054", "055", "056", "057", "058", "059", "060", "061", "064", "066", "067", "068", "073", "075", "076", "078", "101", "102", "137", "163", "164", "194", "195", "288", "293", "306", "320", "332", "335", 
+    // "429",
+    "450"
+  ];
   let folders = ['CUSTDL', 'RTRDL', 'RTRUL'];
 
   let filesGenerated = [];
@@ -991,7 +950,9 @@ app.post('/generateConfigFiles', (req, res) => {
         })
         //=============================================================
         files.forEach((file) => {
-          let source = `C:/Users/Administrator/Desktop/newMasterFSX/${server}/${OpCo}-${i}/${file}`
+          // let source = `//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles/MasterFSX/${server}/${OpCo}-${i}/${file}`
+          // let source = `C:/Users/Administrator/Desktop/MasterFSX/${server}/${OpCo}-${i}/${file}`
+          let source = `//ms212rdctx11/ROUTING/${OpCo}-${i}/${file}`
           let target = `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/${file}`
           fse.copy(source, target, (err) => {
             if (err) {
@@ -1002,13 +963,26 @@ app.post('/generateConfigFiles', (req, res) => {
                 let options = {
                   encoding: 'binary',
                   files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/RTRSETUP.DTA`,
-                  from: `obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER             `,
-                  to: `obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER             `,
+                  from: `isibld\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER                                       `,
+                  to: `na.sysco.net\\roadnet\\obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER             `,
+                  disableGlobs: true,
+                }
+                let options2 = {
+                  encoding: 'binary',
+                  files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/RTRSETUP.DTA`,
+                  from: ['ms212rdctx11', 'ms212rdctx11', 'ms212rdctx11'],
+                  to: `${server}`,
                   disableGlobs: true,
                 }
                 replace(options)
                   .then(() => {
-                    console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
+                    replace(options2)
+                      .then(() => {
+                        console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
+                      })
+                      .catch(() => {
+                        console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
+                      })
                   })
                   .catch((error) => {
                     console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
@@ -1018,13 +992,26 @@ app.post('/generateConfigFiles', (req, res) => {
                 let options = {
                   encoding: 'binary',
                   files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/OPTMENU.DTA`,
-                  from: `obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.exe               `,
-                  to: `obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.exe         `,
+                  from: `isibld\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN15PG.exe                                   `,
+                  to: `na.sysco.net\\roadnet\\obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN15PG.exe         `,
+                  disableGlobs: true,
+                }
+                let options2 = {
+                  encoding: 'binary',
+                  files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/OPTMENU.DTA`,
+                  from: `isibld\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.EXE                                   `,
+                  to: `na.sysco.net\\roadnet\\obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.exe         `,
                   disableGlobs: true,
                 }
                 replace(options)
                   .then(() => {
-                    console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
+                    replace(options2)
+                      .then(() => {
+                        console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
+                      })
+                      .catch((error) => {
+                        console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
+                      })
                   })
                   .catch((error) => {
                     console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
@@ -1114,3 +1101,430 @@ app.post('/generateTransferConfigFiles', (req, res) => {
 
   setTimeout(() => res.send({ filesGenerated, missingFiles }), 60000)
 })
+
+app.get('/superRoutingSolution', (req, res) => {
+  currentTime();
+  console.log('SuperRoutingSolution');
+
+  let OpCos =
+    [
+      // "078",
+      // "103",
+      // "141",
+      // "142",
+      // "224",
+      // "225",
+      "354",
+      // "4861",
+    ];
+  let queryErrors = [];
+  let months =
+    [
+      // '06',
+      // '07',
+      // '08',
+      '09'
+    ];
+  let days =
+    [
+      // '01', 
+      // '02', 
+      // '03', 
+      // '04', 
+      // '05', 
+      // '06', 
+      // '07', 
+      // '08', 
+      // '09', 
+      // '10', 
+      // '11', 
+      // '12', 
+      // '13', 
+      // '14', 
+      // '15', 
+      // '16', 
+      // '17', 
+      // '18', 
+      // '19', 
+      // '20', 
+      // '21', 
+      // '22', 
+      // '23', 
+      // '24', 
+      // '25', 
+      // '26', 
+      // '27', 
+      // '28', 
+      // '29', 
+      // '30', 
+      '31'
+    ]
+
+  exsql.connect()
+    .then((pool) => {
+      console.log('Successfully Connected to RS DB');
+      console.log('Fetching data for Routing Solution');
+
+      OpCos.forEach((OpCo) => {
+        // fs.mkdirSync(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Routes/${OpCo}`);
+        months.forEach((month) => {
+          days.forEach((day) => {
+            let sessionDay = `2019-${month}-${day}`;
+            //=============================================================
+            let exQuery =
+              `SELECT "RS_SESSION"."REGION_ID", "RS_SESSION"."SESSION_DATE", "RS_SESSION"."DESCRIPTION", "RS_STOP"."LOCATION_ID",` +
+              `"RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE1", "RS_ROUTE"."ROUTE_ID", "RS_ROUTE"."DESCRIPTION" AS 'ROUTE_DESCRIPTION', "RS_ROUTE"."LOCATION_ID_ORIGIN",` +
+              `"RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE2", "RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE3", "RS_ROUTE_EQUIPMENT"."EQUIPMENT_TYPE_ID",` +
+              `"RS_STOP"."SEQUENCE_NUMBER", "RS_STOP"."DISTANCE", "RS_ROUTE"."DISTANCE", "TS_LOCATION"."ADDR_LINE1", "TS_LOCATION"."ADDR_LINE2",` +
+              `"TS_LOCATION"."XADDR_LINE1", "TS_LOCATION"."REGION1", "TS_LOCATION"."REGION2", "TS_LOCATION"."REGION3", "TS_LOCATION"."POSTAL_CODE",` +
+              `"TS_LOCATION"."COUNTRY", "RS_ROUTE"."TRAVEL_TIME", "RS_ROUTE"."SERVICE_TIME", "RS_ORDER"."ORDER_NUMBER", "RS_ORDER"."SELECTOR",` +
+              `"RS_ORDER"."ORDER_TYPE", "RS_ORDER"."SIZE1", "RS_ORDER"."SIZE2", "RS_ORDER"."SIZE3", "RS_ORDER"."SIZE1_CAT1", "RS_ORDER"."SIZE2_CAT1",` +
+              `"RS_ORDER"."SIZE3_CAT1", "RS_ORDER"."SIZE1_CAT2", "RS_ORDER"."SIZE2_CAT2", "RS_ORDER"."SIZE3_CAT2", "RS_ORDER"."SIZE1_CAT3",` +
+              `"RS_ORDER"."SIZE2_CAT3", "RS_ORDER"."SIZE3_CAT3", "RS_ROUTE"."START_TIME", "RS_ROUTE"."PREROUTE_TIME", "RS_ROUTE"."POSTROUTE_TIME", "RS_ROUTE"."START_TIME",` +
+              `"RS_ROUTE"."DRIVER1_ID", "RS_ROUTE"."DRIVER2_ID", "RS_STOP"."LOCATION_TYPE", "RS_STOP"."STOP_TYPE", "RS_ROUTE"."LOCATION_ID_DESTINATION", "TS_LOCATION"."SERVICE_TIME_TYPE_ID", "TS_EQUIPMENT_TYPE"."SIZE1", "TS_EQUIPMENT_TYPE"."SIZE2", "TS_EQUIPMENT_TYPE"."SIZE3", "TS_LOCATION"."DESCRIPTION", "TS_LOCATION"."LONGITUDE", "TS_LOCATION"."LATITUDE", "TS_REGION"."USER_FIELD1", "RS_ROUTE_SUMMARY_VIEW"."STOP_SUM", "RS_STOP"."TRAVEL_TIME"` +
+              `FROM   {oj (("UPSLT"."TSDBA"."TS_LOCATION" "TS_LOCATION"` +
+              `INNER JOIN (((("UPSLT"."TSDBA"."TS_REGION" "TS_REGION"` +
+              `INNER JOIN "UPSLT"."TSDBA"."RS_SESSION" "RS_SESSION" ON "TS_REGION"."REGION_ID"="RS_SESSION"."REGION_ID")` +
+              `LEFT OUTER JOIN (("UPSLT"."TSDBA"."TS_EQUIPMENT_TYPE" "TS_EQUIPMENT_TYPE"` +
+              `INNER JOIN "UPSLT"."TSDBA"."RS_ROUTE_EQUIPMENT" "RS_ROUTE_EQUIPMENT"` +
+              `ON ("TS_EQUIPMENT_TYPE"."EQUIPMENT_TYPE_ID"="RS_ROUTE_EQUIPMENT"."EQUIPMENT_TYPE_ID")` +
+              `AND ("TS_EQUIPMENT_TYPE"."REGION_ID"="RS_ROUTE_EQUIPMENT"."EQUIPMENT_OWNER_ID"))` +
+              `INNER JOIN "UPSLT"."TSDBA"."RS_ROUTE" "RS_ROUTE" ON ("RS_ROUTE_EQUIPMENT"."ROUTE_PKEY"="RS_ROUTE"."PKEY")` +
+              `AND ("RS_ROUTE_EQUIPMENT"."RN_SESSION_PKEY"="RS_ROUTE"."RN_SESSION_PKEY")) ON "RS_SESSION"."PKEY"="RS_ROUTE"."RN_SESSION_PKEY")` +
+              `LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_STOP" "RS_STOP" ON ("RS_ROUTE"."RN_SESSION_PKEY"="RS_STOP"."RN_SESSION_PKEY")` +
+              `AND ("RS_ROUTE"."PKEY"="RS_STOP"."ROUTE_PKEY")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_ROUTE_SUMMARY_VIEW" "RS_ROUTE_SUMMARY_VIEW"` +
+              `ON ("RS_ROUTE"."RN_SESSION_PKEY"="RS_ROUTE_SUMMARY_VIEW"."RN_SESSION_PKEY") AND ("RS_ROUTE"."PKEY"="RS_ROUTE_SUMMARY_VIEW"."PKEY"))` +
+              `ON (("TS_LOCATION"."REGION_ID"="RS_STOP"."LOCATION_REGION_ID") AND ("TS_LOCATION"."TYPE"="RS_STOP"."LOCATION_TYPE")) AND ("TS_LOCATION"."ID"="RS_STOP"."LOCATION_ID")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_STOP_SUMMARY_VIEW" "RS_STOP_SUMMARY_VIEW" ON (("RS_STOP"."PKEY"="RS_STOP_SUMMARY_VIEW"."PKEY") AND ("RS_STOP"."RN_SESSION_PKEY"="RS_STOP_SUMMARY_VIEW"."RN_SESSION_PKEY")) AND ("RS_STOP"."ROUTE_PKEY"="RS_STOP_SUMMARY_VIEW"."ROUTE_PKEY")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_ORDER" "RS_ORDER" ON ("RS_STOP"."RN_SESSION_PKEY"="RS_ORDER"."RN_SESSION_PKEY") AND ("RS_STOP"."PKEY"="RS_ORDER"."STOP_PKEY")}` +
+              `WHERE  ("RS_SESSION"."DESCRIPTION" LIKE 'C' OR "RS_SESSION"."DESCRIPTION" LIKE 'C'` +
+              `OR "RS_SESSION"."DESCRIPTION" LIKE 'Integrator Imported' OR "RS_SESSION"."DESCRIPTION" LIKE 'INTEGRATOR IMPORTED')` +
+              `AND "RS_STOP"."SEQUENCE_NUMBER"<>-1 AND ("RS_SESSION"."SESSION_DATE">={ts '${sessionDay} 00:00:00'}` +
+              `AND "RS_SESSION"."SESSION_DATE"<{ts '${sessionDay} 00:00:01'}) AND "RS_SESSION"."REGION_ID"=${OpCo}` +
+              `ORDER BY "RS_SESSION"."SESSION_DATE", "RS_ROUTE"."ROUTE_ID", "RS_STOP"."SEQUENCE_NUMBER"`
+
+            let CSVstring = '';
+            pool.query(exQuery)
+              .then((result) => {
+                // console.log(result.recordset[0]);
+                result.recordset.forEach((item) => {
+                  // console.log(item['DESCRIPTION']);
+                  let timeObj = new Date(item['START_TIME'][0]);
+                  let startTime = `${('0' + timeObj.getHours()).slice(-2)}:${('0' + timeObj.getMinutes()).slice(-2)}`
+                  let startDate = `${(timeObj.getFullYear())}-${('0' + (timeObj.getMonth() + 1)).slice(-2)}-${('0' + timeObj.getDate()).slice(-2)}`
+
+                  CSVstring = CSVstring
+                    .concat(`${item['LOCATION_ID']}`.padEnd(10))                      //1
+                    .concat(`${item['ORDER_NUMBER']}`.padEnd(15))                     //2
+                    .concat(`${item['SIZE1'][0]}`.padEnd(10))                         //3
+                    .concat(`${item['SIZE1_CAT1']}`.padEnd(10))                       //4
+                    .concat(`${item['SIZE1_CAT2']}`.padEnd(10))                       //5
+                    .concat(`${item['SIZE1_CAT3']}`.padEnd(10))                       //6
+                    .concat(`${item['SIZE2'][0]}`.padEnd(10))                         //7
+                    .concat(`${item['SIZE2_CAT1']}`.padEnd(10))                       //8
+                    .concat(`${item['SIZE2_CAT2']}`.padEnd(10))                       //9
+                    .concat(`${item['SIZE2_CAT3']}`.padEnd(10))                       //10
+                    .concat(`${item['SIZE3'][0]}`.padEnd(10))                         //11
+                    .concat(`${item['SIZE3_CAT1']}`.padEnd(10))                       //12
+                    .concat(`${item['SIZE3_CAT2']}`.padEnd(10))                       //13
+                    .concat(`${item['SIZE3_CAT3']}`.padEnd(10))                       //14
+                    .concat(`${item['ROUTE_ID']}`.padEnd(15))                         //15
+                    .concat(`${item['DRIVER1_ID']}`.padEnd(15))                       //16
+                    .concat(`${item['DRIVER2_ID']}`.padEnd(15))                       //17
+                    .concat(`${item['EQUIPMENT_TYPE_ID']}`.padEnd(5))                 //18
+                    .concat(`${item['ROUTE_DESCRIPTION']}`.padEnd(30))                //19
+                    .concat(`${item['LOCATION_ID_ORIGIN']}`.padEnd(10))               //20
+                    .concat(`${item['LOCATION_ID_DESTINATION']}`.padEnd(10))          //21
+                    .concat(`${item['SEQUENCE_NUMBER']}`.padEnd(5))                   //22
+                    .concat(`${item['ORDER_TYPE']}`.padEnd(5))                        //23
+                    .concat(startDate.padEnd(15))                                     //24
+                    .concat(startTime.padEnd(15))                                     //25
+                    .concat(`\r\n`)
+                })
+                if (CSVstring !== '') {
+                  fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Routes/${OpCo}/2019-${month}-${day} - ${OpCo}RoutedSolution.txt`, CSVstring, (err, result) => {
+                    if (err) console.log('Error writing file');
+                    else {
+                      console.log(`File Written for ${sessionDay} : ${OpCo}`);
+                    }
+                  })
+                }
+                if (CSVstring === '') {
+                  console.log(`No Data for ${sessionDay} : ${OpCo}`);
+                }
+              })
+              .catch((err) => {
+                // console.log(`Error with Query 2019-${month}-${day} : ${OpCo}`);
+                console.log(err);
+                queryErrors.push(`2019-${month}-${day}-${OpCo}`)
+              })
+            //=============================================================
+          })
+        })
+      })
+    })
+  setTimeout(() => {
+    console.log('Ending Connection');
+    exsql.close();
+    res.send({ queryErrors })
+  }, 30000)
+})
+app.get('/retrieveAllStandardRoutes', (req, res) => {
+  let OpCos =
+    [
+      "078",
+      "103",
+      "141",
+      "142",
+      "224",
+      "225",
+      "354",
+      "4861",
+    ];
+
+  exsql.connect()
+    .then((pool) => {
+      console.log('Successfully Connected to RS DB');
+      console.log('Fetching data for Routing Solution');
+
+      OpCos.forEach((OpCo) => {
+        let query =
+          `SELECT DISTINCT "RS_STANDARD_ROUTE"."ROUTE_ID", "RS_STANDARD_ROUTE"."REGION_ID", "RS_STANDARD_ROUTE"."DESCRIPTION", "RS_STANDARD_ROUTE"."ORIGIN_LOCATION_ID", "RS_STANDARD_ROUTE"."START_TIME", "RS_STANDARD_ROUTE"."DRIVER1_ID", "RS_STANDARD_ROUTE"."EQUIPMENT_TYPE_ID", "RS_STANDARD_ROUTE"."STANDARD_DAYS", "RS_STANDARD_STOP"."SEQUENCE_NUMBER", "RS_STANDARD_STOP"."LOCATION_ID", "TS_LOCATION"."DESCRIPTION", "RS_STANDARD_ROUTE_SET"."SET_ID", "RS_STANDARD_ROUTE"."OVERRIDE", "RS_STANDARD_ROUTE"."DESTINATION_LOCATION_ID", "RS_STANDARD_ROUTE"."PREROUTE_TIME", "RS_STANDARD_ROUTE"."POSTROUTE_TIME", "RS_STANDARD_ROUTE"."DRIVER2_ID", "TS_LOCATION_TW_OVERRIDE"."DAYS", "TS_LOCATION_TW_OVERRIDE"."OPEN_TIME", "TS_LOCATION_TW_OVERRIDE"."CLOSE_TIME", "TS_LOCATION_TW_OVERRIDE"."TW1_OPEN_TIME", "TS_LOCATION_TW_OVERRIDE"."TW1_CLOSE_TIME", "TS_LOCATION_TW_OVERRIDE"."TW2_OPEN_TIME", "TS_LOCATION_TW_OVERRIDE"."TW2_CLOSE_TIME", "RS_STANDARD_ROUTE"."MODEL_ID", "TS_LOCATION"."ADDR_LINE1", "TS_LOCATION"."REGION1", "TS_LOCATION"."REGION3", "TS_LOCATION"."POSTAL_CODE"` +
+          `FROM   { oj(((("UPSLT"."TSDBA"."RS_STANDARD_ROUTE_SET" "RS_STANDARD_ROUTE_SET" INNER JOIN "UPSLT"."TSDBA"."RS_STANDARD_ROUTE_SET_DETAIL" "RS_STANDARD_ROUTE_SET_DETAIL" ON("RS_STANDARD_ROUTE_SET"."REGION_ID" = "RS_STANDARD_ROUTE_SET_DETAIL"."REGION_ID") AND("RS_STANDARD_ROUTE_SET"."SET_ID" = "RS_STANDARD_ROUTE_SET_DETAIL"."SET_ID")) INNER JOIN "UPSLT"."TSDBA"."RS_STANDARD_ROUTE" "RS_STANDARD_ROUTE" ON("RS_STANDARD_ROUTE_SET_DETAIL"."REGION_ID" = "RS_STANDARD_ROUTE"."REGION_ID") AND("RS_STANDARD_ROUTE_SET_DETAIL"."ROUTE_ID" = "RS_STANDARD_ROUTE"."ROUTE_ID")) INNER JOIN "UPSLT"."TSDBA"."RS_STANDARD_STOP" "RS_STANDARD_STOP" ON(("RS_STANDARD_ROUTE"."ROUTE_ID" = "RS_STANDARD_STOP"."ROUTE_ID") AND("RS_STANDARD_ROUTE"."OVERRIDE" = "RS_STANDARD_STOP"."OVERRIDE")) AND("RS_STANDARD_ROUTE"."REGION_ID" = "RS_STANDARD_STOP"."REGION_ID")) INNER JOIN "UPSLT"."TSDBA"."TS_LOCATION" "TS_LOCATION" ON(("RS_STANDARD_STOP"."REGION_ID" = "TS_LOCATION"."REGION_ID") AND("RS_STANDARD_STOP"."LOCATION_ID" = "TS_LOCATION"."ID")) AND("RS_STANDARD_STOP"."LOCATION_TYPE" = "TS_LOCATION"."TYPE")) LEFT OUTER JOIN "UPSLT"."TSDBA"."TS_LOCATION_TW_OVERRIDE" "TS_LOCATION_TW_OVERRIDE" ON(("TS_LOCATION"."REGION_ID" = "TS_LOCATION_TW_OVERRIDE"."REGION_ID") AND("TS_LOCATION"."TYPE" = "TS_LOCATION_TW_OVERRIDE"."TYPE")) AND("TS_LOCATION"."ID" = "TS_LOCATION_TW_OVERRIDE"."ID")}` +
+          `WHERE  "RS_STANDARD_ROUTE"."OVERRIDE" <> 1 AND "RS_STANDARD_STOP"."SEQUENCE_NUMBER" <> -1 AND "RS_STANDARD_ROUTE"."REGION_ID" = ${OpCo}` +
+          // `WHERE  "RS_STANDARD_ROUTE"."OVERRIDE" <> 1 AND "RS_STANDARD_ROUTE"."REGION_ID" = ${OpCo}` +
+          `ORDER BY "RS_STANDARD_ROUTE_SET"."SET_ID", "RS_STANDARD_ROUTE"."ROUTE_ID", "RS_STANDARD_STOP"."SEQUENCE_NUMBER"`
+
+        let resultString = '';
+        let counter = "00000";
+        pool.query(query)
+          .then((result) => {
+            result.recordset.forEach((record) => {
+              counter++;
+
+              let startTimeObj = new Date(record['START_TIME']);
+              let startTime = `${('0' + startTimeObj.getUTCHours()).slice(-2)}:${('0' + startTimeObj.getUTCMinutes()).slice(-2)}`
+
+              resultString = resultString
+                .concat(`${record['REGION_ID']}`.padEnd(5))         //Region ID
+                .concat(`${record['ROUTE_ID']}`.padEnd(40))         //Route ID
+                .concat(`${record['DESCRIPTION'][0]}`.padEnd(40))   //Description
+                .concat(`${record['ORIGIN_LOCATION_ID']}`.padEnd(5))//Origin Location ID
+                .concat(`${record['DESTINATION_LOCATION_ID']}`.padEnd(5))//Destination Location ID
+                .concat(`${record['MODEL_ID']}`.padEnd(20))  //Model ID
+                .concat(`${startTime}`.padEnd(7))  //Start Time
+                .concat(`00:${("0" + (record['PREROUTE_TIME'] / 60)).slice(-2)}`.padEnd(7))  //Pre-Route Time
+                .concat(`00:${("0" + (record['POSTROUTE_TIME'] / 60)).slice(-2)}`.padEnd(7)) // Post-Route Time
+                .concat(`${record['DRIVER1_ID']}`.padEnd(20)) //Driver1 ID
+                .concat(`${record['EQUIPMENT_TYPE_ID']}`.padEnd(12)) //Equipment ID
+                .concat(`${record['SEQUENCE_NUMBER']}`.padEnd(5))
+                .concat(`${record['LOCATION_ID']}`.padEnd(20)) //Location ID
+                .concat(`${record['SET_ID']}`.padEnd(30))  //Set ID
+                .concat(`${record['OVERRIDE']}`.padEnd(10)) //Override
+                .concat(`${('00000' + counter).slice(-5)}`) //Order
+                .concat(`\r\n`)
+            })
+
+            fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Standard Routes/${OpCo}-Standard Routes.txt`, resultString, (err, result) => {
+              if (err) console.log('Error writing file');
+              else {
+                console.log(`File written for ${OpCo}`);
+              }
+            })
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+      })
+    })
+  setTimeout(() => {
+    console.log('EndingConnection');
+    exsql.close();
+    res.send({});
+  }, 3000);
+});
+app.get('/retrieveAllLocationTables', (req, res) => {
+  let OpCos =
+    [
+      "078",
+      "103",
+      "141",
+      "142",
+      "224",
+      "225",
+      "354",
+      "4861",
+    ];
+  exsql.connect()
+    .then((pool) => {
+      OpCos.forEach((OpCo) => {
+        let query =
+          `SELECT "TS_LOCATION"."REGION_ID", "TS_LOCATION"."TYPE", "TS_LOCATION"."ID", "TS_LOCATION"."ADDR_LINE1", "TS_LOCATION"."ADDR_LINE2", "TS_LOCATION"."XADDR_LINE1", "TS_LOCATION"."REGION1", "TS_LOCATION"."REGION2", "TS_LOCATION"."REGION3", "TS_LOCATION"."POSTAL_CODE", "TS_LOCATION"."COUNTRY", "TS_LOCATION"."LONGITUDE", "TS_LOCATION"."LATITUDE", "TS_LOCATION"."DELIVERY_DAYS", "TS_LOCATION"."PHONE_NUMBER", "TS_LOCATION"."FAX_NUMBER", "TS_LOCATION"."ACCOUNT_TYPE_ID", "TS_LOCATION"."SERVICE_TIME_TYPE_ID", "TS_LOCATION"."TIME_WINDOW_TYPE_ID", "TS_LOCATION"."ZONE_ID", "TS_LOCATION"."PRIORITY", "TS_LOCATION"."BULK_THRESHOLD_SIZE1", "TS_LOCATION"."BULK_THRESHOLD_SIZE2", "TS_LOCATION"."BULK_THRESHOLD_SIZE3", "TS_LOCATION"."COLOR", "TS_LOCATION"."USER_FIELD1", "TS_LOCATION"."USER_FIELD2", "TS_LOCATION"."USER_FIELD3", "TS_LOCATION"."DATE_ADDED", "TS_LOCATION"."DESCRIPTION", "TS_LOCATION"."LOCQUALITY", "TS_LOCATION"."TIME_WINDOW_FACTOR", "TS_LOCATION"."STORE_NUMBER", "TS_LOCATION"."CONTACT", "TS_LOCATION"."ALTERNATE_CONTACT", "TS_LOCATION"."SF_NOTIFY", "TS_LOCATION"."SF_NOTIFY_TYPE", "TS_LOCATION"."SF_CONTACT", "TS_LOCATION"."SF_NOTIFY_MINUTES", "TS_LOCATION"."TIMEZONE", "TS_LOCATION"."FIXED_FEE", "TS_LOCATION"."VARIABLE_FEE", "TS_LOCATION"."PREFERRED_ROUTE_ID", "TS_LOCATION"."USER_MODIFIED", "TS_LOCATION"."DATE_MODIFIED", "TS_LOCATION"."READ_ONLY", "TS_LOCATION"."BUILDING_DELIVERY_SEQUENCE", "TS_LOCATION"."DELIVERY_RADIUS", "TS_LOCATION"."LAST_ORDER_DATE", "TS_LOCATION"."URL", "TS_EMPLOYEE_LOCATION"."EMPLOYEE_ID", "TS_LOCATION_TW_OVERRIDE"."DAYS", "TS_LOCATION_TW_OVERRIDE"."OPEN_TIME", "TS_LOCATION_TW_OVERRIDE"."CLOSE_TIME", "TS_LOCATION_TW_OVERRIDE"."TW1_OPEN_TIME", "TS_LOCATION_TW_OVERRIDE"."TW1_CLOSE_TIME", "TS_LOCATION_TW_OVERRIDE"."TW2_OPEN_TIME", "TS_LOCATION_TW_OVERRIDE"."TW2_CLOSE_TIME", "TS_LOCATION_EQUIPMENT_TYPE"."EQUIPMENT_TYPE_ID", "TS_LOCATION"."STANDARD_INSTRUCTIONS"` +
+          `FROM   {oj (("UPSLT"."TSDBA"."TS_LOCATION" "TS_LOCATION" LEFT OUTER JOIN "UPSLT"."TSDBA"."TS_EMPLOYEE_LOCATION" "TS_EMPLOYEE_LOCATION" ON (("TS_LOCATION"."REGION_ID"="TS_EMPLOYEE_LOCATION"."LOCATION_REGION_ID") AND ("TS_LOCATION"."TYPE"="TS_EMPLOYEE_LOCATION"."LOCATION_TYPE")) AND ("TS_LOCATION"."ID"="TS_EMPLOYEE_LOCATION"."LOCATION_ID")) LEFT OUTER JOIN "UPSLT"."TSDBA"."TS_LOCATION_TW_OVERRIDE" "TS_LOCATION_TW_OVERRIDE" ON (("TS_LOCATION"."REGION_ID"="TS_LOCATION_TW_OVERRIDE"."REGION_ID") AND ("TS_LOCATION"."TYPE"="TS_LOCATION_TW_OVERRIDE"."TYPE")) AND ("TS_LOCATION"."ID"="TS_LOCATION_TW_OVERRIDE"."ID")) LEFT OUTER JOIN "UPSLT"."TSDBA"."TS_LOCATION_EQUIPMENT_TYPE" "TS_LOCATION_EQUIPMENT_TYPE" ON (("TS_LOCATION"."REGION_ID"="TS_LOCATION_EQUIPMENT_TYPE"."REGION_ID") AND ("TS_LOCATION"."TYPE"="TS_LOCATION_EQUIPMENT_TYPE"."LOCATION_TYPE")) AND ("TS_LOCATION"."ID"="TS_LOCATION_EQUIPMENT_TYPE"."LOCATION_ID")}` +
+          `WHERE  "TS_LOCATION"."REGION_ID"='${OpCo}'`
+
+        let resultString = '';
+        let resultString2 = '';
+        pool.query(query)
+          .then((result) => {
+            // console.log(result.recordset[0]);
+            result.recordset.forEach((record) => {
+
+              let openTimeObj = new Date(record['OPEN_TIME']);
+              let openTime = `${('0' + openTimeObj.getUTCHours()).slice(-2)}:${('0' + openTimeObj.getUTCMinutes()).slice(-2)}`
+              let closeTimeObj = new Date(record['CLOSE_TIME']);
+              let closeTime = `${('0' + closeTimeObj.getUTCHours()).slice(-2)}:${('0' + closeTimeObj.getUTCMinutes()).slice(-2)}`
+              let tw1OpenTimeObj = new Date(record['TW1_OPEN_TIME']);
+              let tw1OpenTime = `${('0' + tw1OpenTimeObj.getUTCHours()).slice(-2)}:${('0' + tw1OpenTimeObj.getUTCMinutes()).slice(-2)}`
+              let tw1CloseTimeObj = new Date(record['TW1_CLOSE_TIME']);
+              let tw1CloseTime = `${('0' + tw1CloseTimeObj.getUTCHours()).slice(-2)}:${('0' + tw1CloseTimeObj.getUTCMinutes()).slice(-2)}`
+              let tw2OpenTimeObj = new Date(record['TW2_OPEN_TIME']);
+              let tw2OpenTime = `${('0' + tw2OpenTimeObj.getUTCHours()).slice(-2)}:${('0' + tw2OpenTimeObj.getUTCMinutes()).slice(-2)}`
+              let tw2CloseTimeObj = new Date(record['TW2_CLOSE_TIME']);
+              let tw2CloseTime = `${('0' + tw2CloseTimeObj.getUTCHours()).slice(-2)}:${('0' + tw2CloseTimeObj.getUTCMinutes()).slice(-2)}`
+
+              resultString = resultString
+                .concat(`${record['TYPE']}`.padEnd(5)) //type
+                .concat(`${record['REGION_ID']}`.padEnd(5)) //ID
+                .concat(`${record['ID']}`.padEnd(15)) //Location ID
+                .concat(`${record['ADDR_LINE1']}`.padEnd(50)) //Address_Line 1
+                .concat(`${record['ADDR_LINE2']}`.padEnd(50)) //Address Line 2
+                .concat(`${record['XADDR_LINE1']}`.padEnd(40)) //Cross Address
+                .concat(`${record['REGION1']}`.padEnd(20)) //Region1
+                .concat(`${record['REGION2']}`.padEnd(20)) //Region2
+                .concat(`${record['REGION3']}`.padEnd(5)) //Region3
+                .concat(`${record['POSTAL_CODE']}`.padEnd(11)) //Postal Code
+                .concat(`${record['LONGITUDE']}`.padEnd(12)) //Longitude
+                .concat(`${record['LATITUDE']}`.padEnd(11)) //Latitude
+                .concat(`${record['DESCRIPTION']}`.padEnd(150)) //Description
+                // .concat('\r\n');
+                // resultString2 = resultString2
+                // .concat(`${record['TYPE']}`.padEnd(5)) //type
+                // .concat(`${record['REGION_ID']}`.padEnd(5)) //Location ID
+                // .concat(`${record['ID']}`.padEnd(15)) //ID
+                .concat(`${record['DELIVERY_DAYS']}`.padEnd(8)) //Delivery Days
+                .concat(`${record['PHONE_NUMBER']}`.padEnd(40)) //Phone Number
+                .concat(`${record['ACCOUNT_TYPE_ID']}`.padEnd(3)) //ACC
+                .concat(`${record['SERVICE_TIME_TYPE_ID']}`.padEnd(5)) //Service
+                .concat(`${record['ZONE_ID']}`.padEnd(40)) //Zone ID
+                .concat(`${record['PRIORITY']}`.padEnd(30)) //Priority
+                .concat(`${record['DELIVERY_RADIUS']}`.slice(0, 3).padEnd(4)) //Delivery Radius
+                .concat(`${openTime}`.padEnd(7)) //Open Time
+                .concat(`${closeTime}`.padEnd(7)) //Close Time
+                .concat(`${record['DAYS']}`.padEnd(10)) //Days
+                .concat(`${tw1OpenTime}`.padEnd(7)) //TW1 open
+                .concat(`${tw1CloseTime}`.padEnd(7)) //TW1 close
+                .concat(`${tw2OpenTime}`.padEnd(7)) //TW2 open
+                .concat(`${tw2CloseTime}`.padEnd(7)) //TW2 close
+                .concat(`${record['STANDARD_INSTRUCTIONS']}`.padEnd()) //Standard_Instructions
+                .concat('\r\n');
+
+            })
+            fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Locations/${OpCo}-Locations.txt`, resultString, (err, result) => {
+              if (err) console.log('Error writing file');
+              else {
+                console.log(`File written for ${OpCo}`);
+              }
+            })
+            // fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Locations/${OpCo}-Locations2.txt`, resultString2, (err, result) => {
+            //   if (err) console.log('Error writing file');
+            //   else {
+            //     console.log(`File written for ${OpCo}`);
+            //   }
+            // })
+          })
+          .catch((error) => {
+            console.log("Query Failure");
+          })
+      })
+    })
+  setTimeout(() => {
+    console.log('EndingConnection');
+    exsql.close();
+    res.send({})
+  }, 3000)
+});
+app.get('/retrieveAllServiceTimes', (req, res) => {
+  let OpCos =
+    [
+      "078",
+      "103",
+      "141",
+      "142",
+      "224",
+      "225",
+      "354",
+      "4861",
+    ];
+
+  exsql.connect()
+    .then((pool) => {
+      OpCos.forEach((OpCo) => {
+        let query =
+          `SELECT "TS_LOCATION"."REGION_ID", "TS_LOCATION"."TYPE", "TS_LOCATION"."ID", "TS_LOCATION"."DESCRIPTION", "TS_LOCATION_ST_OVERRIDE"."SCENARIO", "TS_LOCATION_ST_OVERRIDE"."DAYS", "TS_LOCATION_ST_OVERRIDE"."NH_FIXED", "TS_LOCATION_ST_OVERRIDE"."NH_VARIABLE", "TS_LOCATION_ST_OVERRIDE"."H_FIXED", "TS_LOCATION_ST_OVERRIDE"."H_VARIABLE", "TS_LOCATION_ST_OVERRIDE"."B_NH_FIXED", "TS_LOCATION_ST_OVERRIDE"."B_NH_VARIABLE", "TS_LOCATION_ST_OVERRIDE"."B_H_FIXED", "TS_LOCATION_ST_OVERRIDE"."B_H_VARIABLE", "TS_LOCATION_ST_OVERRIDE"."USER_MODIFIED", "TS_LOCATION_ST_OVERRIDE"."DATE_MODIFIED", "TS_SERVICE_TIME_TYPE"."CODE", "TS_SERVICE_TIME_TYPE"."DESCRIPTION", "TS_SERVICE_TIME_TYPE_DETAIL"."NH_FIXED", "TS_SERVICE_TIME_TYPE_DETAIL"."NH_VARIABLE"` +
+          `FROM   {oj (("UPSLT"."TSDBA"."TS_SERVICE_TIME_TYPE_DETAIL" "TS_SERVICE_TIME_TYPE_DETAIL" INNER JOIN "UPSLT"."TSDBA"."TS_SERVICE_TIME_TYPE" "TS_SERVICE_TIME_TYPE" ON ("TS_SERVICE_TIME_TYPE_DETAIL"."CODE"="TS_SERVICE_TIME_TYPE"."CODE") AND ("TS_SERVICE_TIME_TYPE_DETAIL"."REGION_ID"="TS_SERVICE_TIME_TYPE"."REGION_ID")) LEFT OUTER JOIN "UPSLT"."TSDBA"."TS_LOCATION" "TS_LOCATION" ON ("TS_SERVICE_TIME_TYPE"."REGION_ID"="TS_LOCATION"."REGION_ID") AND ("TS_SERVICE_TIME_TYPE"."CODE"="TS_LOCATION"."SERVICE_TIME_TYPE_ID")) LEFT OUTER JOIN "UPSLT"."TSDBA"."TS_LOCATION_ST_OVERRIDE" "TS_LOCATION_ST_OVERRIDE" ON (("TS_LOCATION"."REGION_ID"="TS_LOCATION_ST_OVERRIDE"."REGION_ID") AND ("TS_LOCATION"."TYPE"="TS_LOCATION_ST_OVERRIDE"."TYPE")) AND ("TS_LOCATION"."ID"="TS_LOCATION_ST_OVERRIDE"."ID")}` +
+          `WHERE  "TS_LOCATION"."REGION_ID"='${OpCo}'`
+
+        let resultString = '';
+        pool.query(query)
+          .then((result) => {
+            result.recordset.forEach((record) => {
+
+              resultString = resultString
+                .concat(`${record['REGION_ID']}`.padEnd(5)) //region ID
+                .concat(`${record['TYPE']}`.padEnd(5)) //type
+                .concat(`${record['ID']}`.padEnd(30)) //ID
+                .concat(`${record['DAYS']}`.padEnd(10)) //Days
+                .concat(`${record['NH_FIXED']}`.padEnd(20)) //NH_Fixed
+                .concat(`${record['NH_VARIABLE']}`.padEnd(20)) //NH_Variable
+                .concat(`${record['H_FIXED']}`.padEnd(20)) //H Fixed
+                .concat(`${record['H_VARIABLE']}`.padEnd(20)) //H Variable
+                .concat(`${record['B_NH_FIXED']}`.padEnd(20)) //B NH Fixed
+                .concat(`${record['B_NH_VARIABLE']}`.padEnd(20)) //B NH Variable
+                .concat(`${record['B_H_FIXED']}`.padEnd(20)) //B H Fixed
+                .concat(`${record['B_H_VARIABLE']}`.padEnd(20)) //B H Variable
+                .concat('\r\n')
+            })
+            fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Service Time Overrides/${OpCo}-Service Times.prn`, resultString, (err, result) => {
+              if (err) console.log('Error writing file');
+              else {
+                console.log(`File written for ${OpCo}`);
+
+              }
+            })
+          })
+      })
+    })
+  setTimeout(() => {
+    console.log('EndingConnection');
+    exsql.close();
+    res.send({})
+  }, 3000)
+});
+
+// `SELECT "RS_SESSION"."REGION_ID", "RS_SESSION"."SESSION_DATE", "RS_SESSION"."DESCRIPTION", "RS_STOP"."LOCATION_ID",` +
+// `"RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE1", "RS_ROUTE"."ROUTE_ID", "RS_ROUTE"."DESCRIPTION" AS 'ROUTE_DESCRIPTION', "RS_ROUTE"."LOCATION_ID_ORIGIN",` +
+// `"RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE2", "RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE3", "RS_ROUTE_EQUIPMENT"."EQUIPMENT_TYPE_ID",` +
+// `"RS_STOP"."SEQUENCE_NUMBER", "RS_STOP"."DISTANCE", "RS_ROUTE"."DISTANCE", "TS_LOCATION"."ADDR_LINE1", "TS_LOCATION"."ADDR_LINE2",` +
+// `"TS_LOCATION"."XADDR_LINE1", "TS_LOCATION"."REGION1", "TS_LOCATION"."REGION2", "TS_LOCATION"."REGION3", "TS_LOCATION"."POSTAL_CODE",` +
+// `"TS_LOCATION"."COUNTRY", "RS_ROUTE"."TRAVEL_TIME", "RS_ROUTE"."SERVICE_TIME", "RS_ORDER"."ORDER_NUMBER", "RS_ORDER"."SELECTOR",` +
+// `"RS_ORDER"."ORDER_TYPE", "RS_ORDER"."SIZE1", "RS_ORDER"."SIZE2", "RS_ORDER"."SIZE3", "RS_ORDER"."SIZE1_CAT1", "RS_ORDER"."SIZE2_CAT1",` +
+// `"RS_ORDER"."SIZE3_CAT1", "RS_ORDER"."SIZE1_CAT2", "RS_ORDER"."SIZE2_CAT2", "RS_ORDER"."SIZE3_CAT2", "RS_ORDER"."SIZE1_CAT3",` +
+// `"RS_ORDER"."SIZE2_CAT3", "RS_ORDER"."SIZE3_CAT3", "RS_ROUTE"."START_TIME", "RS_ROUTE"."PREROUTE_TIME", "RS_ROUTE"."POSTROUTE_TIME", "RS_ROUTE"."START_TIME",` +
+// `"RS_ROUTE"."DRIVER1_ID", "RS_ROUTE"."DRIVER2_ID", "RS_STOP"."LOCATION_TYPE", "RS_STOP"."STOP_TYPE", "RS_ROUTE"."LOCATION_ID_DESTINATION", "TS_LOCATION"."SERVICE_TIME_TYPE_ID", "TS_EQUIPMENT_TYPE"."SIZE1", "TS_EQUIPMENT_TYPE"."SIZE2", "TS_EQUIPMENT_TYPE"."SIZE3", "TS_LOCATION"."DESCRIPTION", "TS_LOCATION"."LONGITUDE", "TS_LOCATION"."LATITUDE", "TS_REGION"."USER_FIELD1", "RS_ROUTE_SUMMARY_VIEW"."STOP_SUM", "RS_STOP"."TRAVEL_TIME"` +
+// `FROM   {oj (("UPSLT"."TSDBA"."TS_LOCATION" "TS_LOCATION"` +
+// `INNER JOIN (((("UPSLT"."TSDBA"."TS_REGION" "TS_REGION"` +
+// `INNER JOIN "UPSLT"."TSDBA"."RS_SESSION" "RS_SESSION" ON "TS_REGION"."REGION_ID"="RS_SESSION"."REGION_ID")` +
+// `LEFT OUTER JOIN (("UPSLT"."TSDBA"."TS_EQUIPMENT_TYPE" "TS_EQUIPMENT_TYPE"` +
+// `INNER JOIN "UPSLT"."TSDBA"."RS_ROUTE_EQUIPMENT" "RS_ROUTE_EQUIPMENT"` +
+// `ON ("TS_EQUIPMENT_TYPE"."EQUIPMENT_TYPE_ID"="RS_ROUTE_EQUIPMENT"."EQUIPMENT_TYPE_ID")` +
+// `AND ("TS_EQUIPMENT_TYPE"."REGION_ID"="RS_ROUTE_EQUIPMENT"."EQUIPMENT_OWNER_ID"))` +
+// `INNER JOIN "UPSLT"."TSDBA"."RS_ROUTE" "RS_ROUTE" ON ("RS_ROUTE_EQUIPMENT"."ROUTE_PKEY"="RS_ROUTE"."PKEY")` +
+// `AND ("RS_ROUTE_EQUIPMENT"."RN_SESSION_PKEY"="RS_ROUTE"."RN_SESSION_PKEY")) ON "RS_SESSION"."PKEY"="RS_ROUTE"."RN_SESSION_PKEY")` +
+// `LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_STOP" "RS_STOP" ON ("RS_ROUTE"."RN_SESSION_PKEY"="RS_STOP"."RN_SESSION_PKEY")` +
+// `AND ("RS_ROUTE"."PKEY"="RS_STOP"."ROUTE_PKEY")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_ROUTE_SUMMARY_VIEW" "RS_ROUTE_SUMMARY_VIEW"` +
+// `ON ("RS_ROUTE"."RN_SESSION_PKEY"="RS_ROUTE_SUMMARY_VIEW"."RN_SESSION_PKEY") AND ("RS_ROUTE"."PKEY"="RS_ROUTE_SUMMARY_VIEW"."PKEY"))` +
+// `ON (("TS_LOCATION"."REGION_ID"="RS_STOP"."LOCATION_REGION_ID") AND ("TS_LOCATION"."TYPE"="RS_STOP"."LOCATION_TYPE")) AND ("TS_LOCATION"."ID"="RS_STOP"."LOCATION_ID")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_STOP_SUMMARY_VIEW" "RS_STOP_SUMMARY_VIEW" ON (("RS_STOP"."PKEY"="RS_STOP_SUMMARY_VIEW"."PKEY") AND ("RS_STOP"."RN_SESSION_PKEY"="RS_STOP_SUMMARY_VIEW"."RN_SESSION_PKEY")) AND ("RS_STOP"."ROUTE_PKEY"="RS_STOP_SUMMARY_VIEW"."ROUTE_PKEY")) LEFT OUTER JOIN "UPSLT"."TSDBA"."RS_ORDER" "RS_ORDER" ON ("RS_STOP"."RN_SESSION_PKEY"="RS_ORDER"."RN_SESSION_PKEY") AND ("RS_STOP"."PKEY"="RS_ORDER"."STOP_PKEY")}` +
+// `WHERE  ("RS_SESSION"."DESCRIPTION" LIKE 'Delivery' OR "RS_SESSION"."DESCRIPTION" LIKE 'DELIVERY'` +
+// `OR "RS_SESSION"."DESCRIPTION" LIKE 'Integrator Imported' OR "RS_SESSION"."DESCRIPTION" LIKE 'INTEGRATOR IMPORTED')` +
+// `AND "RS_STOP"."SEQUENCE_NUMBER"<>-1 AND ("RS_SESSION"."SESSION_DATE">={ts '${sessionDay} 00:00:00'}` +
+// `AND "RS_SESSION"."SESSION_DATE"<{ts '${sessionDay} 00:00:01'}) AND "RS_SESSION"."REGION_ID"=${OpCo}` +
+// `ORDER BY "RS_SESSION"."SESSION_DATE", "RS_ROUTE"."ROUTE_ID", "RS_STOP"."SEQUENCE_NUMBER"`

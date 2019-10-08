@@ -119,6 +119,7 @@ class App extends React.Component {
         { num: "338", name: "South Western Ontario", OpCoName: 'SOUTH WESTERN ONTARIO', timezone: "Eastern Daylight Time" },
         { num: "348", name: "Sygma Fort Worth", OpCoName: 'SYGMA FORT WORTH', timezone: "Central Daylight Time" },
         { num: "429", name: "Doerle Foods", OpCoName: 'DOERLE FOODS', timezone: "Central Daylight Time" },
+        { num: "450", name: "Alaska", OpCoName: "Alaska", timezone: "Pacific Time "}
       ],
       file: [],
       drawer: false,
@@ -365,7 +366,7 @@ class App extends React.Component {
                   >
                     <h5
                       style={{
-                        color: '#2F8FD9',
+                        color: 'black',
                         fontSize: 14
                       }}
                     >
@@ -375,7 +376,7 @@ class App extends React.Component {
                     </h5>
                     <h5
                       style={{
-                        color: '#4F8FD9',
+                        color: 'black',
                         fontSize: 14
                       }}
                     >

@@ -13,16 +13,19 @@ class Home extends React.Component {
         {
           'Onshore': [
             { name: 'Geoffrey Bray', number: '281-615-6013' },
-            { name: 'Roy Mammen', number: '' },
+            { name: 'Roy Mammen', number: '713-875-3538' },
             { name: 'Ranuka Subramanian', number: '720-442-2495' },
             { name: 'Calvin Chui', number: '832-524-2731' },
-            { name: 'Jose Suyambu', number: '832-696-4412' },
+            { name: '**JOSE SUYAMBU**', number: '832-696-4412' },
+            { name: 'Prasad Chalumuri', number: '614-804-2798'}
           ]
         },
         {
           'Offshore': [
             { name: 'Thella Ramya', number: '91-99866-97599' },
             { name: 'Mubeena Begum', number: '91-99416-49405' },
+            { name: 'Sam Daniels', number: '91-96883-12713'},
+            { name: 'Jebaraj Baskaran', number: '91-99523-02471'},
           ]
         },
         {
@@ -52,7 +55,7 @@ class Home extends React.Component {
             { name: 'Ravindrareddy Madireddy', number: '972-589-7877' },
             { name: 'Rakesh Sivan', number: '91-98858-33025' },
           ]
-        }
+        },
       ],
 
     };
