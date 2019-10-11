@@ -908,15 +908,17 @@ let rsjob = schedule.scheduleJob(rsRule, () => {
 })
 //=============================================================
 app.post('/generateConfigFiles', (req, res) => {
+  currentTime();
+
   let files = [
     'LOCKOUT.TMP',
     'CONFIG.TMP',
-    'OPTMENU.DTA',
-    'RTRSETUP.DTA'
+    // 'OPTMENU.DTA',
+    // 'RTRSETUP.DTA'
   ];
-  // let newCopyFilePath = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles'
-  let newCopyFilePath = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles/'
-  let master = 'MasterFSX - 450'
+  let newCopyFilePath = '//C:/Users/Administrator/Desktop/'
+  // let newCopyFilePath = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles/'
+  let master = 'MasterFSX'
   let awsServers = [
     'ms238rdctxo1',
     'ms238rdctxo2',
@@ -927,8 +929,8 @@ app.post('/generateConfigFiles', (req, res) => {
     // 'ms238rdctxo1d'
   ];
   let OpCos = [
-    // "001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "022", "023", "024", "025", "026", "027", "029", "031", "032", "035", "036", "037", "038", "039", "040", "043", "045", "046", "047", "048", "049", "050", "051", "052", "054", "055", "056", "057", "058", "059", "060", "061", "064", "066", "067", "068", "073", "075", "076", "078", "101", "102", "137", "163", "164", "194", "195", "288", "293", "306", "320", "332", "335", 
-    // "429",
+    "001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "022", "023", "024", "025", "026", "027", "029", "031", "032", "035", "036", "037", "038", "039", "040", "043", "045", "046", "047", "048", "049", "050", "051", "052", "054", "055", "056", "057", "058", "059", "060", "061", "064", "066", "067", "068", "073", "075", "076", "078", "101", "102", "137", "163", "164", "194", "195", "288", "293", "306", "320", "332", "335", 
+    "429",
     "450"
   ];
   let folders = ['CUSTDL', 'RTRDL', 'RTRUL'];
@@ -936,90 +938,90 @@ app.post('/generateConfigFiles', (req, res) => {
   let filesGenerated = [];
   let missingFiles = [];
 
-  fs.mkdirSync(`${newCopyFilePath}/${master}`)
+  // fs.mkdirSync(`${newCopyFilePath}/${master}`)
 
   awsServers.forEach((server) => {
-    fs.mkdirSync(`${newCopyFilePath}/${master}/${server}`)
+    // fs.mkdirSync(`${newCopyFilePath}/${master}/${server}`)
     console.log(`Created ${server}`);
     OpCos.forEach((OpCo) => {
       for (let i = 1; i <= 5; i++) {
-        fs.mkdirSync(`${newCopyFilePath}/${master}/${server}/${OpCo}-${i}`)
+        // fs.mkdirSync(`${newCopyFilePath}/${master}/${server}/${OpCo}-${i}`)
         console.log(`Created ${server}/${OpCo}-${i}`);
-        folders.forEach((folder) => {
-          fs.mkdir(`${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/${folder}`, (err) => {
-            if (err) console.log(err);
-          })
-          console.log(`Created ${server}/${OpCo}-${i}/${folder}`);
-        })
+        // folders.forEach((folder) => {
+        //   fs.mkdir(`${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/${folder}`, (err) => {
+        //     if (err) console.log(err);
+        //   })
+        //   console.log(`Created ${server}/${OpCo}-${i}/${folder}`);
+        // })
         //=============================================================
         files.forEach((file) => {
           // let source = `//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles/MasterFSX/${server}/${OpCo}-${i}/${file}`
           // let source = `C:/Users/Administrator/Desktop/MasterFSX/${server}/${OpCo}-${i}/${file}`
-          let source = `//ms212rdctx11/ROUTING/${OpCo}-${i}/${file}`
+          let source = `//ms238rdctxo1/ROUTING/${OpCo}-${i}/${file}`
           let target = `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/${file}`
           fse.copy(source, target, (err) => {
             if (err) {
               missingFiles.push(`${file} in ${OpCo}-${i} in ${server}`)
             }
             else {
-              if (file === 'RTRSETUP.DTA') {
-                let options = {
-                  encoding: 'binary',
-                  files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/RTRSETUP.DTA`,
-                  from: `isibld\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER                                       `,
-                  to: `na.sysco.net\\roadnet\\obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER             `,
-                  disableGlobs: true,
-                }
-                let options2 = {
-                  encoding: 'binary',
-                  files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/RTRSETUP.DTA`,
-                  from: ['ms212rdctx11', 'ms212rdctx11', 'ms212rdctx11'],
-                  to: `${server}`,
-                  disableGlobs: true,
-                }
-                replace(options)
-                  .then(() => {
-                    replace(options2)
-                      .then(() => {
-                        console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
-                      })
-                      .catch(() => {
-                        console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
-                      })
-                  })
-                  .catch((error) => {
-                    console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
-                  })
-              }
-              if (file === 'OPTMENU.DTA') {
-                let options = {
-                  encoding: 'binary',
-                  files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/OPTMENU.DTA`,
-                  from: `isibld\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN15PG.exe                                   `,
-                  to: `na.sysco.net\\roadnet\\obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN15PG.exe         `,
-                  disableGlobs: true,
-                }
-                let options2 = {
-                  encoding: 'binary',
-                  files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/OPTMENU.DTA`,
-                  from: `isibld\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.EXE                                   `,
-                  to: `na.sysco.net\\roadnet\\obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.exe         `,
-                  disableGlobs: true,
-                }
-                replace(options)
-                  .then(() => {
-                    replace(options2)
-                      .then(() => {
-                        console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
-                      })
-                      .catch((error) => {
-                        console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
-                      })
-                  })
-                  .catch((error) => {
-                    console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
-                  })
-              }
+              // if (file === 'RTRSETUP.DTA') {
+              //   let options = {
+              //     encoding: 'binary',
+              //     files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/RTRSETUP.DTA`,
+              //     from: `isibld\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER                                       `,
+              //     to: `na.sysco.net\\roadnet\\obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\TRANSFER             `,
+              //     disableGlobs: true,
+              //   }
+              //   let options2 = {
+              //     encoding: 'binary',
+              //     files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/RTRSETUP.DTA`,
+              //     from: ['ms212rdctx11', 'ms212rdctx11', 'ms212rdctx11'],
+              //     to: `${server}`,
+              //     disableGlobs: true,
+              //   }
+              //   replace(options)
+              //     .then(() => {
+              //       replace(options2)
+              //         .then(() => {
+              //           console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
+              //         })
+              //         .catch(() => {
+              //           console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
+              //         })
+              //     })
+              //     .catch((error) => {
+              //       console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
+              //     })
+              // }
+              // if (file === 'OPTMENU.DTA') {
+              //   let options = {
+              //     encoding: 'binary',
+              //     files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/OPTMENU.DTA`,
+              //     from: `isibld\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN15PG.exe                                   `,
+              //     to: `na.sysco.net\\roadnet\\obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN15PG.exe         `,
+              //     disableGlobs: true,
+              //   }
+              //   let options2 = {
+              //     encoding: 'binary',
+              //     files: `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/OPTMENU.DTA`,
+              //     from: `isibld\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.EXE                                   `,
+              //     to: `na.sysco.net\\roadnet\\obt\\rd_data\\RD_Transfer\\ern-sus\\${OpCo}\\OPRN16PG.exe         `,
+              //     disableGlobs: true,
+              //   }
+              //   replace(options)
+              //     .then(() => {
+              //       replace(options2)
+              //         .then(() => {
+              //           console.log(`Replaced file path in ${server}/${OpCo}-${i}/${file}`);
+              //         })
+              //         .catch((error) => {
+              //           console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
+              //         })
+              //     })
+              //     .catch((error) => {
+              //       console.log(`Error replacing server details ${server}/${OpCo}-${i}/${file}`)
+              //     })
+              // }
               filesGenerated.push(`${file} in ${OpCo}-${i} in ${server}`)
               console.log(`Copied ${file} into ${OpCo}-${i} in ${server}`);
             }
@@ -1030,7 +1032,7 @@ app.post('/generateConfigFiles', (req, res) => {
     })
   })
   ////
-  // setTimeout(() => res.send({ filesGenerated, missingFiles }), 120000)
+  setTimeout(() => res.send({ filesGenerated, missingFiles }), 10000)
 })
 
 app.post('/generateTransferConfigFiles', (req, res) => {

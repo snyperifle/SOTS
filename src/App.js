@@ -28,6 +28,8 @@ import GS1Barcode from './Screens/GS1/GS1Barcode';
 
 import MigrationExport from './Screens/Development/MigrationExport';
 import GenerateRIConfig from './Screens/Development/GenerateRIConfig';
+
+import STSHostUpgrade from './Screens/Development/STSHostUpgrade';
 //=============================================================
 class App extends React.Component {
   constructor(props) {
@@ -119,7 +121,7 @@ class App extends React.Component {
         { num: "338", name: "South Western Ontario", OpCoName: 'SOUTH WESTERN ONTARIO', timezone: "Eastern Daylight Time" },
         { num: "348", name: "Sygma Fort Worth", OpCoName: 'SYGMA FORT WORTH', timezone: "Central Daylight Time" },
         { num: "429", name: "Doerle Foods", OpCoName: 'DOERLE FOODS', timezone: "Central Daylight Time" },
-        { num: "450", name: "Alaska", OpCoName: "Alaska", timezone: "Pacific Time "}
+        { num: "450", name: "Alaska", OpCoName: "Alaska", timezone: "Pacific Time " }
       ],
       file: [],
       drawer: false,
@@ -140,6 +142,7 @@ class App extends React.Component {
     this.RoutesToTelogis = this.RoutesToTelogis.bind(this);
     this.GS1Barcode = this.GS1Barcode.bind(this);
     this.GenerateRIConfig = this.GenerateRIConfig.bind(this);
+    this.STSHostUpgrade = this.STSHostUpgrade.bind(this);
     //=============================================================
     this.changeSelectedRouterNumber = this.changeSelectedRouterNumber.bind(this);
     this.updateOpCo = this.updateOpCo.bind(this);
@@ -297,6 +300,12 @@ class App extends React.Component {
       <GenerateRIConfig />
     )
   }
+
+  STSHostUpgrade() {
+    return (
+      <STSHostUpgrade />
+    )
+  }
   //=============================================================
   render() {
     return (
@@ -323,6 +332,7 @@ class App extends React.Component {
             <h5 id="category">Development</h5>
             <Link to="/migrationExport">Routing Solution</Link>
             <Link to="/generateRIConfig">Generate RI Config Files</Link>
+            <Link to="/STSHostUpgrade">STSHostUpgrade</Link>
           </Menu>
           <div id="page-wrap">
             <Navbar
@@ -424,6 +434,7 @@ class App extends React.Component {
             <Route path="/gs1Barcode" component={this.GS1Barcode} />
             <Route path="/migrationExport" component={this.MigrationExport} />
             <Route path="/generateRIConfig" component={this.GenerateRIConfig} />
+            <Route path="/STSHostUpgrade" component={this.STSHostUpgrade} />
           </div>
         </div >
       </Router >
