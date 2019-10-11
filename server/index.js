@@ -97,17 +97,20 @@ app.post('/replaceRIConfig', (req, res) => {
         .then(() => {
           filesReplaced.push(`${server}/${req.body.data.OpCo}/${file}`);
           if (server === servers[servers.length - 1] && file === files[files.length - 1]) {
-            res.send({ filesReplaced })
+
           }
         })
         .catch((error) => {
           console.log(error);
           if (server === servers[servers.length - 1] && file === files[files.length - 1]) {
-            res.send({ filesReplaced })
+
           }
         })
     })
   })
+  setTimeout(() => {
+    res.send({ filesReplaced })
+  }, 3000)
   //=============================================================
 })
 //=============================================================
@@ -198,7 +201,7 @@ app.post('/restoreColumns', (req, res) => {
       .then(() => { copied.push(file); })
       .catch((error) => { console.log(error); })
   })
-  setTimeout(() => { res.send(copied) }, 1000)
+  setTimeout(() => { res.send(copied) }, 3000)
 })
 //=============================================================
 app.post('/mirrorProfile', (req, res) => {
@@ -213,7 +216,7 @@ app.post('/mirrorProfile', (req, res) => {
       .then(() => { copied.push(item); })
       .catch((error) => { console.log(error); })
   })
-  setTimeout(() => { res.send(copied); }, 1000)
+  setTimeout(() => { res.send(copied); }, 3000)
 })
 //=============================================================
 app.get('/connectToGBDB', (req, res) => {
