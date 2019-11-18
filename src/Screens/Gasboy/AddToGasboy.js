@@ -339,6 +339,7 @@ class AddToGasboy extends React.Component {
       queue: [],
       excelData: [],
       downloadData: [],
+      oldSOTSip: "http://10.242.5.28:4000/addToGasboy"
     };
     this.connectoToGBDB = this.connectoToGBDB.bind(this);
     this.generateEquipmentExcelFile = this.generateEquipmentExcelFile.bind(this);
@@ -412,156 +413,171 @@ class AddToGasboy extends React.Component {
   }
   //=============================================================
   render() {
-    return this.state.gasboyDatabaseStatus === false ?
+    return (
       <Container className="MainPage">
         <Row>
           <Col>
-            <h2 className='title'>Sorry, Gasboy DB is down for maintenance</h2>
-            <h5>Please try again later</h5>
+            <h2>
+              Gasboy functionality does not yet work with AWS SOTS
+          </h2>
+            <h4>Please use <a href={this.state.oldSOTSip}>old SOTS</a>.</h4>
+
           </Col>
         </Row>
       </Container>
-      :
-      <Container className="MainPage">
-        <Row>
-          <Col>
-            <h2 className="title">Add to Gasboy</h2>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <form
-              autoComplete="off"
-              style={{ marginBottom: 5 }}
-            >
-              <FormControl>
-                <InputLabel >Select OpCo</InputLabel>
-                <Select
-                  style={{ width: 250 }}
-                  value={this.state.selectedOpCo || "No Opco Selected"}
-                  onChange={(event) => {
-                    this.setState({
-                      selectedOpCo: event.target.value
-                    })
-                    // console.log(`Selected OpCo: ${event.target.value.num}`)
-                  }}
-                >
-                  {this.props.allOpCo.map((item, i) => (
-                    <MenuItem key={item.num} value={item}>{item.num} - {item.name}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </form>
-            {/* //============================================================= */}
-            <form
-              autoComplete="off"
-              style={{ marginBottom: 5 }}
-            >
-              <FormControl>
-                <InputLabel >Select Device Type</InputLabel>
-                <Select
-                  style={{ width: 250 }}
-                  value={this.state.selectedDeviceType || "No Device Type Selected"}
-                  onChange={(event) => {
-                    this.setState({
-                      selectedDeviceType: event.target.value
-                    })
-                  }}
-                >
-                  {this.state.deviceType.map((item, i) => (
-                    <MenuItem key={item.type} value={item}>{item.type}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </form>
-            {/* //============================================================= */}
-            {this.state.selectedDeviceType === this.state.deviceType[1] ?
-              <form>
-                <TextField
-                  label="Employee Name"
-                  required
-                  value={this.state.employeeName}
-                  onChange={(event) => {
-                    this.setState({ employeeName: event.target.value })
-                  }}
-                />
-              </form>
-              : null
-            }
-            {/* //============================================================= */}
-            {this.state.selectedDeviceType ?
-              <form>
-                <TextField
-                  label="ID"
-                  required
-                  value={this.state.number}
-                  onChange={(event) => {
-                    this.setState({ number: event.target.value })
-                  }}
-                  style={{ marginBottom: 10 }}
-                />
-              </form> : null}
-            {/* //============================================================= */}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                let temp = this.state.queue;
-                if (this.state.employeeName && this.state.number) {
-                  temp.push(`${this.state.employeeName},${this.state.number}`)
-                  this.setState({
-                    queue: temp,
-                    employeeName: '',
-                    number: '',
-                  })
-                } else if (!this.state.employeeName && this.state.number) {
-                  temp.push(`${this.state.number}`)
-                  this.setState({
-                    queue: temp,
-                    number: '',
-                  })
-                }
-                else {
-                  console.log("Require input")
-                }
-              }}
-            >Add</Button>
-            {/* //============================================================= */}
-            {this.state.queue.length ?
-              <ul>
-                {this.state.queue.map((item, i) => (
-                  <li key={item[i]}>{item}</li>
-                ))}
-              </ul>
-              : null}
-            {/* //============================================================= */}
-            {this.state.queue.length ?
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => {
-                  this.state.selectedDeviceType === this.state.deviceType[0] ?
-                    this.generateEquipmentExcelFile() : this.generateEmployeeExcelFile()
-                  this.setState({
-                    queue: []
-                  })
-                }}
-              >Create Excel file</Button> : null}
-            {/* //============================================================= */}
-            {this.state.downloadData.length > 0 ?
-              <CSVLink
-                data={this.state.downloadData}
-                filename={'GasboyExport.csv'}
-                style={{
-                  color: 'green',
-                  margin: 20
-                }}
-              >Download File</CSVLink>
-              : null
-            }
-          </Col>
-        </Row>
-      </Container>
+    )
   }
+  // render() {
+  //   return this.state.gasboyDatabaseStatus === false ?
+  //     <Container className="MainPage">
+  //       <Row>
+  //         <Col>
+  //           <h2 className='title'>Sorry, Gasboy DB is down for maintenance</h2>
+  //           <h5>Please try again later</h5>
+  //         </Col>
+  //       </Row>
+  //     </Container>
+  //     :
+  //     <Container className="MainPage">
+  //       <Row>
+  //         <Col>
+  //           <h2 className="title">Add to Gasboy</h2>
+  //         </Col>
+  //       </Row>
+  //       <Row>
+  //         <Col>
+  //           <form
+  //             autoComplete="off"
+  //             style={{ marginBottom: 5 }}
+  //           >
+  //             <FormControl>
+  //               <InputLabel >Select OpCo</InputLabel>
+  //               <Select
+  //                 style={{ width: 250 }}
+  //                 value={this.state.selectedOpCo || "No Opco Selected"}
+  //                 onChange={(event) => {
+  //                   this.setState({
+  //                     selectedOpCo: event.target.value
+  //                   })
+  //                   // console.log(`Selected OpCo: ${event.target.value.num}`)
+  //                 }}
+  //               >
+  //                 {this.props.allOpCo.map((item, i) => (
+  //                   <MenuItem key={item.num} value={item}>{item.num} - {item.name}</MenuItem>
+  //                 ))}
+  //               </Select>
+  //             </FormControl>
+  //           </form>
+  //           {/* //============================================================= */}
+  //           <form
+  //             autoComplete="off"
+  //             style={{ marginBottom: 5 }}
+  //           >
+  //             <FormControl>
+  //               <InputLabel >Select Device Type</InputLabel>
+  //               <Select
+  //                 style={{ width: 250 }}
+  //                 value={this.state.selectedDeviceType || "No Device Type Selected"}
+  //                 onChange={(event) => {
+  //                   this.setState({
+  //                     selectedDeviceType: event.target.value
+  //                   })
+  //                 }}
+  //               >
+  //                 {this.state.deviceType.map((item, i) => (
+  //                   <MenuItem key={item.type} value={item}>{item.type}</MenuItem>
+  //                 ))}
+  //               </Select>
+  //             </FormControl>
+  //           </form>
+  //           {/* //============================================================= */}
+  //           {this.state.selectedDeviceType === this.state.deviceType[1] ?
+  //             <form>
+  //               <TextField
+  //                 label="Employee Name"
+  //                 required
+  //                 value={this.state.employeeName}
+  //                 onChange={(event) => {
+  //                   this.setState({ employeeName: event.target.value })
+  //                 }}
+  //               />
+  //             </form>
+  //             : null
+  //           }
+  //           {/* //============================================================= */}
+  //           {this.state.selectedDeviceType ?
+  //             <form>
+  //               <TextField
+  //                 label="ID"
+  //                 required
+  //                 value={this.state.number}
+  //                 onChange={(event) => {
+  //                   this.setState({ number: event.target.value })
+  //                 }}
+  //                 style={{ marginBottom: 10 }}
+  //               />
+  //             </form> : null}
+  //           {/* //============================================================= */}
+  //           <Button
+  //             variant="contained"
+  //             color="primary"
+  //             onClick={() => {
+  //               let temp = this.state.queue;
+  //               if (this.state.employeeName && this.state.number) {
+  //                 temp.push(`${this.state.employeeName},${this.state.number}`)
+  //                 this.setState({
+  //                   queue: temp,
+  //                   employeeName: '',
+  //                   number: '',
+  //                 })
+  //               } else if (!this.state.employeeName && this.state.number) {
+  //                 temp.push(`${this.state.number}`)
+  //                 this.setState({
+  //                   queue: temp,
+  //                   number: '',
+  //                 })
+  //               }
+  //               else {
+  //                 console.log("Require input")
+  //               }
+  //             }}
+  //           >Add</Button>
+  //           {/* //============================================================= */}
+  //           {this.state.queue.length ?
+  //             <ul>
+  //               {this.state.queue.map((item, i) => (
+  //                 <li key={item[i]}>{item}</li>
+  //               ))}
+  //             </ul>
+  //             : null}
+  //           {/* //============================================================= */}
+  //           {this.state.queue.length ?
+  //             <Button
+  //               variant="contained"
+  //               color="secondary"
+  //               onClick={() => {
+  //                 this.state.selectedDeviceType === this.state.deviceType[0] ?
+  //                   this.generateEquipmentExcelFile() : this.generateEmployeeExcelFile()
+  //                 this.setState({
+  //                   queue: []
+  //                 })
+  //               }}
+  //             >Create Excel file</Button> : null}
+  //           {/* //============================================================= */}
+  //           {this.state.downloadData.length > 0 ?
+  //             <CSVLink
+  //               data={this.state.downloadData}
+  //               filename={'GasboyExport.csv'}
+  //               style={{
+  //                 color: 'green',
+  //                 margin: 20
+  //               }}
+  //             >Download File</CSVLink>
+  //             : null
+  //           }
+  //         </Col>
+  //       </Row>
+  //     </Container>
+  // }
 }
 export default AddToGasboy;

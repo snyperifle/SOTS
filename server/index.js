@@ -47,8 +47,8 @@ let sessionDate;
 let servers = [
   'ms238rdctxo1',
   'ms238rdctxo2',
-  'ms238rdctxo3',
-  'ms238rdctxo4',
+  // 'ms238rdctxo3',
+  // 'ms238rdctxo4',
   // 'ms238rdctxo5', 
   // 'ms238rdctxo6',
 ];
@@ -91,7 +91,7 @@ app.post('/replaceRIConfig', (req, res) => {
   servers.forEach((server) => {
     files.forEach((file) => {
       console.log(`Replacing ${file} in ${req.body.data.OpCo} in ${server}`);
-      let source = `//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles/MasterFSX/${server}/${req.body.data.OpCo}/${file}`
+      let source = `//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/RIConfigFiles/MasterFSX/${server}/${req.body.data.OpCo}/${file}`
       let target = `//${server}/routing/${req.body.data.OpCo}/${file}`
       fse.copy(source, target)
         .then(() => {
@@ -193,13 +193,13 @@ app.post('/restoreColumns', (req, res) => {
   console.log(`Restoring Profile for ${req.body.data}`);
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
-  let backupFolder = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/rdclient$';
+  let backupFolder = '//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/profiles';
   let destinationFolder = '//na.sysco.net/roadnet/obt/rd_data/profiles';
 
   files.forEach((file) => {
     fse.copy(`${backupFolder}/${req.body.data}/${file}`, `${destinationFolder}/${req.body.data}/${file}`)
       .then(() => { copied.push(file); })
-      .catch((error) => { console.log(error); })
+      .catch((error) => { console.log(`Cannot find ${file} for ${req.body.data}`); })
   })
   setTimeout(() => { res.send(copied) }, 3000)
 })
@@ -208,7 +208,7 @@ app.post('/mirrorProfile', (req, res) => {
   console.log(`Mirroring Profile from ${req.body.data.fromProfile} to ${req.body.data.toProfile}`);
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
-  let backupFolder = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/rdclient$';
+  let backupFolder = '//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/profiles';
   let destinationFolder = '//na.sysco.net/roadnet/obt/rd_data/profiles';
 
   files.forEach((item) => {
@@ -917,7 +917,7 @@ app.post('/generateConfigFiles', (req, res) => {
     // 'RTRSETUP.DTA'
   ];
   let newCopyFilePath = '//C:/Users/Administrator/Desktop/'
-  // let newCopyFilePath = '//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles/'
+  // let newCopyFilePath = '//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/RIConfigFiles/'
   let master = 'MasterFSX'
   let awsServers = [
     'ms238rdctxo1',
@@ -955,7 +955,7 @@ app.post('/generateConfigFiles', (req, res) => {
         // })
         //=============================================================
         files.forEach((file) => {
-          // let source = `//na.sysco.net/roadnet/obt-np/rd_data/OBT/RIConfigFiles/MasterFSX/${server}/${OpCo}-${i}/${file}`
+          // let source = `//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/RIConfigFiles/MasterFSX/${server}/${OpCo}-${i}/${file}`
           // let source = `C:/Users/Administrator/Desktop/MasterFSX/${server}/${OpCo}-${i}/${file}`
           let source = `//ms238rdctxo1/ROUTING/${OpCo}-${i}/${file}`
           let target = `${newCopyFilePath}/${master}/${server}/${OpCo}-${i}/${file}`
@@ -1041,7 +1041,7 @@ app.post('/generateTransferConfigFiles', (req, res) => {
   let missingFiles = [];
   //=============================================================
   let count = 5;
-  let master = `//na.sysco.net/roadnet/obt-np/rd_data/ERN-SUS/New ERN-SUS${count}`;
+  let master = `//na.sysco.net/roadnet/obt-np/Development/rd_data/ERN-SUS/New ERN-SUS${count}`;
   let folders = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "022", "023", "024", "025", "026", "027", "029", "031", "032", "035", "036", "037", "038", "039", "040", "043", "045", "046", "047", "048", "049", "050", "051", "052", "054", "055", "056", "057", "058", "059", "060", "061", "064", "066", "067", "068", "073", "075", "076", "078", "101", "102", "137", "163", "164", "194", "195", "288", "293", "306", "320", "332", "335", "429", "450"];
   let files = ["OPTMENU.DTA", "RTRSETUP.DTA"];
   //=============================================================
@@ -1171,7 +1171,7 @@ app.get('/superRoutingSolution', (req, res) => {
       console.log('Fetching data for Routing Solution');
 
       OpCos.forEach((OpCo) => {
-        // fs.mkdirSync(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Routes/${OpCo}`);
+        // fs.mkdirSync(`//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/AWS Backup Data/Master Routes/${OpCo}`);
         months.forEach((month) => {
           days.forEach((day) => {
             let sessionDay = `2019-${month}-${day}`;
@@ -1245,7 +1245,7 @@ app.get('/superRoutingSolution', (req, res) => {
                     .concat(`\r\n`)
                 })
                 if (CSVstring !== '') {
-                  fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Routes/${OpCo}/2019-${month}-${day} - ${OpCo}RoutedSolution.txt`, CSVstring, (err, result) => {
+                  fs.writeFile(`//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/AWS Backup Data/Master Routes/${OpCo}/2019-${month}-${day} - ${OpCo}RoutedSolution.txt`, CSVstring, (err, result) => {
                     if (err) console.log('Error writing file');
                     else {
                       console.log(`File Written for ${sessionDay} : ${OpCo}`);
@@ -1328,7 +1328,7 @@ app.get('/retrieveAllStandardRoutes', (req, res) => {
                 .concat(`\r\n`)
             })
 
-            fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Standard Routes/${OpCo}-Standard Routes.txt`, resultString, (err, result) => {
+            fs.writeFile(`//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/AWS Backup Data/Master Standard Routes/${OpCo}-Standard Routes.txt`, resultString, (err, result) => {
               if (err) console.log('Error writing file');
               else {
                 console.log(`File written for ${OpCo}`);
@@ -1423,13 +1423,13 @@ app.get('/retrieveAllLocationTables', (req, res) => {
                 .concat('\r\n');
 
             })
-            fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Locations/${OpCo}-Locations.txt`, resultString, (err, result) => {
+            fs.writeFile(`//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/AWS Backup Data/Master Locations/${OpCo}-Locations.txt`, resultString, (err, result) => {
               if (err) console.log('Error writing file');
               else {
                 console.log(`File written for ${OpCo}`);
               }
             })
-            // fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Locations/${OpCo}-Locations2.txt`, resultString2, (err, result) => {
+            // fs.writeFile(`//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/AWS Backup Data/Master Locations/${OpCo}-Locations2.txt`, resultString2, (err, result) => {
             //   if (err) console.log('Error writing file');
             //   else {
             //     console.log(`File written for ${OpCo}`);
@@ -1488,7 +1488,7 @@ app.get('/retrieveAllServiceTimes', (req, res) => {
                 .concat(`${record['B_H_VARIABLE']}`.padEnd(20)) //B H Variable
                 .concat('\r\n')
             })
-            fs.writeFile(`//na.sysco.net/roadnet/obt-np/rd_data/OBT/AWS Backup Data/Master Service Time Overrides/${OpCo}-Service Times.prn`, resultString, (err, result) => {
+            fs.writeFile(`//na.sysco.net/roadnet/obt-np/Development/rd_data/OBT/AWS Backup Data/Master Service Time Overrides/${OpCo}-Service Times.prn`, resultString, (err, result) => {
               if (err) console.log('Error writing file');
               else {
                 console.log(`File written for ${OpCo}`);
