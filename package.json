@@ -47,7 +47,7 @@
   },
   "proxy": "http://localhost:3999",
   "scripts": {
-    "start": "set PORT=4000 && react-scripts start",
+    "start": "title SOTS Dashboard && set PORT=4000 && react-scripts start",
     "server": "node-env-run server --exec nodemon",
     "app": "run-p server start",
     "build": "react-scripts build",
