@@ -13,9 +13,10 @@ class Home extends React.Component {
         {
           'Onshore': [
             { name: 'Geoffrey Bray', number: '281-615-6013' },
-            { name: 'Roy Mammen', number: '' },
+            { name: 'Roy Mammen', number: '713-875-3538' },
             { name: 'Ranuka Subramanian', number: '720-442-2495' },
             { name: 'Calvin Chui', number: '832-524-2731' },
+            { name: 'Prasad Chalumuri', number: '614-804-2798' },
             { name: 'Jose Suyambu', number: '832-696-4412' },
           ]
         },
@@ -23,20 +24,8 @@ class Home extends React.Component {
           'Offshore': [
             { name: 'Thella Ramya', number: '91-99866-97599' },
             { name: 'Mubeena Begum', number: '91-99416-49405' },
-          ]
-        },
-        {
-          'Account Admin': [
-            { name: 'Sivakota Reddy Guduru', number: '91-95500-50009' },
-            { name: 'Devi Pedamallu', number: '91-70939-49686' },
-            { name: 'Louis Shields', number: '832-349-7595' },
-          ]
-        },
-        {
-          'CCOD': [
-            { name: 'Joy Aaron', number: '213-435-1487' },
-            { name: 'Jhansi Lakshmi Kondireddy', number: '' },
-            { name: 'Chaganti Prathyusha', number: '' }
+            { name: 'Sam', number: '91-96883-12713' },
+            { name: 'Jebaraj', number: '91-99523-02471' },
           ]
         },
         {
@@ -47,12 +36,25 @@ class Home extends React.Component {
           ]
         },
         {
+          'Account Admin': [
+            { name: 'Sivakota Reddy Guduru', number: '91-95500-50009' },
+            { name: 'Devi Pedamallu', number: '91-70939-49686' },
+            { name: 'Louis Shields', number: '832-349-7595' },
+          ]
+        },
+        {
           'DBA': [
             { name: 'Manogyna Devarapalli', number: '91-94944-90249' },
-            { name: 'Ravindrareddy Madireddy', number: '972-589-7877' },
             { name: 'Rakesh Sivan', number: '91-98858-33025' },
           ]
-        }
+        },
+        {
+          'CCOD': [
+            { name: 'Joy Aaron', number: '213-435-1487' },
+            { name: 'Jhansi Lakshmi Kondireddy', number: '' },
+            { name: 'Chaganti Prathyusha', number: '' }
+          ]
+        },
       ],
 
     };

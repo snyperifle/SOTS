@@ -5,6 +5,7 @@ import Select from '@material-ui/core/Select';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
+// import { TextareaAutosize } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { CSVLink } from "react-csv";
 import { Container, Row, Col } from 'react-bootstrap';
@@ -293,7 +294,7 @@ class AddToGasboy extends React.Component {
           fleetName: 'A425 Riverside'
         },
         "306": {
-          stationCode: '1430',
+          stationCode: '1415',
           fleetName: 'A415 Long Island'
         },
         "013": {
@@ -313,8 +314,8 @@ class AddToGasboy extends React.Component {
           fleetName: 'D000 Sygma Fort Worth'
         },
         "223": {
-          stationCode: '7601',
-          fleetName: 'D601 Sygma Pennsylvania'
+          stationCode: '2095',
+          fleetName: 'D095 Sygma Southern California'
         },
         "089": {
           stationCode: '2090',
@@ -323,8 +324,11 @@ class AddToGasboy extends React.Component {
         "063": {
           stationCode: '2095',
           fleetName: 'D095 Sygma Southern California'
-        }
-
+        },
+        "335": {
+          stationCode: '335',
+          fleetName: '335 Bahamas Food Service'
+        },
       },
       deviceType: [
         { type: "Tractor / Trailer" },
@@ -346,8 +350,6 @@ class AddToGasboy extends React.Component {
   }
   componentDidMount() {
     if (this.props.userOpCo) {
-      console.log(this.props.userOpCo.substring(0, 3));
-      console.log(this.state.OpCoData[this.props.userOpCo.substring(0, 3)]);
       this.setState({
         selectedOpCo: this.state.OpCoData[this.props.userOpCo.substring(0, 3)]
       })
@@ -358,7 +360,6 @@ class AddToGasboy extends React.Component {
   connectoToGBDB() {
     axios.get('/connectToGBDB', {})
       .then((response) => {
-        console.log(response.data);
         if (response.data === 'ELOGIN') {
           this.setState({
             gasboyDatabaseStatus: false
@@ -480,25 +481,32 @@ class AddToGasboy extends React.Component {
                 <TextField
                   label="Employee Name"
                   required
+                  multiline
+                  rows="10"
+                  placeholder='ex. Sysco Employee,123456'
                   value={this.state.employeeName}
                   onChange={(event) => {
                     this.setState({ employeeName: event.target.value })
                   }}
+                  style={{ marginBottom: 10, width: 500 }}
                 />
               </form>
               : null
             }
             {/* //============================================================= */}
-            {this.state.selectedDeviceType ?
+            {this.state.selectedDeviceType === this.state.deviceType[0] ?
               <form>
                 <TextField
                   label="ID"
                   required
+                  multiline
+                  rows="10"
+                  placeholder='ex. 123456'
                   value={this.state.number}
                   onChange={(event) => {
                     this.setState({ number: event.target.value })
                   }}
-                  style={{ marginBottom: 10 }}
+                  style={{ marginBottom: 10, width: 500 }}
                 />
               </form> : null}
             {/* //============================================================= */}
@@ -507,19 +515,33 @@ class AddToGasboy extends React.Component {
               color="primary"
               onClick={() => {
                 let temp = this.state.queue;
-                if (this.state.employeeName && this.state.number) {
-                  temp.push(`${this.state.employeeName},${this.state.number}`)
+                if (this.state.selectedDeviceType === this.state.deviceType[1] && this.state.employeeName) {
+                  this.state.employeeName.split('\n').forEach((item) => {
+                    temp.push(`${item.split(',')[0].trim()},${item.split(',')[1].trim()}`)
+                  })
                   this.setState({
                     queue: temp,
-                    employeeName: '',
-                    number: '',
+                    employeeName: ''
                   })
-                } else if (!this.state.employeeName && this.state.number) {
-                  temp.push(`${this.state.number}`)
+                  // temp.push(`${this.state.employeeName},${this.state.number}`)
+                  // this.setState({
+                  //   queue: temp,
+                  //   employeeName: '',
+                  //   number: '',
+                  // })
+                } else if (this.state.number) {
+                  this.state.number.split('\n').forEach((item) => {
+                    temp.push(`${item.trim()}`)
+                  })
                   this.setState({
                     queue: temp,
-                    number: '',
+                    number: ''
                   })
+                  // temp.push(`${this.state.number}`)
+                  // this.setState({
+                  //   queue: temp,
+                  //   number: '',
+                  // })
                 }
                 else {
                   console.log("Require input")

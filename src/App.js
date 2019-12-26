@@ -296,7 +296,7 @@ class App extends React.Component {
         <div className="App" id="outer-container">
           <Menu pageWrapId={"page-wrap"} outerContainerId={"outer-container"}>
             <h2 id="menu">Menu</h2>
-            <h5 id="category">Roadnet</h5>
+            {/* <h5 id="category">Roadnet</h5>
             <Link to="/addToRoadnet">Add New User</Link>
             <Link to='/restoreColumns'>Restore User Columns</Link>
             <Link to='/mirrorProfile'>Mirror User Profile</Link>
@@ -304,16 +304,16 @@ class App extends React.Component {
             <Link to="/addToRoutingInterface">Add New User</Link>
             <Link to="/removeFromRoutingInterface">Remove User</Link>
             <Link to="/replaceRIConfig">Replace RI Config File</Link>
-            <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link>
+            <Link to="/routesNotFlowing">Routes Not Flowing to SUS</Link> */}
             <h5 id="category">GasBoy</h5>
             <Link to="/addToGasboy">Add to Gasboy</Link>
-            <h5 id="category">Telogis</h5>
+            {/* <h5 id="category">Telogis</h5>
             <Link to="/telogisInfo">Telogis Information</Link>
             <Link to="/routesToTelogis">Routes not Flowing to Telogis</Link>
             <h5 id="category">GS1 Barcode</h5>
             <Link to="/gs1Barcode">GS1 Report</Link>
             <h5 id="category">Development</h5>
-            <Link to="/migrationExport">Routing Solution</Link>
+            <Link to="/migrationExport">Routing Solution</Link> */}
           </Menu>
           <div id="page-wrap">
             <Navbar

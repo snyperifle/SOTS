@@ -16,7 +16,6 @@ let replace = require('replace-in-file');
 const gs1js = require('gs1js');
 const FTP = require('ftp');
 const FTPClient = require('ftp-client');
-const FTPPromise = require('promise-ftp');
 //=============================================================
 let servers = ['ms212rdctx06', 'ms212rdctx07', 'ms212rdctx08', 'ms212rdctx11', 'ms212rdctx12', 'ms212rdctx14', 'ms212rdctx15', 'ms212rdctx16'];
 let filePath = `//${servers[0]}/routing/UserConfig.txt`;
@@ -54,6 +53,12 @@ let ftpConfig = {
   user: process.env.GS1FTP_USER,
   password: process.env.GS1FTP_PW,
   host: process.env.GS1FTP_SERVER,
+}
+let sftpConfig = {
+  user: process.env.GS1FTP_USER,
+  password: process.env.GS1FTP_PW,
+  host: process.env.GS1FTP_SERVER,
+  port: '22'
 }
 let gbsql = new sql.ConnectionPool(gbconfig);
 let gs1sql = new sql.ConnectionPool(gs1config);
@@ -93,7 +98,7 @@ app.post('/replaceRIConfig', (req, res) => {
   let files = ['CONFIG.TMP', 'LOCKOUT.TMP', 'OPTMENU.DTA', 'RTRSETUP.DTA'];
   servers.forEach((server) => {
     files.forEach((file) => {
-      let source = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${req.body.data.OpCo}/${file}`
+      let source = `//ms212rdfsc/ERN-support/SOTS Files/RI CONFIG/master/${req.body.data.OpCo}/${file}`
       let target = `//${server}/routing/${req.body.data.OpCo}/${file}`
       fse.copy(source, target)
         .then(() => {
@@ -170,7 +175,7 @@ app.post('/replaceRIConfig', (req, res) => {
 
   //       // files.forEach((file) => {
   //       //   let source = `//${server}/ROUTING/${OpCo}-${i}/${file}`
-  //       //   let target = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${OpCo}-${i}/${file}`
+  //       //   let target = `//ms212rdfsc/ERN-support/SOTS Files/RI CONFIG/master/${OpCo}-${i}/${file}`
   //       //   fse.copy(source, target, (err) => {
   //       //     if (err) {
   //       //       console.log(`Could not find ${file} in ${OpCo}-${i} in ${server}`);
@@ -182,7 +187,7 @@ app.post('/replaceRIConfig', (req, res) => {
 
   //       files.forEach((file) => {
   //         // console.log(`${OpCo}-${i}/${file}`);
-  //         let source = `//ms212rdfsc/ERN-support/DOCs/SOTS stuff/RI CONFIG/master/${OpCo}-${i}/${file}`
+  //         let source = `//ms212rdfsc/ERN-support/SOTS Files/RI CONFIG/master/${OpCo}-${i}/${file}`
   //         let target = `//ms212rdfsc/ERN-support/AWSRI/${master}/${server}/${OpCo}-${i}/${file}`
   //         // fse.copy(source, target, (err) => {
   //         // if (err) {
@@ -308,7 +313,7 @@ app.post('/restoreColumns', (req, res) => {
   console.log(`Restoring Profile for ${req.body.data}`);
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
-  let backupFolder = '//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/'
+  let backupFolder = '//ms212rdfsc/ern-support/SOTS Files/rdclient-backup/'
   let destinationFolder = '//ms212rdfsc/rdclient$/'
 
   fse.pathExists(`${backupFolder}${req.body.data}`, (err, exists) => {
@@ -342,7 +347,7 @@ app.post('/mirrorProfile', (req, res) => {
   console.log(`Mirroring Profile from ${req.body.data.fromProfile} to ${req.body.data.toProfile}`);
   let files = ['rnedrte.cps', 'tsmaint.cps', 'rnedrte.wps', 'tsmaint.wps'];
   let copied = [];
-  let backupFolder = '//ms212rdfsc/ern-support/DOCs/SOTS stuff/rdclient-backup/'
+  let backupFolder = '//ms212rdfsc/ern-support/SOTS Files/rdclient-backup/'
   let destinationFolder = '//ms212rdfsc/rdclient$/'
 
   fse.pathExists(`${backupFolder}${req.body.data.fromProfile}`, (err, exists) => {
@@ -616,7 +621,7 @@ app.post('/gasboyEquipment', (req, res) => {
         })
         .catch((error) => {
           gbsql.close().then(() => console.log('Gasboy Database Connection closed'))
-          console.log(`GB Query Error::: ${error.code}`);
+          console.log(`GB Query Error::: ${error}`);
           res.send(excelData);
         })
     })
@@ -715,7 +720,7 @@ app.post('/routesToTelogis', (req, res) => {
 })
 //=============================================================
 function gs1Process(req, res) {
-
+  console.log(today);
   let queryDate = (req ? req.body.data.date : today);
 
   let gs1Query =
@@ -892,19 +897,27 @@ function gs1Process(req, res) {
                 .concat(`${item['Product Quantity Units']},`)                                   //Required - Product Quantity Units
                 .concat(`${item['Product Quantity Amount']},`)                                  //Required - Product Quantity Amount
                 .concat(`${item['PO Number']},`)                                                //Required - PO Number
-                .concat(`${temp['13'] ? `${temp['13'].slice(2, 4)}/${temp['13'].slice(4, 6)}/20${temp['13'].slice(0, 2)}` : ''},`)  //packDate
-                .concat(`${temp['17'] ? `${temp['17'].slice(2, 4)}/${temp['17'].slice(4, 6)}/20${temp['17'].slice(0, 2)}` : ''},`)  //useThruDate
-                .concat(`${temp['11'] ? `${temp['11'].slice(2, 4)}/${temp['11'].slice(4, 6)}/20${temp['11'].slice(0, 2)}` : ''},`)  //productionDate
+                .concat(temp['13'] ? `${temp['13'].slice(2, 4)}/${temp['13'].slice(4, 6)}/20${temp['13'].slice(0, 2)},` : `,`)
+                .concat(temp['17'] ? `${temp['17'].slice(2, 4)}/${temp['17'].slice(4, 6)}/20${temp['17'].slice(0, 2)},` : `,`)
+                .concat(temp['11'] ? `${temp['11'].slice(2, 4)}/${temp['11'].slice(4, 6)}/20${temp['11'].slice(0, 2)},` : `,`)
                 .concat(`,`)                                                                    //expirationDate
-                .concat(`${temp['15'] ? `${temp['15'].slice(2, 4)}/${temp['15'].slice(4, 6)}/20${temp['15'].slice(0, 2)}` : ''},`)  //bestBeforeDate
+                .concat(temp['15'] ? `${temp['15'].slice(2, 4)}/${temp['15'].slice(4, 6)}/20${temp['15'].slice(0, 2)},` : `,`)
                 .concat(``)                                                                     //If Applicable - poNumber2
                 .concat(`\r\n`)
             }
           })
-          if (res) res.send({ CSVstring: CSVstring })
+          if (res && !req.body.data.ftp) {
+            res.send({ CSVstring: CSVstring })
+          }
+          else if (res && req.body.data.ftp) {
+            console.log('Here');
+            fs.writeFile(`C:/Users/cchu0415/Desktop/SOTS/events/${req.body.data.date}-GS1SubwayExport.csv`, CSVstring, (err, result) => {
+              if (err) console.log(err);
+            })
+          }
           /// modify this based on export
           else {
-            fs.writeFile(`//ms212rdfsc/ern-support/GS1/Exports/${today}-GS1Export.csv`, CSVstring, (err, result) => {
+            fs.writeFile(`C:/Users/cchu0415/Desktop/SOTS/events/${today}-GS1SubwayExport.csv`, CSVstring, (err, result) => {
               if (err) console.log(err);
             })
           }
@@ -924,19 +937,7 @@ function gs1Process(req, res) {
 //=============================================================
 app.post('/processGS1', (req, res) => {
   currentTime();
-
   gs1Process(req, res)
-})
-
-let gs1Rule = new schedule.RecurrenceRule();
-gs1Rule.hour = 17;
-gs1Rule.minute = 0;
-gs1Rule.second = 0;
-
-let gs1job = schedule.scheduleJob(gs1Rule, () => {
-  currentTime();
-  console.log('Running scheduled GS1 Job');
-  gs1Process();
 })
 //=============================================================
 app.post('/updateMasterGLN', (req, res) => {
@@ -953,42 +954,76 @@ app.post('/updateMasterGLN', (req, res) => {
 //=============================================================
 app.post('/uploadFTP', (req, res) => {
   currentTime();
-  console.log('GS1 FTP');
-
-  // let client = new FTP();
-  // client.connect(ftpConfig)
-  // client.on('ready', () => {
-  //   client.list((err, list) => {
-  //     if (err) console.log(err);
-  //     console.dir(list);
-  //     client.end();
-  //   })
-  //   client.put('//ms212rdfsc/ERN-support/GS1/Exports/test.csv', '/events/', (err) => {
-  //     if (err) console.log(err);
-  //     else console.log('Successfully PUT file');
-  //   })
-  // })
-  // client.end();
-
-  let client = new FTPClient(ftpConfig, { logging: 'debug' });
+  if (req) {
+    console.log(req.body.file)
+    let temp = {
+      body: {
+        data: {
+          date: req.body.file.slice(-30, -20),
+          ftp: true
+        }
+      }
+    }
+    gs1Process(temp, res);
+    let client = new FTPClient(ftpConfig, { logging: 'debug', baseDir: 'events' });
+    client.connect(() => {
+      client.upload(
+        [`./events/${req.body.file}`],
+        '',
+        {
+          overwrite: 'older',
+        },
+        (result) => {
+          console.log(result);
+          res.send(result)
+        })
+    })
+  }
+  else {
+    let client = new FTPClient(ftpConfig, { logging: 'debug', baseDir: 'events' });
+    client.connect(() => {
+      client.upload(
+        [`./events/${today}-GS1SubwayExport.csv`],
+        '',
+        {
+          overwrite: 'older',
+        },
+        (result) => {
+          console.log(result);
+        })
+    })
+  }
+});
+//=============================================================
+function ftpUpload() {
+  currentTime();
+  let client = new FTPClient(ftpConfig, { logging: 'debug', baseDir: 'events' });
   client.connect(() => {
     client.upload(
-      ['./*.csv*'],
-      // [`Z:/GS1/Exports/*.csv`],     //origin
-      '/events',                    //destination
+      [`./events/${today}-GS1SubwayExport.csv`],
+      '',
       {
-        overwrite: 'none',
+        overwrite: 'older',
       },
       (result) => {
         console.log(result);
       })
   })
+}
+let gs1FTPRule = new schedule.RecurrenceRule();
+gs1FTPRule.hour = 22;
+gs1FTPRule.minute = 0;
+gs1FTPRule.second = 0;
 
-});
-//=============================================================
-function routingSolution(req, res) {
+// let gs1FTPJob = schedule.scheduleJob(gs1FTPRule, () => {
+//   console.log('Running scheduled GS1 FTP Upload');
+//   ftpUpload();
+// })
+
+function routingSolution(OpCo, res) {
   currentTime();
-
+  console.log(`Creating Routing Solution for ${OpCo}`);
+  // let sessionDate = '2019-09-04'
   let exQuery =
     `SELECT "RS_SESSION"."REGION_ID", "RS_SESSION"."SESSION_DATE", "RS_SESSION"."DESCRIPTION", "RS_STOP"."LOCATION_ID",` +
     `"RS_STOP_SUMMARY_VIEW"."DELIVERY_SIZE1", "RS_ROUTE"."ROUTE_ID", "RS_ROUTE"."DESCRIPTION" AS 'ROUTE_DESCRIPTION', "RS_ROUTE"."LOCATION_ID_ORIGIN",` +
@@ -1016,7 +1051,7 @@ function routingSolution(req, res) {
     `WHERE  ("RS_SESSION"."DESCRIPTION" LIKE 'Delivery' OR "RS_SESSION"."DESCRIPTION" LIKE 'DELIVERY'` +
     `OR "RS_SESSION"."DESCRIPTION" LIKE 'Integrator Imported' OR "RS_SESSION"."DESCRIPTION" LIKE 'INTEGRATOR IMPORTED')` +
     `AND "RS_STOP"."SEQUENCE_NUMBER"<>-1 AND ("RS_SESSION"."SESSION_DATE">={ts '${sessionDate} 00:00:00'}` +
-    `AND "RS_SESSION"."SESSION_DATE"<{ts '${sessionDate} 00:00:01'}) AND "RS_SESSION"."REGION_ID"='078'` +
+    `AND "RS_SESSION"."SESSION_DATE"<{ts '${sessionDate} 00:00:01'}) AND "RS_SESSION"."REGION_ID"=${OpCo}` +
     `ORDER BY "RS_SESSION"."SESSION_DATE", "RS_ROUTE"."ROUTE_ID", "RS_STOP"."SEQUENCE_NUMBER"`
   let CSVstring = '';
   exsql.connect()
@@ -1060,15 +1095,15 @@ function routingSolution(req, res) {
               .concat(startDate.padEnd(15))                                     //24
               .concat(startTime.padEnd(15))                                     //25
               .concat(`\r\n`)
-
-            // .concat(` ${item['PREROUTE_TIME']}`.padEnd(10))                   //22
-            // .concat(` ${item['POSTROUTE_TIME']}`.padEnd(10))                  //23
           })
           if (res) {
-            res.send({ CSVstring: CSVstring })
+            res.send({ 
+              CSVstring: CSVstring,
+              filename: `${sessionDate} - ${OpCo}RoutedSolution.csv`
+            })
           }
           else {
-            fs.writeFile(`//ms212rdfsc/ern-support/078RoutingSolution/${today} - 078RoutedSolution.csv`, CSVstring, (err, result) => {
+            fs.writeFile(`//ms212rdfsc/ern-support/${OpCo}RoutingSolution/${sessionDate} - ${OpCo}RoutedSolution.csv`, CSVstring, (err, result) => {
               if (err) console.log(err);
             })
           }
@@ -1084,9 +1119,20 @@ function routingSolution(req, res) {
     })
 }
 
-app.get('/routingSolution', (req, res) => {
-  routingSolution(req, res);
+app.post('/routingSolution', (req, res) => {
+  routingSolution(req.body.data.OpCo, res);
 });
+//=============================================================
+let gs1Rule = new schedule.RecurrenceRule();
+gs1Rule.hour = 21;
+gs1Rule.minute = 55;
+gs1Rule.second = 0;
+
+// let gs1job = schedule.scheduleJob(gs1Rule, () => {
+//   currentTime();
+//   console.log('Running scheduled GS1 Job');
+//   gs1Process();
+// })
 
 let rsRule = new schedule.RecurrenceRule();
 rsRule.hour = 20;
@@ -1095,5 +1141,15 @@ rsRule.second = 0;
 
 let rsjob = schedule.scheduleJob(rsRule, () => {
   console.log('Running scheduled RS Job');
-  routingSolution();
+  routingSolution("078");
+})
+
+let rs2Rule = new schedule.RecurrenceRule();
+rs2Rule.hour = 20;
+rs2Rule.minute = 46;
+rs2Rule.second = 0;
+
+let rs2job = schedule.scheduleJob(rs2Rule, () => {
+  console.log('Running scheduled RS2 Job');
+  routingSolution("103")
 })

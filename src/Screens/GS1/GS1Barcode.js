@@ -22,8 +22,10 @@ class GS1Barcode extends React.Component {
       fileName: '',
       loading: false,
       response: '',
+      ftpLoading: false,
       ftpFileName: '',
       ftpUpload: '',
+      ftpResponse: '',
     };
     this.processGS1 = this.processGS1.bind(this);
     this.changeDate = this.changeDate.bind(this);
@@ -60,7 +62,7 @@ class GS1Barcode extends React.Component {
         }
       })
       .then((response) => {
-        console.log(response.data.CSVstring);
+        // console.log(response.data.CSVstring);
         this.setState({
           downloadData: response.data.CSVstring
         })
@@ -105,36 +107,42 @@ class GS1Barcode extends React.Component {
     else alert('Wrong File');
   }
   //=============================================================
-  uploadFTP(){
+  uploadFTP() {
+    this.setState({
+      ftpLoading: true,
+      ftpResponse: '',
+    })
     let reader = new FileReader();
-    // reader.onload = () => {
-    //   let workbook = XLSX.read(new Uint8Array(reader.result), { type: 'array' });
-    //   let firstSheet = workbook.SheetNames[0];
-    //   let worksheet = workbook.Sheets[firstSheet];
-    //   let jsonSheet = XLSX.utils.sheet_to_json(worksheet);
-      let data = '';
-    //   jsonSheet.forEach((item) => {
-    //     // data = data.concat(`${item['Store']}:${item['Store GLN']}\r\n`)
-    //     console.log(item);
-    //   })
+    // console.log('DATE:', this.state.ftpUpload[0].name)
+    reader.onload = () => {
+      // let workbook = XLSX.read(new Uint8Array(reader.result), { type: 'array' });
+      // let firstSheet = workbook.SheetNames[0];
+      // let worksheet = workbook.Sheets[firstSheet];
+      // let jsonSheet = XLSX.utils.sheet_to_json(worksheet);
+      // let data = 'Date,SSCC,GLN (ship from),GLN Extension (ship from),Destination GLN,Destination GLN Extension,GTIN,Product Lot,Product Serial Number,Product Quantity Units,Product Quantity Amount,poNumber,packDate,useThruDate,productionDate,expirationDate,bestBeforeDate,poNumber2\r\n';
+      // jsonSheet.forEach((item) => {
+        // console.log(item);
+        // data = data.concat(`${item['Store']}:${item['Store GLN']}\r\n`)
+      // })
       axios.post('/uploadFTP',
         {
-          data: data
+          // data: data,
+          file: this.state.ftpUpload[0].name
         })
         .then((response) => {
           console.log(response.data);
           this.setState({
-            loading: false,
-            response: response.data,
+            ftpLoading: false,
+            ftpResponse: response.data,
           })
         })
         .catch((error) => {
           console.log(error);
         })
-    // }
-    // reader.onabort = () => console.log('File reading was aborted');
-    // reader.onerror = () => console.log('File reading has failed');
-    // reader.readAsArrayBuffer(this.state.ftpUpload[0]);
+    }
+    reader.onabort = () => console.log('File reading was aborted');
+    reader.onerror = () => console.log('File reading has failed');
+    reader.readAsArrayBuffer(this.state.ftpUpload[0]);
   }
   //=============================================================
   render() {
@@ -171,7 +179,7 @@ class GS1Barcode extends React.Component {
               this.state.downloadData.length > 0 ?
                 <CSVLink
                   data={this.state.downloadData}
-                  filename={`${this.state.date}-GS1Export.csv`}
+                  filename={`${this.state.date}-GS1SubwayExport.csv`}
                   style={{
                     color: 'green',
                     margin: 15,
@@ -269,18 +277,40 @@ class GS1Barcode extends React.Component {
         </Row>
         <Row>
           <Col>
-          <Button
-              variant="contained"
-              color="primary"
-              style={{ marginTop: 15 }}
-              onClick={() => {
-                this.uploadFTP();
-                console.log('Firing');
-              }}
-            >Export</Button>
+            {
+              this.state.ftpUpload[0] ?
+                <Button
+                  variant="contained"
+                  color="primary"
+                  style={{ marginTop: 15 }}
+                  onClick={() => {
+                    this.uploadFTP();
+                  }}
+                >Export</Button>
+                :
+                null
+            }
           </Col>
-        <Col>
-        </Col>
+          <Col>
+            {
+              this.state.ftpLoading === true ?
+                <PulseLoader
+                  style={{ margin: 20 }}
+                />
+                : null
+            }
+            {
+              this.state.ftpResponse ?
+                <div>
+                  {this.state.ftpResponse.uploadedFiles ? <h6>{this.state.ftpResponse.uploadedFiles[0].slice(-30)} Successfully Uploaded</h6> : <h6 style={{ color: 'red' }}>Error with Upload</h6>}
+                  {/* <h6>{this.state.ftpResponse.errors}</h6> */}
+                </div>
+                :
+                null
+            }
+          </Col>
+          <Col></Col>
+          <Col></Col>
         </Row>
       </Container >
     );
